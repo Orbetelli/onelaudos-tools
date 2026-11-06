@@ -1,0 +1,492 @@
+{
+ "titulo": "Guia rápido — Suporte Médico",
+ "objetivo": [
+  "Orientar a equipe na identificação, triagem e resolução de solicitações simples, garantindo que cada ocorrência seja direcionada corretamente à equipe responsável.",
+  "O objetivo é reduzir retrabalho, evitar acionamentos desnecessários e estabelecer critérios claros de prioridade."
+ ],
+ "secoes": [
+  {
+   "id": "exames-nao-sobem",
+   "numero": 1,
+   "titulo": "Exames não sobem para o One Laudos?",
+   "resumo": "Entender o cenário, localizar o acesso e acionar a MobileMed.",
+   "tags": [
+    "exame",
+    "upload",
+    "anydesk",
+    "mobilemed"
+   ],
+   "blocos": [
+    {
+     "tipo": "subtitulo",
+     "conteudo": "Passo 1 — Entenda o cenário"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Antes de encaminhar, identifique:"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "Não sobe nenhum exame ou apenas um paciente?",
+      "Se for um exame específico, identifique qual é.",
+      "O problema acontece com todos os exames ou começou recentemente?"
+     ]
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "Passo 2 — Localize o acesso"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "Consulte a **planilha de acessos das unidades TELE** para localizar o AnyDesk e o contato da TI local.",
+      "Se houver telefone cadastrado, entre em contato e solicite que aceitem o acesso remoto.",
+      "Se não houver telefone, solicite no próprio grupo que a TI ou o responsável aceite a conexão."
+     ]
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "Passo 3 — Encaminhe para a MobileMed"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "Envie o AnyDesk e explique o problema identificado.",
+      "Informe se a falha acontece em um ou vários exames.",
+      "A MobileMed realizará a análise técnica.",
+      "Caso a MobileMed não consiga solucionar o problema ou identifique uma falha de infraestrutura, deverá direcionar o caso ao Suporte TI."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "imagens-faltando",
+   "numero": 2,
+   "titulo": "Exame subiu com imagens faltando?",
+   "resumo": "Conferir quantidades e encaminhar à MobileMed, sem acessar a máquina.",
+   "tags": [
+    "imagens",
+    "faltando",
+    "incompleto",
+    "anydesk"
+   ],
+   "blocos": [
+    {
+     "tipo": "texto",
+     "conteudo": "Exemplo: foram enviadas 1.000 imagens, mas apenas 500 chegaram ao One Laudos."
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "Procedimento"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "Confirme a quantidade de imagens enviadas e recebidas.",
+      "Verifique se acontece em apenas um exame ou em vários.",
+      "Consulte a planilha de acessos das unidades TELE.",
+      "Solicite que a TI local ou o responsável aceite o acesso remoto.",
+      "Encaminhe o AnyDesk e os detalhes da ocorrência para a MobileMed."
+     ]
+    },
+    {
+     "tipo": "aviso",
+     "variante": "importante",
+     "conteudo": "O Suporte Médico não deve acessar a máquina para investigar falhas no envio de imagens. Essa análise técnica é de responsabilidade da MobileMed."
+    }
+   ]
+  },
+  {
+   "id": "troca-de-senha",
+   "numero": 3,
+   "titulo": "Troca de senha",
+   "resumo": "Passo a passo em Permissões, pelo ícone de usuário.",
+   "tags": [
+    "senha",
+    "permissoes",
+    "usuario",
+    "alterar senha"
+   ],
+   "blocos": [
+    {
+     "tipo": "subtitulo",
+     "conteudo": "Procedimento"
+    },
+    {
+     "tipo": "passos",
+     "itens": [
+      "Clique na **engrenagem** no menu superior.",
+      "Selecione **Permissões**.",
+      "Pesquise o usuário pelo nome ou e-mail.",
+      "Localize o usuário e clique no **ícone azul de usuário**.",
+      "Na tela de informações, clique em **ALTERAR SENHA**.",
+      "Siga as instruções apresentadas pelo sistema."
+     ]
+    },
+    {
+     "tipo": "aviso",
+     "variante": "importante",
+     "conteudo": "Nunca solicite ou compartilhe senhas de usuários pelos grupos de atendimento."
+    }
+   ]
+  },
+  {
+   "id": "criacao-ativacao-usuario",
+   "numero": 4,
+   "titulo": "Criação ou ativação de usuário",
+   "resumo": "Dados obrigatórios antes de encaminhar ao Suporte TI.",
+   "tags": [
+    "usuario",
+    "criar",
+    "ativar",
+    "cadastro",
+    "crm",
+    "cpf"
+   ],
+   "blocos": [
+    {
+     "tipo": "texto",
+     "conteudo": "Antes de encaminhar a solicitação ao grupo **Suporte TI**, confira se todas as informações necessárias foram preenchidas:"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "**Nome completo**",
+      "**E-mail**",
+      "**Telefone**",
+      "**CPF**",
+      "**Unidade**",
+      "**Função**",
+      "**CRM:** obrigatório para médicos."
+     ]
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**Faltou alguma informação?** Solicite os dados antes de encaminhar ao Suporte TI."
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "O objetivo é evitar solicitações incompletas e reduzir o retrabalho."
+    }
+   ]
+  },
+  {
+   "id": "internet-conexao",
+   "numero": 5,
+   "titulo": "Problemas de internet e conexão",
+   "resumo": "Testes básicos e como proceder em cada cenário.",
+   "tags": [
+    "internet",
+    "rede",
+    "conexao",
+    "lentidao",
+    "cache",
+    "navegador",
+    "telerradiologia"
+   ],
+   "blocos": [
+    {
+     "tipo": "texto",
+     "conteudo": "Antes de acionar o Suporte TI, faça algumas perguntas para identificar se o problema está na internet, em uma máquina ou em um sistema específico."
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "Passo 1 — Entenda o cenário"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "A internet não funciona ou apenas um sistema não abre?",
+      "Outros sites, como o Google, abrem normalmente?",
+      "O problema acontece em apenas uma máquina ou em todas da unidade?",
+      "Outros computadores conseguem acessar a internet normalmente?",
+      "A conexão está funcionando, mas apresenta lentidão?"
+     ]
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "Passo 2 — Faça os testes básicos"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "Teste o acesso a outros sites.",
+      "Se o problema for em um sistema específico, teste o acesso na sua própria máquina.",
+      "Confira se o link utilizado está correto.",
+      "Tente acessar por outro navegador ou por uma janela anônima.",
+      "Limpe o cache do navegador e teste novamente."
+     ]
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "Passo 3 — Identifique o cenário e saiba como proceder"
+    },
+    {
+     "tipo": "tabela",
+     "colunas": [
+      "Situação",
+      "Como proceder"
+     ],
+     "linhas": [
+      [
+       "Apenas a Telerradiologia não abre",
+       "Confira o link, limpe o cache e teste em outro navegador ou máquina. Se persistir, encaminhe para análise."
+      ],
+      [
+       "Apenas uma máquina está sem internet",
+       "Teste outros sites e verifique se outras máquinas conseguem navegar. Se necessário, encaminhe ao Suporte TI."
+      ],
+      [
+       "Nenhuma máquina consegue acessar a internet",
+       "Possível falha na rede ou conexão da unidade. Se o cliente constar na planilha de acessos, acione primeiro a TI local."
+      ],
+      [
+       "A internet funciona, mas está muito lenta",
+       "Verifique se a lentidão acontece em uma ou várias máquinas e informe o resultado ao Suporte TI."
+      ],
+      [
+       "Outros sites funcionam, mas um sistema específico não abre",
+       "Confira o endereço, teste outro navegador e outra máquina. Se persistir, encaminhe para análise da equipe responsável pelo sistema."
+      ]
+     ]
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "Passo 4 — Quando acionar o Suporte TI One Laudos?"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Se os testes básicos não resolverem, encaminhe o chamado informando:"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "O que não está funcionando.",
+      "Se o problema afeta uma ou várias máquinas.",
+      "Se outros sites e sistemas abrem normalmente.",
+      "Quais testes foram realizados.",
+      "Print ou mensagem de erro, se houver.",
+      "Se a TI local já foi acionada."
+     ]
+    },
+    {
+     "tipo": "aviso",
+     "variante": "importante",
+     "conteudo": "Se apenas um sistema não abre, não conclua que é problema de internet. Faça os testes básicos antes de encaminhar."
+    }
+   ]
+  },
+  {
+   "id": "quem-acionar",
+   "numero": 6,
+   "titulo": "Quem acionar?",
+   "resumo": "Tabela de encaminhamento por tipo de solicitação.",
+   "tags": [
+    "encaminhamento",
+    "quem",
+    "acionar",
+    "responsavel",
+    "suporte ti",
+    "mobilemed",
+    "helpdesk"
+   ],
+   "blocos": [
+    {
+     "tipo": "texto",
+     "conteudo": "Utilize a tabela abaixo para identificar a equipe responsável por cada solicitação."
+    },
+    {
+     "tipo": "tabela",
+     "colunas": [
+      "Solicitação",
+      "Encaminhamento"
+     ],
+     "linhas": [
+      [
+       "Troca de senha",
+       "Suporte Médico / MobileMed"
+      ],
+      [
+       "Exames não sobem",
+       "MobileMed"
+      ],
+      [
+       "Exames com imagens faltando",
+       "MobileMed"
+      ],
+      [
+       "Criação ou ativação de usuário",
+       "Suporte TI"
+      ],
+      [
+       "Telerradiologia não abre após os testes básicos",
+       "MobileMed / Suporte TI, conforme a origem da falha"
+      ],
+      [
+       "Problemas de internet ou rede",
+       "TI local da unidade ou Suporte TI One Laudos, conforme o cenário"
+      ],
+      [
+       "Problemas em máquinas, infraestrutura ou equipamentos",
+       "Suporte TI"
+      ]
+     ]
+    },
+    {
+     "tipo": "aviso",
+     "variante": "observacao",
+     "conteudo": "Sempre que possível, identifique primeiro a origem do problema para evitar encaminhamentos incorretos."
+    }
+   ]
+  },
+  {
+   "id": "prioridade",
+   "numero": 7,
+   "titulo": "Prioridade dos chamados: urgente ou não urgente?",
+   "resumo": "Urgente (grupo Suporte TI) ou não urgente (Helpdesk).",
+   "tags": [
+    "urgente",
+    "urgencia",
+    "prioridade",
+    "helpdesk",
+    "email",
+    "horario comercial",
+    "fora do horario"
+   ],
+   "blocos": [
+    {
+     "tipo": "texto",
+     "conteudo": "O grupo **Suporte TI** deve ser acionado fora do horário comercial somente em situações urgentes que estejam impactando o funcionamento da unidade e precisem de atenção imediata."
+    },
+    {
+     "tipo": "destaque",
+     "variante": "urgente",
+     "titulo": "Urgente — acionar no grupo Suporte TI",
+     "blocos": [
+      {
+       "tipo": "texto",
+       "conteudo": "Situações que impedem ou prejudicam significativamente o funcionamento da unidade, como:"
+      },
+      {
+       "tipo": "lista",
+       "itens": [
+        "Falha no envio de exames que esteja comprometendo a operação.",
+        "Unidade sem acesso à internet, impedindo a realização das atividades.",
+        "Indisponibilidade de sistemas essenciais para o atendimento.",
+        "Problemas técnicos que interrompam o funcionamento da unidade."
+       ]
+      }
+     ]
+    },
+    {
+     "tipo": "aviso",
+     "variante": "atencao",
+     "conteudo": "Antes de acionar o Suporte TI, consulte a planilha de acessos das unidades TELE. Caso a unidade possua TI local cadastrada, solicite primeiro a verificação da equipe responsável."
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Se a unidade não constar na planilha ou não possuir contato de TI local, o Suporte TI One Laudos poderá ser acionado para avaliação, desde que exista impacto operacional urgente."
+    },
+    {
+     "tipo": "destaque",
+     "variante": "nao-urgente",
+     "titulo": "Não urgente — abrir chamado no Helpdesk",
+     "blocos": [
+      {
+       "tipo": "texto",
+       "conteudo": "Solicitações que não impedem o funcionamento da unidade e podem aguardar o próximo dia útil, como:"
+      },
+      {
+       "tipo": "lista",
+       "itens": [
+        "Pedidos de melhoria ou alteração de sistema.",
+        "Dúvidas e solicitações administrativas.",
+        "Problemas pontuais que não comprometem a operação.",
+        "Solicitações de configuração ou ajustes sem impacto imediato."
+       ]
+      },
+      {
+       "tipo": "contato",
+       "rotulo": "E-mail",
+       "valor": "helpdesk@onelaudos.com.br"
+      },
+      {
+       "tipo": "texto",
+       "conteudo": "Esses casos serão tratados durante o horário comercial."
+      }
+     ]
+    },
+    {
+     "tipo": "aviso",
+     "variante": "importante",
+     "conteudo": "Antes de acionar o grupo Suporte TI, avalie o impacto do problema na unidade. O fato de um cliente solicitar atendimento ou cobrar uma solução não significa, necessariamente, que seja uma urgência."
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**Na dúvida, avalie:** o problema impede a unidade de funcionar ou pode aguardar o próximo dia útil?"
+    }
+   ]
+  },
+  {
+   "id": "engenharia-clinica",
+   "numero": 8,
+   "titulo": "Equipamentos de engenharia clínica",
+   "resumo": "Diferença entre Engenharia Clínica e equipamentos de TI.",
+   "tags": [
+    "engenharia clinica",
+    "raio-x",
+    "tomografia",
+    "ressonancia",
+    "mamografia",
+    "equipamento",
+    "romulo"
+   ],
+   "blocos": [
+    {
+     "tipo": "texto",
+     "conteudo": "É importante identificar a diferença entre os equipamentos utilizados pela Engenharia Clínica e os computadores de apoio utilizados para acessar a Telerradiologia."
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "Como identificar?"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**Equipamentos da Engenharia Clínica:**"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "São as máquinas e equipamentos responsáveis pela realização dos exames.",
+      "Exemplos: equipamentos de Raio-X, Tomografia, Ressonância e Mamografia.",
+      "Problemas relacionados ao funcionamento, operação ou configuração desses equipamentos devem ser direcionados ao **Rômulo (Engenharia Clínica)**."
+     ]
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**Equipamentos de TI / Suporte One Laudos:**"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "São os computadores utilizados como apoio para acessar a plataforma One Laudos e visualizar os exames de Telerradiologia."
+     ]
+    }
+   ]
+  }
+ ],
+ "regra": {
+  "titulo": "Regra importante",
+  "texto": "Antes de encaminhar qualquer chamado:",
+  "itens": [
+   "Entenda o problema e faça os testes básicos.",
+   "Verifique se a falha ocorre em uma ou várias máquinas.",
+   "Consulte a planilha de acessos, quando aplicável.",
+   "Identifique a equipe responsável.",
+   "Avalie se a situação é urgente ou pode aguardar o próximo dia útil.",
+   "Encaminhe o caso com todas as informações necessárias."
+  ],
+  "fechamento": "**O objetivo não é apenas encaminhar solicitações, mas garantir que cada problema chegue à equipe correta, com as informações necessárias para sua resolução.**"
+ }
+}

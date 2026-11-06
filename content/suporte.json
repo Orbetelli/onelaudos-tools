@@ -1,0 +1,233 @@
+{
+ "titulo": "Níveis de suporte",
+ "intro": "O Nível 1 resolve as checagens dentro do portal. O que depende de T.I. ou da Mobile é do Nível 2.",
+ "niveis": [
+  {
+   "numero": 1,
+   "rotulo": "Sup Nível 1",
+   "subtitulo": "Checagens dentro do portal",
+   "descricao": "Atende o que pode ser verificado e resolvido dentro do portal, além de tirar dúvidas de uso.",
+   "resolve": [
+    "Procura de exames",
+    "Criação de usuários",
+    "Alteração de cabeçalho e rodapé",
+    "Dúvidas de como usar o portal",
+    "Análise de cache do navegador"
+   ]
+  },
+  {
+   "numero": 2,
+   "rotulo": "Sup Nível 2",
+   "subtitulo": "T.I. e assistência da Mobile",
+   "descricao": "Atende tudo que precisa da assistência de T.I. ou da Mobile.",
+   "resolve": [
+    "Falha no envio de exames",
+    "Checagem de Router",
+    "Checagem de Worklist",
+    "Problemas de internet",
+    "Outros problemas que envolvam T.I."
+   ]
+  }
+ ],
+ "casos": [
+  {
+   "texto": "Procurar um exame no portal",
+   "nivel": 1,
+   "palavras": [
+    "exame",
+    "procura",
+    "procurar",
+    "buscar",
+    "busca",
+    "localizar",
+    "paciente"
+   ]
+  },
+  {
+   "texto": "Criar um usuário",
+   "nivel": 1,
+   "palavras": [
+    "usuario",
+    "criar",
+    "cadastro",
+    "novo usuario"
+   ]
+  },
+  {
+   "texto": "Alterar cabeçalho ou rodapé",
+   "nivel": 1,
+   "palavras": [
+    "cabecalho",
+    "rodape",
+    "laudo",
+    "alteracao"
+   ]
+  },
+  {
+   "texto": "Dúvida de como usar o portal",
+   "nivel": 1,
+   "palavras": [
+    "duvida",
+    "como usar",
+    "filtro",
+    "filtros",
+    "portal",
+    "tutorial"
+   ]
+  },
+  {
+   "texto": "Analisar o cache do navegador",
+   "nivel": 1,
+   "palavras": [
+    "cache",
+    "navegador",
+    "limpar cache",
+    "chrome",
+    "janela anonima"
+   ]
+  },
+  {
+   "texto": "Falha no envio de exames",
+   "nivel": 2,
+   "palavras": [
+    "exame",
+    "envio",
+    "upload",
+    "nao sobe",
+    "imagens faltando",
+    "falha"
+   ]
+  },
+  {
+   "texto": "Checar o Router",
+   "nivel": 2,
+   "palavras": [
+    "router",
+    "roteador"
+   ]
+  },
+  {
+   "texto": "Checar a Worklist",
+   "nivel": 2,
+   "palavras": [
+    "worklist",
+    "lista de trabalho"
+   ]
+  },
+  {
+   "texto": "Problemas de internet ou rede",
+   "nivel": 2,
+   "palavras": [
+    "internet",
+    "rede",
+    "conexao",
+    "lentidao",
+    "sem internet"
+   ]
+  },
+  {
+   "texto": "Problemas em máquinas ou infraestrutura de T.I.",
+   "nivel": 2,
+   "palavras": [
+    "maquina",
+    "computador",
+    "infraestrutura",
+    "equipamento",
+    "t.i.",
+    "suporte ti"
+   ]
+  },
+  {
+   "texto": "Qualquer caso que precise da assistência da Mobile",
+   "nivel": 2,
+   "palavras": [
+    "mobile",
+    "mobilemed",
+    "anydesk",
+    "acesso remoto"
+   ]
+  }
+ ],
+ "comparativo": {
+  "tipo": "tabela",
+  "colunas": [
+   "",
+   "Sup Nível 1",
+   "Sup Nível 2"
+  ],
+  "linhas": [
+   [
+    "Foco",
+    "Checagens e dúvidas dentro do portal",
+    "Problemas que dependem de T.I. ou da Mobile"
+   ],
+   [
+    "Onde atua",
+    "Dentro do portal e no navegador",
+    "Rede, router, worklist, envio de exames e máquinas"
+   ],
+   [
+    "Exemplos",
+    "Procura de exames, criação de usuários, cabeçalho e rodapé, cache",
+    "Falha no envio, router, worklist, internet"
+   ],
+   [
+    "Precisa de T.I. ou da Mobile?",
+    "Não",
+    "Sim"
+   ],
+   [
+    "Quando acionar",
+    "Dúvidas e checagens dentro do portal",
+    "Quando o problema envolve T.I. ou a Mobile"
+   ]
+  ]
+ },
+ "escalar": {
+  "titulo": "Antes de escalar para o Nível 2",
+  "blocos": [
+   {
+    "tipo": "texto",
+    "conteudo": "Faça estas checagens antes de passar o chamado adiante (baseado no Guia rápido):"
+   },
+   {
+    "tipo": "subtitulo",
+    "conteudo": "Entenda o cenário"
+   },
+   {
+    "tipo": "lista",
+    "itens": [
+     "Afeta um exame ou vários?",
+     "Afeta uma máquina ou todas da unidade?",
+     "Outros sites e sistemas abrem normalmente?"
+    ]
+   },
+   {
+    "tipo": "subtitulo",
+    "conteudo": "Testes básicos"
+   },
+   {
+    "tipo": "lista",
+    "itens": [
+     "Confira se o link utilizado está correto.",
+     "Tente outro navegador ou uma janela anônima.",
+     "Limpe o cache do navegador e teste novamente."
+    ]
+   },
+   {
+    "tipo": "subtitulo",
+    "conteudo": "Ao escalar, informe"
+   },
+   {
+    "tipo": "lista",
+    "itens": [
+     "O que não está funcionando.",
+     "Se afeta uma ou várias máquinas.",
+     "Quais testes já foram feitos.",
+     "Print ou mensagem de erro, se houver.",
+     "Se a TI local já foi acionada."
+    ]
+   }
+  ]
+ }
+}

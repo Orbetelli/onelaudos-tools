@@ -1,0 +1,439 @@
+{
+ "titulo": "Padronização Onelaudos",
+ "objetivoTitulo": "Procedimentos operacionais",
+ "objetivo": [
+  "Procedimentos operacionais padronizados da Onelaudos. Escolha um documento abaixo e siga sempre o padrão descrito nele."
+ ],
+ "secoes": [
+  {
+   "id": "cadastro-usuarios",
+   "numero": 1,
+   "titulo": "Cadastro de usuários no portal OneLaudos",
+   "resumo": "Caminho de acesso, dados, permissões, verificações e envio do primeiro acesso.",
+   "tags": [
+    "usuario",
+    "cadastro",
+    "permissao",
+    "tecnico",
+    "enfermagem",
+    "senha temporaria",
+    "primeiro acesso",
+    "checklist"
+   ],
+   "blocos": [
+    {
+     "tipo": "texto",
+     "conteudo": "**Área responsável:** Suporte Técnico / Implantação"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**Finalidade:** Padronizar o cadastramento de novos usuários"
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "1. Objetivo"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Este documento orienta os colaboradores sobre o procedimento correto para cadastrar novos usuários no portal OneLaudos. São apresentados o caminho de acesso, o preenchimento dos dados, a escolha das permissões e o envio das credenciais para o primeiro acesso."
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "2. Acesso ao cadastro de usuários"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Para iniciar o cadastramento, siga o caminho abaixo:"
+    },
+    {
+     "tipo": "passos",
+     "itens": [
+      "Acesse o portal OneLaudos.",
+      "No canto superior esquerdo, clique no ícone de engrenagem.",
+      "Selecione a opção “Cadastro de unidades”.",
+      "Localize a unidade que solicitou o cadastro (por exemplo, HGF).",
+      "Clique no ícone de lápis, localizado à direita da unidade.",
+      "Na página de configuração da unidade, acesse a aba “Usuários”.",
+      "Clique em “Novo usuário” para iniciar o cadastro."
+     ]
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "3. Preenchimento dos dados do usuário"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Antes de preencher o nome, identifique a função do profissional. Utilize o prefixo correspondente para manter a padronização dos cadastros."
+    },
+    {
+     "tipo": "tabela",
+     "colunas": [
+      "Campo",
+      "Orientação"
+     ],
+     "linhas": [
+      [
+       "Nome",
+       "Utilizar “Tec.” ou “Enf.” antes do nome, conforme a função do colaborador."
+      ],
+      [
+       "E-mail",
+       "Informar o endereço de e-mail do colaborador."
+      ],
+      [
+       "CPF",
+       "Inserir o CPF do novo usuário."
+      ],
+      [
+       "Telefone",
+       "Informar um número de contato válido."
+      ],
+      [
+       "Permissão",
+       "Selecionar o nível de acesso adequado às atividades do profissional."
+      ]
+     ]
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**Exemplos de nomenclatura:** Tec. João da Silva (profissional técnico) e Enf. Maria Oliveira (profissional de enfermagem)."
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "4. Tipos de permissões"
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "4.1. Técnico"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Permissão destinada aos profissionais responsáveis pela preparação e organização dos exames antes de serem encaminhados ao médico responsável pelo laudo."
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "Preparar e organizar os exames recebidos pela unidade.",
+      "Realizar a montagem dos exames para disponibilização ao médico.",
+      "Verificar os exames que estejam com o status “A Preparar”.",
+      "Garantir que os exames estejam prontos para a etapa de laudo."
+     ]
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "4.2. Somente leitura"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Permissão destinada aos profissionais que precisam consultar informações e acompanhar os exames, sem executar as operações de preparação. É normalmente utilizada por recepcionistas e colaboradores administrativos."
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "Consultar informações dos exames.",
+      "Acompanhar o andamento dos exames.",
+      "Encaminhar exames aos pacientes, conforme as funcionalidades disponíveis no portal.",
+      "Realizar consultas sem executar atividades operacionais de preparação."
+     ]
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "5. Verificações obrigatórias antes do cadastro"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Antes de criar qualquer usuário, realize as seguintes confirmações:"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "Identifique quem é o proprietário do contrato ou gestor responsável pela unidade.",
+      "Confirme com o responsável se a criação do novo usuário está autorizada.",
+      "Valide a função do colaborador e o nível de acesso necessário.",
+      "Utilize os prefixos “Tec.” ou “Enf.” conforme a função informada.",
+      "Confira se nome, e-mail, CPF e telefone foram preenchidos corretamente."
+     ]
+    },
+    {
+     "tipo": "aviso",
+     "variante": "atencao",
+     "conteudo": "Não realize cadastros sem a confirmação do responsável pela unidade ou de pessoa autorizada."
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "6. Geração e envio de senha temporária"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Após concluir o cadastro, disponibilize ao novo colaborador as credenciais necessárias para o primeiro acesso."
+    },
+    {
+     "tipo": "aviso",
+     "variante": "observacao",
+     "conteudo": "A senha temporária padrão do procedimento consta no documento original e não é exibida nesta página, por segurança. Em caso de dúvida, consulte o Time de Implantação."
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "6.1. Utilização do Gerador de Senhas"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Quando for necessário gerar uma nova senha, utilize a ferramenta interna **Gerador de senhas**, no menu desta página:"
+    },
+    {
+     "tipo": "passos",
+     "itens": [
+      "Abra o **Gerador de senhas** e permaneça na aba **Geral**.",
+      "Informe o nome do colaborador e o e-mail utilizado no cadastro do portal.",
+      "Defina o prefixo da senha, utilizando **Onelaudos** como padrão.",
+      "Clique em **Gerar senhas**.",
+      "Escolha a senha desejada e clique em **Salvar**.",
+      "Em **Usuários salvos**, localize o registro gerado.",
+      "Abra **Mensagem de boas-vindas** e clique em **Copiar para todos** para obter a mensagem com os dados de acesso (com mais de um usuário salvo, a mensagem sai para todos, separada por traços)."
+     ]
+    },
+    {
+     "tipo": "link",
+     "rotulo": "Abrir o Gerador de senhas",
+     "href": "#/senhas"
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "6.2. Modelo de mensagem para o primeiro acesso"
+    },
+    {
+     "tipo": "comando",
+     "so": "texto",
+     "conteudo": "Seja bem-vindo(a) ao nosso sistema de Telerradiologia OneLaudos!\n\nSeguem abaixo as informações necessárias para realizar seu primeiro acesso:\n\nPortal: https://onelaudos.mobilemed.com.br/\nLogin (e-mail): [E-mail do colaborador]\nSenha temporária: [Senha gerada]\n\nAtenciosamente,\nEquipe OneLaudos"
+    },
+    {
+     "tipo": "aviso",
+     "variante": "seguranca",
+     "conteudo": "Encaminhe a senha individualmente ao usuário autorizado, evitando compartilhamento em grupos ou canais não apropriados. Sempre que possível, oriente o colaborador a alterar a senha no primeiro acesso. A utilização de senha padrão deve respeitar as políticas de segurança da empresa."
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "7. Suporte e auxílio"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Caso ocorram dúvidas ou dificuldades durante o cadastramento, entre em contato com o Time de Implantação. A equipe poderá auxiliar na identificação da unidade, configuração das permissões, geração de senhas e resolução de dificuldades encontradas durante a criação do usuário."
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "8. Checklist final"
+    },
+    {
+     "tipo": "checklist",
+     "itens": [
+      "Unidade correta selecionada.",
+      "Responsável pelo contrato ou gestor identificado.",
+      "Autorização para criação do usuário confirmada.",
+      "Prefixo “Tec.” ou “Enf.” aplicado corretamente.",
+      "Nome, e-mail, CPF e telefone conferidos.",
+      "Permissão de acesso configurada corretamente.",
+      "Cadastro concluído no portal.",
+      "Senha temporária definida ou gerada.",
+      "Credenciais encaminhadas ao colaborador autorizado."
+     ]
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "9. Considerações finais"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "O cadastramento de usuários no portal OneLaudos exige atenção, principalmente quanto à autorização do responsável pela unidade e à configuração correta das permissões. A execução padronizada desse procedimento contribui para a segurança das informações, a organização dos acessos e a continuidade das atividades operacionais das unidades."
+    }
+   ]
+  },
+  {
+   "id": "cabecalho-rodape",
+   "numero": 2,
+   "titulo": "Cadastro e formatação de cabeçalho e rodapé",
+   "resumo": "Como alterar ou cadastrar cabeçalho, sempre com a unidade DEMO como referência.",
+   "tags": [
+    "cabecalho",
+    "rodape",
+    "formatacao",
+    "demo",
+    "laudo",
+    "unidade",
+    "validacao"
+   ],
+   "blocos": [
+    {
+     "tipo": "subtitulo",
+     "conteudo": "1. Orientações gerais"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "O cabeçalho e o rodapé dos laudos devem seguir um padrão de formatação previamente estabelecido. Sua estrutura não deve ser definida exclusivamente conforme a preferência de cada unidade."
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "O objetivo é manter a padronização visual e estrutural dos laudos emitidos pelo sistema, garantindo uniformidade entre as unidades atendidas."
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "É permitido adicionar campos complementares conforme a necessidade da unidade, como:"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "Nome social;",
+      "Idade;",
+      "Sexo;",
+      "Outros dados relevantes para a identificação do paciente."
+     ]
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Entretanto, a estrutura principal e a formatação do cabeçalho devem permanecer de acordo com o modelo estabelecido."
+    },
+    {
+     "tipo": "aviso",
+     "variante": "importante",
+     "conteudo": "A unidade utilizada como referência oficial para a formatação é a **AMBIENTE DE APRESENTACAO (DEMO) ONE LAUDOS**. Todas as alterações e novos cadastros devem seguir esse modelo."
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "2. Como alterar o cabeçalho de uma unidade"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Para realizar alterações no cabeçalho de uma unidade, siga o procedimento abaixo:"
+    },
+    {
+     "tipo": "passos",
+     "itens": [
+      "Acesse o portal da Onelaudos.",
+      "Clique no ícone de engrenagem, localizado no canto superior esquerdo da tela.",
+      "Selecione a opção **Cadastro de unidades**.",
+      "Localize a unidade na qual deseja realizar a alteração. Exemplo: HGF.",
+      "Clique no ícone de lápis, localizado no canto direito do cadastro da unidade.",
+      "Acesse a opção **Formatação**.",
+      "Realize as alterações solicitadas pela unidade, respeitando o padrão de formatação estabelecido."
+     ]
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "3. Cadastro de um novo cabeçalho"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Caso seja necessário cadastrar um novo cabeçalho, utilize como referência o modelo já existente na unidade: **AMBIENTE DE APRESENTACAO (DEMO) ONE LAUDOS**."
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Esse modelo representa o padrão oficial utilizado para a configuração dos cabeçalhos e deve ser utilizado como base para novos cadastros."
+    },
+    {
+     "tipo": "aviso",
+     "variante": "atencao",
+     "conteudo": "Não desenvolva uma estrutura de cabeçalho do zero ou utilize modelos diferentes sem antes consultar o padrão de referência."
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "4. Validação com o cliente"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Após realizar a alteração ou cadastrar um novo cabeçalho:"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "Encaminhe o modelo atualizado para o cliente.",
+      "Solicite a validação das informações e da formatação.",
+      "Verifique se os campos apresentados estão corretos e atendem à solicitação.",
+      "Caso sejam identificadas divergências, realize os ajustes necessários, sempre respeitando o padrão estabelecido."
+     ]
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "5. Considerações finais"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "A padronização dos cabeçalhos e rodapés é fundamental para manter a consistência dos documentos emitidos pelo sistema."
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "É importante reforçar que as unidades podem solicitar a inclusão de informações adicionais, mas isso não significa que possam modificar livremente a estrutura principal do cabeçalho."
+    },
+    {
+     "tipo": "aviso",
+     "variante": "regra",
+     "conteudo": "Sempre utilizar a unidade **AMBIENTE DE APRESENTACAO (DEMO) ONE LAUDOS** como referência para qualquer alteração ou novo cadastro de cabeçalho e rodapé."
+    }
+   ]
+  },
+  {
+   "id": "alteracao-senha",
+   "numero": 3,
+   "titulo": "Alteração de senha de usuário no portal Onelaudos",
+   "resumo": "Passo a passo da redefinição e quando ela pode ser feita.",
+   "tags": [
+    "senha",
+    "alterar senha",
+    "redefinir",
+    "permissao",
+    "usuario",
+    "chamado"
+   ],
+   "blocos": [
+    {
+     "tipo": "subtitulo",
+     "conteudo": "1. Objetivo"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Este documento tem como objetivo orientar a equipe de suporte sobre o procedimento de alteração de senha de usuários dentro do portal Onelaudos, garantindo que as solicitações sejam atendidas corretamente e com segurança."
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "2. Procedimento para alteração de senha"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Para realizar a alteração da senha de um usuário, siga as etapas abaixo:"
+    },
+    {
+     "tipo": "passos",
+     "itens": [
+      "Na tela inicial do portal Onelaudos, localize e clique no ícone da engrenagem, no canto superior esquerdo.",
+      "Selecione a primeira opção, denominada “Permissão”.",
+      "No campo de pesquisa, informe o nome ou endereço de e-mail do usuário que solicitou a alteração de senha.",
+      "Após localizar o usuário, clique no botão azul correspondente para acessar o perfil.",
+      "Dentro do perfil do usuário, selecione a opção “Alterar senha”.",
+      "Defina uma senha temporária de fácil comunicação para o usuário, seguindo o padrão de senha temporária da Onelaudos.",
+      "Após concluir a alteração, encaminhe a senha temporária ao usuário por um canal de comunicação adequado."
+     ]
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "3. Orientações importantes"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "A senha definida durante esse procedimento deve ser considerada temporária.",
+      "Oriente o usuário a realizar a alteração da senha assim que conseguir acessar novamente o portal.",
+      "Evite encaminhar senhas por canais de comunicação inadequados ou compartilhados.",
+      "Sempre confirme se a alteração foi solicitada pelo próprio usuário ou por um responsável autorizado."
+     ]
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "4. Quando realizar esse procedimento?"
+    },
+    {
+     "tipo": "aviso",
+     "variante": "atencao",
+     "conteudo": "Este procedimento deve ser realizado exclusivamente quando houver um chamado de suporte solicitando a alteração ou redefinição da senha de um usuário. Não realize alterações de senha sem uma solicitação formal registrada."
+    }
+   ]
+  }
+ ]
+}

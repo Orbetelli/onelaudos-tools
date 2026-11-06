@@ -1,0 +1,8 @@
+[
+  {"id":"router-interface","titulo":"Router com interface","categoria":"Instalação","tags":["router","gui"],
+   "blocos":[{"tipo":"passos","itens":["Passo 1 (exemplo)","Passo 2 (exemplo)"]},{"tipo":"aviso","conteudo":"Exemplo de ponto de atenção."}]},
+  {"id":"router-sem-interface","titulo":"Router sem interface","categoria":"Instalação","tags":["router","headless","linux"],
+   "blocos":[{"tipo":"comando","so":"linux","conteudo":"# comando de exemplo\nsystemctl status router"}]},
+  {"id":"worklist","titulo":"Worklist","categoria":"Instalação","tags":["worklist"],
+   "blocos":[{"tipo":"texto","conteudo":"Exemplo: tutorial de instalação da Worklist."}]}
+]

@@ -1,0 +1,9 @@
+[
+  {"id":"filtros","titulo":"Filtros do portal","categoria":"Portal","tags":["filtro","busca"],
+   "blocos":[{"tipo":"texto","conteudo":"Exemplo: descreva aqui como usar os filtros da worklist do portal."},
+             {"tipo":"passos","itens":["Abra a lista de exames","Clique em Filtros","Escolha os critérios e aplique"]}]},
+  {"id":"usuarios","titulo":"Criação de usuários","categoria":"Portal","tags":["usuario","cadastro"],
+   "blocos":[{"tipo":"texto","conteudo":"Exemplo: passo a passo de criação de usuário."}]},
+  {"id":"cabecalho-rodape","titulo":"Cabeçalho e rodapé","categoria":"Portal","tags":["laudo","cabecalho","rodape"],
+   "blocos":[{"tipo":"texto","conteudo":"Exemplo: como configurar cabeçalho e rodapé."}]}
+]
