@@ -1,9 +1,80 @@
-[
-  {"id":"filtros","titulo":"Filtros do portal","categoria":"Portal","tags":["filtro","busca"],
-   "blocos":[{"tipo":"texto","conteudo":"Exemplo: descreva aqui como usar os filtros da worklist do portal."},
-             {"tipo":"passos","itens":["Abra a lista de exames","Clique em Filtros","Escolha os critérios e aplique"]}]},
-  {"id":"usuarios","titulo":"Criação de usuários","categoria":"Portal","tags":["usuario","cadastro"],
-   "blocos":[{"tipo":"texto","conteudo":"Exemplo: passo a passo de criação de usuário."}]},
-  {"id":"cabecalho-rodape","titulo":"Cabeçalho e rodapé","categoria":"Portal","tags":["laudo","cabecalho","rodape"],
-   "blocos":[{"tipo":"texto","conteudo":"Exemplo: como configurar cabeçalho e rodapé."}]}
-]
+{
+ "titulo": "Portal Onelaudos — tutorial",
+ "objetivoTitulo": "Sobre este tutorial",
+ "objetivo": [
+  "Guia de uso do portal Onelaudos. Novos tópicos, como filtros e cabeçalho e rodapé, serão adicionados aqui."
+ ],
+ "secoes": [
+  {
+   "id": "permissoes",
+   "numero": 1,
+   "titulo": "Permissões de usuário",
+   "resumo": "O que cada permissão faz: Técnico, Somente leitura, Médico executante, Gestor, Digitador e Financeiro.",
+   "tags": [
+    "permissao",
+    "permissoes",
+    "tecnico",
+    "somente leitura",
+    "medico executante",
+    "gestor",
+    "digitador",
+    "financeiro",
+    "relatorios",
+    "laudo",
+    "assinar",
+    "recepcao",
+    "acesso",
+    "usuario"
+   ],
+   "blocos": [
+    {
+     "tipo": "texto",
+     "conteudo": "Cada usuário do portal recebe uma permissão, que define o que ele pode ver e fazer. Veja o que cada uma libera:"
+    },
+    {
+     "tipo": "tabela",
+     "colunas": [
+      "Permissão",
+      "O que faz"
+     ],
+     "linhas": [
+      [
+       "Técnico",
+       "Preparo de exames (estudo, lateralidade e nome do paciente), conferência de imagens e consulta a pacientes."
+      ],
+      [
+       "Somente leitura",
+       "Consulta a lista de exames liberados (ou não) e aos laudos. Pode ser usada por recepções e demais pessoas que só precisam visualizar o laudo."
+      ],
+      [
+       "Médico executante",
+       "Assina os laudos e visualiza as imagens."
+      ],
+      [
+       "Gestor",
+       "Acesso a todas as ferramentas do portal. É o perfil de T.I. e do gerente do contrato."
+      ],
+      [
+       "Digitador",
+       "Acesso aos exames para auxiliar os médicos nos laudos."
+      ],
+      [
+       "Financeiro",
+       "Acesso aos relatórios."
+      ]
+     ]
+    },
+    {
+     "tipo": "aviso",
+     "variante": "atencao",
+     "conteudo": "A permissão **Gestor** libera todas as ferramentas do portal. Conceda somente a T.I. e ao gerente do contrato, e confirme a autorização do responsável pela unidade antes de cadastrar."
+    },
+    {
+     "tipo": "link",
+     "rotulo": "Ver o procedimento de cadastro de usuários",
+     "href": "#/padronizacao"
+    }
+   ]
+  }
+ ]
+}

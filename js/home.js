@@ -7,7 +7,7 @@ const Home = {
         { titulo: 'Atendimento', itens: [
             { rota: 'guia', icone: '📘', titulo: 'Guia rápido',
               descricao: 'Triagem do Suporte Médico: o que fazer em cada situação, quem acionar e como priorizar os chamados.',
-              topicos: ['Exames não sobem', 'Troca de senha', 'Quem acionar?', 'Urgente x não urgente'], pronto: true },
+              topicos: ['Exames não sobem', 'Troca de senha', 'Falha no login', 'Quem acionar?'], pronto: true },
             { rota: 'suporte', icone: '🧭', titulo: 'Sup 1 e Sup 2',
               descricao: 'Como o atendimento se divide: o que o Nível 1 resolve dentro do portal e o que sobe para o Nível 2 (T.I. e Mobile).',
               topicos: ['Nível 1', 'Nível 2', 'Qual nível?', 'Antes de escalar'], pronto: true }
@@ -22,8 +22,8 @@ const Home = {
         ]},
         { titulo: 'Documentação', itens: [
             { rota: 'portal', icone: '🖥️', titulo: 'Portal (tutorial)',
-              descricao: 'Tutorial completo do portal Onelaudos: filtros, criação de usuários, cabeçalho e rodapé e demais funcionalidades.',
-              topicos: ['Filtros', 'Usuários', 'Cabeçalho e rodapé'], pronto: false },
+              descricao: 'Tutorial do portal Onelaudos, começando pelas permissões de usuário e o que cada uma faz. Novos tópicos em breve.',
+              topicos: ['Permissões', 'Técnico', 'Gestor', 'Médico executante'], pronto: false },
             { rota: 'padronizacao', icone: '📐', titulo: 'Padronização',
               descricao: 'Procedimentos operacionais padronizados: cadastro de usuários, cabeçalho e rodapé e alteração de senha.',
               topicos: ['Cadastro de usuários', 'Cabeçalho e rodapé', 'Alteração de senha', 'Checklist'], pronto: true },

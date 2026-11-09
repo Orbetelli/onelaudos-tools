@@ -106,22 +106,29 @@
     "senha",
     "permissoes",
     "usuario",
-    "alterar senha"
+    "alterar senha",
+    "permissao",
+    "senha temporaria"
    ],
    "blocos": [
     {
      "tipo": "subtitulo",
-     "conteudo": "Procedimento"
+     "conteudo": "Procedimento para alteração de senha"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Para realizar a alteração da senha de um usuário, siga as etapas abaixo:"
     },
     {
      "tipo": "passos",
      "itens": [
-      "Clique na **engrenagem** no menu superior.",
-      "Selecione **Permissões**.",
-      "Pesquise o usuário pelo nome ou e-mail.",
-      "Localize o usuário e clique no **ícone azul de usuário**.",
-      "Na tela de informações, clique em **ALTERAR SENHA**.",
-      "Siga as instruções apresentadas pelo sistema."
+      "Na tela inicial do portal Onelaudos, localize e clique no ícone da engrenagem, no canto superior esquerdo.",
+      "Selecione a primeira opção, denominada “Permissão”.",
+      "No campo de pesquisa, informe o nome ou endereço de e-mail do usuário que solicitou a alteração de senha.",
+      "Após localizar o usuário, clique no botão azul correspondente para acessar o perfil.",
+      "Dentro do perfil do usuário, selecione a opção “Alterar senha”.",
+      "Defina uma senha temporária de fácil comunicação para o usuário, seguindo o padrão de senha temporária da Onelaudos.",
+      "Após concluir a alteração, encaminhe a senha temporária ao usuário por um canal de comunicação adequado."
      ]
     },
     {
@@ -429,10 +436,109 @@
    ]
   },
   {
-   "id": "engenharia-clinica",
+   "id": "acesso-falha-login",
    "numero": 8,
+   "titulo": "Acesso à Telerradiologia — falha no login",
+   "resumo": "Pedir o print, identificar o tipo de erro e conferir o endereço de acesso.",
+   "tags": [
+    "login",
+    "acesso",
+    "erro",
+    "cache",
+    "senha",
+    "endereco",
+    "url",
+    "print",
+    "permissoes",
+    "navegador"
+   ],
+   "blocos": [
+    {
+     "tipo": "texto",
+     "conteudo": "Quando o cliente informar que não consegue fazer login ou acessar a Telerradiologia, o primeiro passo é entender qual mensagem de erro está aparecendo."
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "Passo 1 — Solicite uma evidência"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "Peça um print ou foto da tela com a mensagem de erro.",
+      "Confirme qual endereço o cliente está tentando acessar.",
+      "Verifique o e-mail utilizado para entrar no sistema."
+     ]
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "Passo 2 — Identifique o tipo de erro"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**A) Erro relacionado ao navegador (cache)**"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "Pode aparecer uma mensagem de erro mesmo com os dados corretos.",
+      "Oriente o cliente a limpar o cache do navegador e tentar novamente.",
+      "Se o problema continuar, acione a MobileMed para análise."
+     ]
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**B) E-mail ou senha incorretos**"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "A mensagem normalmente informa que o e-mail ou a senha estão incorretos.",
+      "Confirme o e-mail utilizado pelo usuário.",
+      "Acesse a engrenagem do portal, entre em Permissões e pesquise pelo e-mail informado.",
+      "Se o usuário não for localizado, confira se o endereço está correto e se ele possui cadastro.",
+      "Se o usuário for localizado, poderá ser necessário realizar a alteração da senha.",
+      "A alteração poderá ser feita pelo próprio Suporte Médico ou solicitada à MobileMed."
+     ]
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**C) Endereço incorreto**"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "Confira se o cliente está acessando o endereço correto da Telerradiologia."
+     ]
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**Endereço correto:**"
+    },
+    {
+     "tipo": "comando",
+     "so": "texto",
+     "conteudo": "https://onelaudos.mobilemed.com.br"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**Endereço incorreto (portal geral da MobileMed):** https://laudos.mobilemed.com.br"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Oriente o cliente a utilizar o endereço correto."
+    },
+    {
+     "tipo": "aviso",
+     "variante": "importante",
+     "conteudo": "Sempre solicite o print da mensagem de erro antes de realizar o encaminhamento. Isso ajuda a identificar a causa do problema e evita acionamentos desnecessários."
+    }
+   ]
+  },
+  {
+   "id": "engenharia-clinica",
+   "numero": 9,
    "titulo": "Equipamentos de engenharia clínica",
-   "resumo": "Diferença entre Engenharia Clínica e equipamentos de TI.",
+   "resumo": "Diferença entre Engenharia Clínica e equipamentos de TI, e como acioná-la.",
    "tags": [
     "engenharia clinica",
     "raio-x",
@@ -440,7 +546,12 @@
     "ressonancia",
     "mamografia",
     "equipamento",
-    "romulo"
+    "romulo",
+    "plantao",
+    "escala",
+    "contato",
+    "acionamento",
+    "final de semana"
    ],
    "blocos": [
     {
@@ -472,6 +583,27 @@
      "itens": [
       "São os computadores utilizados como apoio para acessar a plataforma One Laudos e visualizar os exames de Telerradiologia."
      ]
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "Como acionar a Engenharia Clínica"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Quando o problema estiver relacionado aos equipamentos responsáveis pela realização dos exames, o Suporte Médico deverá acionar a equipe de Engenharia Clínica."
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "**Durante a semana:** poderá ser acionado qualquer profissional listado na relação de contatos da região correspondente.",
+      "**Aos finais de semana:** deverá ser respeitada a escala de plantões, acionando o profissional responsável pelo período.",
+      "Antes de realizar o contato, identifique a região da unidade e consulte os telefones disponíveis."
+     ]
+    },
+    {
+     "tipo": "aviso",
+     "variante": "observacao",
+     "conteudo": "A relação de contatos e a escala de plantões (Osasco e Zona Leste; São Bernardo do Campo) muda todo mês e consta no documento original do guia, na versão de novembro/2026. Nomes e telefones não são exibidos nesta página."
     }
    ]
   }

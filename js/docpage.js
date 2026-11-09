@@ -75,6 +75,7 @@ function criarPaginaDoc(cfg) {
             document.getElementById('guiaQ').addEventListener('input', function (e) { self.filtrar(self.norm(e.target.value.trim())); });
             document.getElementById('guiaExpandir').addEventListener('click', function () { self.todos(true); });
             document.getElementById('guiaRecolher').addEventListener('click', function () { self.todos(false); });
+            if (d.secoes.length === 1) document.querySelector('.guia-sec').open = true; // seção única já abre aberta
         },
 
         abrir: function (id) {
@@ -98,7 +99,7 @@ function criarPaginaDoc(cfg) {
             });
             document.getElementById('guiaIndex').classList.toggle('hidden', !!q);
             document.getElementById('guiaInfo').textContent = q ? (achados ? achados + ' seção(ões) encontrada(s)' : 'Nada encontrado.') : '';
-            if (!q) this.todos(false);
+            if (!q) this.todos(Object.keys(this.busca).length === 1); // com seção única, mantém aberta
         }
     };
 }
