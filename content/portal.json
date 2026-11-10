@@ -2,7 +2,7 @@
  "titulo": "Portal Onelaudos — tutorial",
  "objetivoTitulo": "Sobre este tutorial",
  "objetivo": [
-  "Guia de uso do portal Onelaudos. Novos tópicos, como filtros e cabeçalho e rodapé, serão adicionados aqui."
+  "Guia de uso do portal Onelaudos, com as permissões de usuário e vídeos tutoriais. Novos tópicos serão adicionados aqui."
  ],
  "secoes": [
   {
@@ -73,6 +73,103 @@
      "tipo": "link",
      "rotulo": "Ver o procedimento de cadastro de usuários",
      "href": "#/padronizacao"
+    }
+   ]
+  },
+  {
+   "id": "videos-tecnico",
+   "numero": 2,
+   "titulo": "Vídeos: Técnico",
+   "resumo": "13 vídeos tutoriais da playlist de Técnicos: Mobile Router, filtros, atribuição de exames, cancelamento e mais.",
+   "tags": [
+    "video",
+    "videos",
+    "tutorial",
+    "tecnico",
+    "playlist",
+    "youtube",
+    "mobile router",
+    "senha",
+    "filtros",
+    "assinatura digital",
+    "lote",
+    "cancelar",
+    "duplicar",
+    "anexar",
+    "importar",
+    "atribuir"
+   ],
+   "blocos": [
+    {
+     "tipo": "texto",
+     "conteudo": "Vídeos tutoriais da playlist de Técnicos. Clique na miniatura para assistir aqui mesmo ou use “Abrir no YouTube”."
+    },
+    {
+     "tipo": "videos",
+     "itens": [
+      {
+       "id": "HHb8py4nP9M",
+       "titulo": "Como excluir exames do Mobile Router para reenviá-los"
+      },
+      {
+       "id": "hGzW7S2UoSI",
+       "titulo": "Como recuperar a senha"
+      },
+      {
+       "id": "E4ZHGjD5CxI",
+       "titulo": "Ferramentas do aplicativo"
+      },
+      {
+       "id": "6kFnWxkPy4w",
+       "titulo": "Filtros de pesquisa"
+      },
+      {
+       "id": "D51tUDbfaS4",
+       "titulo": "Como atribuir exames em lote para o médico solicitante"
+      },
+      {
+       "id": "RPgfnoNo-c8",
+       "titulo": "Como cancelar exames"
+      },
+      {
+       "id": "u0remZxy-tI",
+       "titulo": "Assinatura digital"
+      },
+      {
+       "id": "d1emIFEmf1s",
+       "titulo": "Como duplicar exames"
+      },
+      {
+       "id": "DlEzB8pTafY",
+       "titulo": "Como atribuir exames ao médico"
+      },
+      {
+       "id": "OXE9BUdLvm0",
+       "titulo": "Como reverter cancelamento de exame"
+      },
+      {
+       "id": "rO6OVwORSWM",
+       "titulo": "Como anexar documento ao exame"
+      },
+      {
+       "id": "jIm4AGaIGLg",
+       "titulo": "Como importar exames de forma manual"
+      },
+      {
+       "id": "St2bueT26CM",
+       "titulo": "Ferramentas do Mobile Router"
+      }
+     ]
+    },
+    {
+     "tipo": "aviso",
+     "variante": "observacao",
+     "conteudo": "A playlist completa tem 47 vídeos; esta lista traz 13 deles. Use o botão abaixo para ver todos."
+    },
+    {
+     "tipo": "link",
+     "rotulo": "Abrir a playlist completa de Técnicos no YouTube",
+     "href": "https://www.youtube.com/playlist?list=PL2giLlnYa_rgxJ1DzZm4jDaLvAYi04f7m"
     }
    ]
   }

@@ -22,14 +22,14 @@ const Home = {
         ]},
         { titulo: 'Documentação', itens: [
             { rota: 'portal', icone: '🖥️', titulo: 'Portal (tutorial)',
-              descricao: 'Tutorial do portal Onelaudos, começando pelas permissões de usuário e o que cada uma faz. Novos tópicos em breve.',
-              topicos: ['Permissões', 'Técnico', 'Gestor', 'Médico executante'], pronto: false },
+              descricao: 'Tutorial do portal Onelaudos: permissões de usuário e o que cada uma faz, mais vídeos tutoriais da playlist de Técnicos. Novos tópicos em breve.',
+              topicos: ['Permissões', 'Vídeos de Técnico', 'Mobile Router', 'Filtros'], pronto: false },
             { rota: 'padronizacao', icone: '📐', titulo: 'Padronização',
               descricao: 'Procedimentos operacionais padronizados: cadastro de usuários, cabeçalho e rodapé e alteração de senha.',
               topicos: ['Cadastro de usuários', 'Cabeçalho e rodapé', 'Alteração de senha', 'Checklist'], pronto: true },
             { rota: 'instalacao', icone: '🛠️', titulo: 'Instalação',
-              descricao: 'Tutoriais passo a passo de instalação de sistemas, com comandos prontos para copiar.',
-              topicos: ['Router com interface', 'Router sem interface', 'Worklist'], pronto: false },
+              descricao: 'Tutoriais passo a passo de instalação: MobileRouter, SQL Server e Worklist (instalação e configuração), com comandos prontos para copiar.',
+              topicos: ['MobileRouter', 'SQL Server', 'Worklist', 'Configuração'], pronto: false },
             { rota: 'downloads', icone: '📥', titulo: 'Downloads',
               descricao: 'Documentos e tutoriais em arquivo para baixar, como PDFs e arquivos do Word.',
               topicos: ['Guias', 'Tutoriais'], pronto: true }

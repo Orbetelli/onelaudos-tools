@@ -22,7 +22,7 @@ const rotas = {
   portal: () => Portal.render(app),
   padronizacao: () => Padronizacao.render(app),
   suporte: () => Suporte.render(app),
-  instalacao: () => Docs.pagina(app, 'Tutoriais de instalação', 'instalacao.json'),
+  instalacao: () => Instalacao.render(app),
   downloads
 };
 

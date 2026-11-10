@@ -131,3 +131,15 @@ details.guia-sec[open]>summary::after{content:'▾'}
 .checklist label{display:flex;gap:10px;align-items:flex-start;color:var(--txt);font-size:15px;margin:0;cursor:pointer}
 .checklist input{width:auto;margin-top:4px;accent-color:var(--acc)}
 .checklist input:checked+span{color:var(--mut);text-decoration:line-through}
+
+/* ---- Vídeos ---- */
+.video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin:12px 0}
+.video-card{background:var(--bg);border:1px solid var(--line);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+.video-quadro{position:relative;aspect-ratio:16/9;background:#0b1117}
+.video-quadro iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.video-play{position:absolute;inset:0;width:100%;height:100%;padding:0;border-radius:0;background:#0b1117;cursor:pointer}
+.video-play img{width:100%;height:100%;object-fit:cover;display:block;opacity:.85}
+.video-play:hover img{opacity:1}
+.video-icone{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:46px;height:46px;border-radius:50%;background:rgba(15,23,32,.82);border:2px solid #fff;color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;padding-left:3px}
+.video-info{padding:10px 12px;display:flex;flex-direction:column;gap:6px;font-size:14px}
+.video-info a{font-size:12px}

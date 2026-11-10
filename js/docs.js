@@ -1,5 +1,5 @@
 // Renderizador de conteúdo: carrega arquivos JSON e monta páginas com busca (search-first)
-// Blocos: texto, subtitulo, lista, passos, aviso, checklist, link, tabela, contato, destaque, comando, imagem
+// Blocos: texto, subtitulo, lista, passos, aviso, checklist, link, videos, tabela, contato, destaque, comando, imagem
 const Docs = {
   esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); },
   // Escapa primeiro e só depois aplica **negrito** (não abre brecha para HTML)
@@ -22,7 +22,13 @@ const Docs = {
         return `<div class="aviso${v ? ' aviso-' + v : ''}">${v ? '<strong>' + rot[v] + ':</strong> ' : ''}${this.inline(b.conteudo)}</div>`;
       }
       case 'checklist': return `<ul class="checklist">${b.itens.map(i => `<li><label><input type="checkbox"><span>${this.inline(i)}</span></label></li>`).join('')}</ul>`;
-      case 'link': return /^(#\/|https:\/\/|downloads\/)/.test(String(b.href)) ? `<p><a class="btn sec" href="${this.esc(b.href)}">${this.esc(b.rotulo)}</a></p>` : '';
+      case 'link': {
+        const h = String(b.href);
+        if (!/^(#\/|https:\/\/|downloads\/)/.test(h)) return '';
+        const ext = h.indexOf('https://') === 0 ? ' target="_blank" rel="noopener noreferrer"' : '';
+        return `<p><a class="btn sec" href="${this.esc(h)}"${ext}>${this.esc(b.rotulo)}</a></p>`;
+      }
+      case 'videos': return `<div class="video-grid">${b.itens.filter(v => /^[\w-]{11}$/.test(String(v.id))).map(v => `<div class="video-card"><div class="video-quadro"><button type="button" class="video-play" data-yt="${this.esc(v.id)}" data-titulo="${this.esc(v.titulo)}" aria-label="Reproduzir: ${this.esc(v.titulo)}"><img src="https://i.ytimg.com/vi/${this.esc(v.id)}/hqdefault.jpg" alt="" loading="lazy"><span class="video-icone">▶</span></button></div><div class="video-info"><strong>${this.esc(v.titulo)}</strong><a href="https://www.youtube.com/watch?v=${this.esc(v.id)}" target="_blank" rel="noopener noreferrer">Abrir no YouTube</a></div></div>`).join('')}</div>`;
       case 'tabela': return `<div class="tabela-wrap"><table><thead><tr>${b.colunas.map(c=>`<th>${this.esc(c)}</th>`).join('')}</tr></thead><tbody>${b.linhas.map(l=>`<tr>${l.map(c=>`<td>${this.inline(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
       case 'contato': return `<p class="contato">${this.esc(b.rotulo)}: <a href="mailto:${this.esc(b.valor)}">${this.esc(b.valor)}</a><button type="button" class="sec mini" data-copy="${this.esc(b.valor)}">Copiar</button></p>`;
       case 'destaque': {
@@ -49,6 +55,21 @@ const Docs = {
   }
 };
 document.addEventListener('click', e => {
+  // Miniatura de vídeo -> troca pelo player do YouTube (só carrega quando a pessoa clica)
+  const yt = e.target.closest('button[data-yt]');
+  if(yt && /^[\w-]{11}$/.test(yt.dataset.yt)){
+    const f = document.createElement('iframe');
+    f.src = 'https://www.youtube-nocookie.com/embed/' + yt.dataset.yt + '?autoplay=1&rel=0';
+    f.title = yt.dataset.titulo || 'Vídeo';
+    f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    f.allowFullscreen = true;
+    yt.replaceWith(f);
+    return;
+  }
   const b = e.target.closest('[data-copy]');
   if(b){ navigator.clipboard.writeText(b.dataset.copy); const t=b.textContent; b.textContent='Copiado!'; setTimeout(()=>b.textContent=t,1200); }
 });
+// Miniatura que não carregou (ex.: YouTube bloqueado na rede): esconde o ícone de imagem quebrada
+document.addEventListener('error', e => {
+  if(e.target && e.target.matches && e.target.matches('.video-play img')) e.target.style.display = 'none';
+}, true);

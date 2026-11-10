@@ -3,5 +3,5 @@ const Portal = criarPaginaDoc({
     titulo: 'Portal Onelaudos — tutorial',
     hash: '#/portal',
     arquivo: 'content/portal.json',
-    busca: 'Buscar no tutorial (ex.: permissão, gestor, laudo)...'
+    busca: 'Buscar no tutorial (ex.: permissão, filtros, router, cancelar)...'
 });

@@ -1,8 +1,606 @@
-[
-  {"id":"router-interface","titulo":"Router com interface","categoria":"Instalação","tags":["router","gui"],
-   "blocos":[{"tipo":"passos","itens":["Passo 1 (exemplo)","Passo 2 (exemplo)"]},{"tipo":"aviso","conteudo":"Exemplo de ponto de atenção."}]},
-  {"id":"router-sem-interface","titulo":"Router sem interface","categoria":"Instalação","tags":["router","headless","linux"],
-   "blocos":[{"tipo":"comando","so":"linux","conteudo":"# comando de exemplo\nsystemctl status router"}]},
-  {"id":"worklist","titulo":"Worklist","categoria":"Instalação","tags":["worklist"],
-   "blocos":[{"tipo":"texto","conteudo":"Exemplo: tutorial de instalação da Worklist."}]}
-]
+{
+ "titulo": "Tutoriais de instalação",
+ "objetivoTitulo": "Sobre estes tutoriais",
+ "objetivo": [
+  "Passo a passo de instalação dos sistemas usados nas implantações, com comandos prontos para copiar. Novos tutoriais, como o Router sem interface, serão adicionados aqui."
+ ],
+ "secoes": [
+  {
+   "id": "router",
+   "numero": 1,
+   "titulo": "Instalação do MobileRouter (Windows)",
+   "resumo": "Copiar arquivos, Visual C++, instalador, configuração DICOM e do Router, e firewall.",
+   "tags": [
+    "router",
+    "mobilerouter",
+    "mobile router",
+    "visual c++",
+    "dicom",
+    "firewall",
+    "modalidades",
+    "ia",
+    "unidade",
+    "implantacao",
+    "onelaudos",
+    "mobilevet",
+    "disco c"
+   ],
+   "blocos": [
+    {
+     "tipo": "subtitulo",
+     "conteudo": "1. Copiar arquivos necessários"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Acesse o Drive e copie os seguintes arquivos:"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "Instalador do Visual C++",
+      "Pasta MOBILEMED"
+     ]
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Depois, cole os arquivos diretamente no **Disco C:\\** do computador do cliente."
+    },
+    {
+     "tipo": "aviso",
+     "variante": "importante",
+     "conteudo": "Os arquivos precisam estar no disco C:, pois é necessário acesso e liberação total do sistema para o funcionamento correto do Router."
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**Qual pasta usar?**"
+    },
+    {
+     "tipo": "tabela",
+     "colunas": [
+      "Implantação para",
+      "Pasta a utilizar"
+     ],
+     "linhas": [
+      [
+       "Portal",
+       "Pasta MOBILEMED"
+      ],
+      [
+       "Onelaudos",
+       "Pasta específica do Onelaudos"
+      ],
+      [
+       "MobileVet",
+       "Pasta específica do MobileVet"
+      ]
+     ]
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "2. Instalar o Visual C++"
+    },
+    {
+     "tipo": "passos",
+     "itens": [
+      "Execute o instalador do Visual C++.",
+      "Conclua a instalação normalmente."
+     ]
+    },
+    {
+     "tipo": "aviso",
+     "variante": "atencao",
+     "conteudo": "Se o instalador solicitar a reinicialização do computador, é obrigatório reiniciar."
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "3. Instalar o MobileRouter"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Após a instalação do Visual C++:"
+    },
+    {
+     "tipo": "passos",
+     "itens": [
+      "Execute o instalador do MobileRouter.",
+      "Finalize a instalação normalmente."
+     ]
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "4. Configuração do MobileRouter"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**4.1 Configuração DICOM**"
+    },
+    {
+     "tipo": "passos",
+     "itens": [
+      "Abra o MobileRouter.",
+      "Clique em **Configurações DICOM**.",
+      "Faça login com o **e-mail** e a **senha do usuário do Portal**.",
+      "Selecione a **Unidade** onde está sendo realizada a implantação."
+     ]
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**4.2 Configuração do Router**"
+    },
+    {
+     "tipo": "passos",
+     "itens": [
+      "Vá em **Configurações do Router**.",
+      "Acesse **Configurações avançadas**.",
+      "Clique em **Modalidades**.",
+      "Retire a opção de **IA** selecionada.",
+      "Clique no ícone de **Salvar**.",
+      "Clique em **Atualizar Router**."
+     ]
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "5. Finalização"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Para finalizar corretamente a instalação, **desative o Firewall do Windows**."
+    },
+    {
+     "tipo": "aviso",
+     "variante": "atencao",
+     "conteudo": "Isso é necessário para garantir que o recebimento e o envio DICOM funcionem sem bloqueios."
+    }
+   ]
+  },
+  {
+   "id": "worklist-instalacao",
+   "numero": 2,
+   "titulo": "Instalação da Worklist (Windows): SQL Server e Worklist",
+   "resumo": "Instalar o SQL Server (instância MOBILEMED) e, em seguida, a Worklist.",
+   "tags": [
+    "worklist",
+    "sql server",
+    "sql",
+    "instancia",
+    "mobilemed",
+    "custom",
+    "installation center",
+    "azure",
+    "sa",
+    "windows",
+    "instalacao"
+   ],
+   "blocos": [
+    {
+     "tipo": "subtitulo",
+     "conteudo": "1. Instalação do SQL Server"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Para o funcionamento da Worklist é necessário instalar o SQL Server na máquina, pois ele armazena as informações do sistema. Atualmente utilizamos normalmente as seguintes versões:"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "**SQL Server 2025** (recomendado)",
+      "**SQL Server 2022**"
+     ]
+    },
+    {
+     "tipo": "aviso",
+     "variante": "atencao",
+     "conteudo": "Recomendamos a versão 2025: ela traz melhorias de desempenho e compatibilidade e é a que usamos com mais frequência nas implantações."
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**1.1 Iniciando a instalação**"
+    },
+    {
+     "tipo": "passos",
+     "itens": [
+      "Execute o instalador do SQL Server.",
+      "Selecione a opção **Custom** (Instalação Personalizada).",
+      "Clique em **Install**."
+     ]
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "O instalador irá iniciar o download e a preparação dos arquivos necessários. Em seguida, será aberto o **SQL Server Installation Center**, onde o SQL é instalado na máquina."
+    },
+    {
+     "tipo": "aviso",
+     "variante": "atencao",
+     "conteudo": "Esse processo pode demorar alguns minutos, dependendo da máquina e da internet."
+    },
+    {
+     "tipo": "aviso",
+     "variante": "observacao",
+     "conteudo": "Nesse momento o SQL ainda não está totalmente configurado: após a instalação é necessário fazer algumas configurações adicionais."
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**1.2 Criar nova instalação.** Na tela do SQL Server Installation Center:"
+    },
+    {
+     "tipo": "passos",
+     "itens": [
+      "Clique em “Nova instalação autônoma do SQL Server ou adicionar recursos a uma instalação existente”.",
+      "Aceite os termos de licença."
+     ]
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**1.3 Verificação do sistema.** O instalador verifica algumas configurações do sistema."
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "Se o Windows não estiver atualizado, faça as atualizações antes de continuar."
+     ]
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**1.4 Configurações adicionais**"
+    },
+    {
+     "tipo": "passos",
+     "itens": [
+      "Desmarque a opção do **Azure**.",
+      "Clique apenas em **Avançar** até chegar na configuração da instância."
+     ]
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**1.5 Nome da instância.** Na configuração da instância, altere o nome para:"
+    },
+    {
+     "tipo": "comando",
+     "so": "texto",
+     "conteudo": "MOBILEMED"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Depois, clique em **Avançar**."
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**1.6 Configuração de autenticação.** Defina a senha do usuário **sa** conforme o padrão das implantações e continue a instalação normalmente."
+    },
+    {
+     "tipo": "aviso",
+     "variante": "seguranca",
+     "conteudo": "A senha padrão do usuário sa consta no documento original e não é exibida nesta página, por segurança. Em caso de dúvida, consulte o Time de Implantação."
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**1.7 Finalização.** Clique em **Install** e aguarde o término da instalação do SQL Server."
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "2. Instalação da Worklist"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Com o SQL Server instalado, instale a Worklist. Atualmente utilizamos normalmente a versão:"
+    },
+    {
+     "tipo": "comando",
+     "so": "texto",
+     "conteudo": "Worklist 2.5.0"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**2.1 Instalação**"
+    },
+    {
+     "tipo": "passos",
+     "itens": [
+      "Execute o instalador da Worklist.",
+      "Clique em **Next** nas telas iniciais."
+     ]
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Durante a instalação será exibida a tela para selecionar a instância do SQL Server."
+    },
+    {
+     "tipo": "aviso",
+     "variante": "atencao",
+     "conteudo": "Confirme se a instância selecionada é **MOBILEMED**. Essa verificação normalmente aparece na terceira tela do instalador."
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**2.2 Finalização**"
+    },
+    {
+     "tipo": "passos",
+     "itens": [
+      "Continue clicando em **Next**.",
+      "Aguarde a finalização da instalação."
+     ]
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Após isso, a Worklist estará instalada na máquina."
+    }
+   ]
+  },
+  {
+   "id": "worklist-configuracao",
+   "numero": 3,
+   "titulo": "Configuração da Worklist (pós-instalação)",
+   "resumo": "Via XML (Mirth) ou via banco de dados: string de conexão, queries, mapeamento e validação.",
+   "tags": [
+    "worklist",
+    "configuracao",
+    "xml",
+    "mirth",
+    "jdk",
+    "java",
+    "banco de dados",
+    "string de conexao",
+    "query",
+    "select",
+    "update",
+    "view",
+    "mapeamento",
+    "paciente",
+    "checklist",
+    "validacao"
+   ],
+   "blocos": [
+    {
+     "tipo": "texto",
+     "conteudo": "Depois de instalar a Worklist, o próximo passo é configurá-la para que ela busque os exames e pacientes corretamente e os exiba na lista de trabalho. A configuração pode ser feita de duas formas:"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "**Via XML** (Mirth + Java JDK)",
+      "**Via banco de dados** (string de conexão + queries)"
+     ]
+    },
+    {
+     "tipo": "aviso",
+     "variante": "importante",
+     "conteudo": "Nos dois casos é obrigatório fazer o mapeamento dos dados do paciente, garantindo que os campos necessários sejam preenchidos corretamente na Worklist."
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "Método 1 — Via XML (Mirth Connect)"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Este método usa um arquivo XML como base para a comunicação e a configuração dos dados enviados para a Worklist."
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**Pré-requisitos**"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "Instalar o Java JDK",
+      "Instalar o Mirth Connect"
+     ]
+    },
+    {
+     "tipo": "link",
+     "rotulo": "Documentação de instalação do Mirth (Notion)",
+     "href": "https://www.notion.so/Instala-o-do-Mirth-3066fb4e00a080948506e479eafcc8d2?pvs=10"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**Como funciona.** O Mirth é responsável por:"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "Receber ou gerar informações do paciente e do exame",
+      "Organizar os dados em formato XML",
+      "Enviar esses dados para a Worklist"
+     ]
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**Quando utilizar.** Este método é indicado quando:"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "O cliente não libera acesso direto ao banco",
+      "Já existe integração estruturada via Mirth",
+      "O fluxo do hospital ou laboratório já trabalha com XML/HL7"
+     ]
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "Método 2 — Via banco de dados"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "É o método mais utilizado e mais direto: a Worklist se conecta ao banco de dados do cliente e lê as informações através de uma **VIEW** ou tabela."
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**Informações necessárias do banco** (obrigatórias para configurar):"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "IP do banco",
+      "Nome do banco (Database)",
+      "VIEW ou tabela utilizada",
+      "Usuário",
+      "Senha",
+      "(Opcional) Porta do banco, caso não seja a padrão"
+     ]
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Com esses dados é possível criar a string de conexão, a query de entrada (SELECT) e a query de saída (UPDATE/confirmação), esta última nem sempre necessária."
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**String de conexão.** É usada para a Worklist acessar diretamente o banco do cliente. Geralmente contém IP, porta, nome do database, usuário e senha. Exemplo genérico:"
+    },
+    {
+     "tipo": "comando",
+     "so": "texto",
+     "conteudo": "Server=IP_DO_BANCO;Port=PORTA;Database=NOME_DO_BANCO;User Id=USUARIO;Password=SENHA;"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "A estrutura pode variar conforme o tipo de banco: PostgreSQL, SQL Server, Firebird, etc."
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**Query de entrada (SELECT).** É a consulta que busca os exames e pacientes no banco e os carrega na Worklist. Normalmente é feita em cima de uma VIEW já pronta, o que facilita e evita alterações diretas em tabelas críticas. Exemplo:"
+    },
+    {
+     "tipo": "comando",
+     "so": "texto",
+     "conteudo": "SELECT\n  paciente_nome,\n  paciente_id,\n  exame_id,\n  data_exame,\n  modalidade\nFROM view_worklist\nWHERE status = 'PENDENTE'\nORDER BY data_exame DESC;"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Objetivo da query de entrada:"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "Buscar apenas exames novos",
+      "Garantir que não haja duplicidade",
+      "Ordenar corretamente a fila de exames"
+     ]
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "**Query de saída (UPDATE / confirmação de leitura).** É usada quando o banco exige a confirmação de que o exame foi lido pela Worklist."
+    },
+    {
+     "tipo": "aviso",
+     "variante": "atencao",
+     "conteudo": "Nem todo cliente exige query de saída."
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Ela é necessária quando o cliente precisa marcar o exame como:"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "Lido",
+      "Enviado",
+      "Em processamento",
+      "Baixado pela Worklist"
+     ]
+    },
+    {
+     "tipo": "comando",
+     "so": "texto",
+     "conteudo": "UPDATE tabela_exames\nSET register_read = true\nWHERE exame_id = ${exame_id};"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Objetivo da query de saída:"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "Evitar que o mesmo exame fique subindo repetidamente",
+      "Garantir rastreabilidade no banco"
+     ]
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "Mapeamento de dados do paciente (obrigatório)"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Independentemente do método (XML ou banco), a Worklist precisa que os campos do paciente e do exame estejam corretamente mapeados. Mapear é definir qual campo do banco ou do XML corresponde a cada campo interno da Worklist."
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Exemplos comuns de campos mapeados:"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "Nome do paciente",
+      "Data de nascimento",
+      "Sexo",
+      "ID do paciente",
+      "ID do exame",
+      "Data e hora do exame",
+      "Modalidade (RX, TC, RM, US...)",
+      "Convênio",
+      "Médico solicitante"
+     ]
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Sem o mapeamento correto:"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "O paciente pode aparecer sem informações",
+      "A Worklist pode não abrir os exames corretamente",
+      "Pode haver falhas de cadastro ou inconsistência"
+     ]
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "Fluxo resumido de configuração"
+    },
+    {
+     "tipo": "passos",
+     "itens": [
+      "**Definir o método:** XML (Mirth + JDK) ou banco de dados (conexão direta).",
+      "**Reunir as informações:** IP, usuário, senha, database e view ou tabela.",
+      "**Criar a string de conexão**, ajustando conforme o tipo de banco.",
+      "**Configurar a query de entrada:** o SELECT que busca os exames.",
+      "**Configurar a query de saída**, se necessário: o UPDATE que confirma a leitura.",
+      "**Realizar o mapeamento** dos campos do paciente, garantindo que os dados apareçam corretamente.",
+      "**Validar e testar** o carregamento da Worklist: os exames sobem corretamente, não duplicam e a leitura é registrada."
+     ]
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "Validação final (checklist)"
+    },
+    {
+     "tipo": "texto",
+     "conteudo": "Antes de finalizar a implantação, valide:"
+    },
+    {
+     "tipo": "checklist",
+     "itens": [
+      "Worklist conecta corretamente no banco ou no Mirth.",
+      "Query de entrada retorna os exames corretamente.",
+      "Exames aparecem na lista sem duplicar.",
+      "Dados do paciente estão completos.",
+      "Query de saída funciona (se aplicável).",
+      "Worklist não trava e mantém estabilidade.",
+      "Exames antigos não sobem indevidamente."
+     ]
+    },
+    {
+     "tipo": "subtitulo",
+     "conteudo": "Observações importantes"
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "Sempre priorize o uso de **VIEW** em vez de tabelas diretas.",
+      "A query de saída deve ser usada apenas quando realmente for exigida.",
+      "Se o cliente tiver regras específicas (por exemplo, exames por setor, modalidade ou urgência), aplique essas condições no WHERE da query de entrada.",
+      "O mapeamento é a etapa mais importante, pois garante que a Worklist interprete corretamente os dados."
+     ]
+    }
+   ]
+  }
+ ]
+}
