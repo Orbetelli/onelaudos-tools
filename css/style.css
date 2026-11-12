@@ -152,3 +152,42 @@ details.guia-sec[open]>summary::after{content:'▾'}
 .escala-folga{background:#0e2216;color:#38ef7d;border:1px solid #1f6b3a}
 .escala-rodape{color:var(--mut);font-size:13px;margin:6px 0}
 @media(max-width:720px){.escala td,.escala th{padding:7px;font-size:13px}}
+
+/* ---- Busca global ---- */
+#buscaGlobal{margin-bottom:14px;padding:9px 12px;font-size:14px}
+mark{background:#1f4f86;color:#fff;border-radius:3px;padding:0 2px}
+kbd{background:#2a3a4d;border:1px solid var(--line);border-radius:4px;padding:1px 6px;font-size:12px}
+.busca-item{display:block;color:var(--txt);text-decoration:none}
+.busca-item:hover{border-color:var(--acc)}
+.busca-item p{margin:6px 0 0;color:var(--mut);font-size:14px;line-height:1.5}
+.busca-pag{display:inline-block;font-size:11px;color:var(--acc);background:#1f2d3b;border-radius:4px;padding:1px 7px;margin-bottom:6px}
+.busca-sug{background:#1f2d3b;border:1px solid var(--line);border-radius:999px;padding:4px 12px;color:var(--txt);text-decoration:none;font-size:13px}
+.busca-sug:hover{border-color:var(--acc)}
+
+/* ---- Glossário ---- */
+.glos-filtros{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 8px}
+.glos-letras{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
+.glos-letra{background:var(--card);color:var(--mut);border:1px solid var(--line);padding:3px 9px;font-size:13px}
+.glos-letra.active{background:var(--acc);color:#fff;border-color:var(--acc)}
+.glos-termo h3{margin-bottom:2px}
+.glos-termo p{margin:8px 0 0;line-height:1.55}
+.glos-dia{background:#13202c;border-left:3px solid var(--acc);padding:7px 11px;border-radius:0 6px 6px 0}
+.glos-alvo{border-color:var(--acc);box-shadow:0 0 0 2px #2f9bff55}
+
+/* ---- Diagnóstico de rede ---- */
+.diag-trilha{list-style:none;margin:6px 0 10px;padding:0;display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--mut)}
+.diag-trilha strong{color:var(--txt);font-weight:600}
+.diag-trilha li::before{content:'✓ ';color:#3fb56b}
+.diag-no h3{margin:0 0 6px;font-size:18px}
+.diag-selo{display:inline-block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#fff;background:#1f6b3a;border-radius:4px;padding:1px 8px;margin-bottom:6px}
+.diag-opcoes{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.diag-opcao{text-align:left;background:#1f2d3b;border:1px solid var(--line);color:var(--txt);padding:11px 14px;font-size:15px}
+.diag-opcao:hover{border-color:var(--acc)}
+.diag-encaminhar{border:1px solid #6b5420;background:#2b2412;border-radius:8px;padding:10px 14px;margin-top:12px}
+.diag-encaminhar p{margin:4px 0 0}
+.diag-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:10px 0}
+select{width:100%;padding:11px 14px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--txt);font-size:15px;font-family:inherit}
+.diag-tab code{white-space:pre-wrap;word-break:break-word}
+.diag-tab td:first-child{min-width:220px}
+#rSaida{min-height:260px;font-family:Consolas,monospace;font-size:13px}
+@media(max-width:720px){#buscaGlobal{margin-bottom:8px}}

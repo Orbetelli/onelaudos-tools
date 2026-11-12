@@ -12,7 +12,7 @@ function criarPaginaDoc(cfg) {
             return String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
         },
 
-        render: async function (el) {
+        render: async function (el, param) {
             var esc = Docs.esc.bind(Docs);
             el.innerHTML = '<h1>' + esc(cfg.titulo) + '</h1><p class="vazio">Carregando...</p>';
             try {
@@ -22,7 +22,7 @@ function criarPaginaDoc(cfg) {
                 return;
             }
             if (location.hash.indexOf(cfg.hash) !== 0) return; // trocou de aba durante o carregamento
-            try { this.montar(el); }
+            try { this.montar(el); if (param) this.abrir(param); }
             catch (e) {
                 console.error(e);
                 el.innerHTML = '<h1>' + esc(cfg.titulo) + '</h1><p class="vazio">Erro ao montar a página: ' + esc(e.message) +

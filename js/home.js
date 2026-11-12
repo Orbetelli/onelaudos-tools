@@ -10,7 +10,10 @@ const Home = {
               topicos: ['Exames não sobem', 'Troca de senha', 'Falha no login', 'Quem acionar?'], pronto: true },
             { rota: 'suporte', icone: '🧭', titulo: 'Sup 1 e Sup 2',
               descricao: 'Como o atendimento se divide: o que o Nível 1 resolve dentro do portal e o que sobe para o Nível 2 (T.I. e Mobile).',
-              topicos: ['Nível 1', 'Nível 2', 'Qual nível?', 'Antes de escalar'], pronto: true }
+              topicos: ['Nível 1', 'Nível 2', 'Qual nível?', 'Antes de escalar'], pronto: true },
+            { rota: 'diagnostico', icone: '🌐', titulo: 'Diagnóstico de rede',
+              descricao: 'Descubra onde está o problema de internet, Router ou Worklist com um passo a passo guiado, comandos prontos, teste do navegador e resumo para o chamado.',
+              topicos: ['Passo a passo', 'Comandos', 'Teste do navegador', 'Resumo do chamado'], pronto: true }
         ]},
         { titulo: 'Ferramentas', itens: [
             { rota: 'senhas', icone: '🔑', titulo: 'Gerador de senhas',
@@ -30,6 +33,9 @@ const Home = {
             { rota: 'instalacao', icone: '🛠️', titulo: 'Instalação',
               descricao: 'Tutoriais passo a passo de instalação: MobileRouter, SQL Server e Worklist (instalação e configuração), com comandos prontos para copiar.',
               topicos: ['MobileRouter', 'SQL Server', 'Worklist', 'Configuração'], pronto: false },
+            { rota: 'glossario', icone: '📖', titulo: 'Glossário',
+              descricao: 'Termos do dia a dia do suporte explicados de forma simples: DICOM, PACS, Worklist, AE Title, DNS, ping e outros.',
+              topicos: ['DICOM e PACS', 'Rede', 'Operação', 'Buscar termo'], pronto: true },
             { rota: 'downloads', icone: '📥', titulo: 'Downloads',
               descricao: 'Documentos e tutoriais em arquivo para baixar, como PDFs e arquivos do Word.',
               topicos: ['Guias', 'Tutoriais'], pronto: true }
@@ -39,7 +45,7 @@ const Home = {
     render: function (el) {
         var esc = Docs.esc.bind(Docs);
         var html = '<h1>Onelaudos <span class="home-acc">Tools</span></h1>' +
-            '<p class="home-sub">Ferramentas e documentação para a equipe de suporte. Escolha uma seção abaixo.</p>';
+            '<p class="home-sub">Ferramentas e documentação para a equipe de suporte. Escolha uma seção abaixo ou use a busca no menu para procurar em tudo (atalho: tecle /).</p>';
         this.grupos.forEach(function (g) {
             html += '<h2 class="home-grupo">' + esc(g.titulo) + '</h2><div class="home-grid">';
             g.itens.forEach(function (i) {

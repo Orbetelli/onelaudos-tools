@@ -1,0 +1,822 @@
+{
+ "titulo": "Diagnóstico de rede e conexão",
+ "inicio": "inicio",
+ "nos": {
+  "inicio": {
+   "tipo": "pergunta",
+   "titulo": "O que está acontecendo?",
+   "opcoes": [
+    {
+     "rotulo": "Nenhum site abre, ou a máquina está sem internet",
+     "vai": "sem-internet"
+    },
+    {
+     "rotulo": "Só um sistema não abre (ex.: Telerradiologia), os outros sites abrem",
+     "vai": "sistema"
+    },
+    {
+     "rotulo": "A internet está lenta, ou cai e volta",
+     "vai": "lenta"
+    },
+    {
+     "rotulo": "O exame não chega: o equipamento não envia ao Router (DICOM)",
+     "vai": "router"
+    },
+    {
+     "rotulo": "A Worklist não funciona: o paciente não aparece no equipamento",
+     "vai": "worklist"
+    }
+   ],
+   "texto": "Escolha o cenário mais próximo. O passo a passo leva aos testes e diz quando e para quem encaminhar."
+  },
+  "sem-internet": {
+   "tipo": "pergunta",
+   "titulo": "O computador está ligado à rede?",
+   "opcoes": [
+    {
+     "rotulo": "Sim, cabo encaixado ou Wi-Fi conectado",
+     "vai": "gateway"
+    },
+    {
+     "rotulo": "Não, o cabo está solto ou o Wi-Fi está desligado",
+     "vai": "r-cabo-wifi"
+    }
+   ],
+   "texto": "Veja o cabo de rede na máquina e no switch (luzes acesas), ou o ícone do Wi-Fi na barra do Windows."
+  },
+  "r-cabo-wifi": {
+   "tipo": "resultado",
+   "titulo": "Falta conexão física com a rede",
+   "resumo": "Cabo, Wi-Fi ou placa de rede.",
+   "blocos": [
+    {
+     "tipo": "passos",
+     "itens": [
+      "Encaixe o cabo de rede nas duas pontas e confira se as luzinhas da porta estão acesas.",
+      "Se for Wi-Fi, ligue o Wi-Fi e conecte à rede da unidade.",
+      "Teste outro cabo ou outra porta do switch, se a luz continuar apagada.",
+      "Reinicie o computador e teste de novo."
+     ]
+    }
+   ],
+   "encaminhar": {
+    "para": "TI local da unidade",
+    "texto": "Se o cabo e a porta estão bons e a máquina continua sem rede, pode ser problema na placa de rede ou no switch. Acione a TI local ou o Suporte TI, informando o que foi testado."
+   }
+  },
+  "gateway": {
+   "tipo": "pergunta",
+   "titulo": "O computador recebeu IP e consegue falar com o gateway?",
+   "opcoes": [
+    {
+     "rotulo": "Sim, o gateway responde ao ping",
+     "vai": "ping-externo"
+    },
+    {
+     "rotulo": "Não, o gateway não responde",
+     "vai": "r-gateway"
+    },
+    {
+     "rotulo": "O IP começa com 169.254 ou não aparece IP",
+     "vai": "r-sem-ip"
+    }
+   ],
+   "texto": "Abra o Prompt de Comando (Windows + R, digite cmd) e rode o primeiro comando. Anote o \"Gateway Padrão\". Depois faça ping nele.",
+   "blocos": [
+    {
+     "tipo": "comando",
+     "conteudo": "ipconfig"
+    },
+    {
+     "tipo": "comando",
+     "conteudo": "ping NUMERO-DO-GATEWAY"
+    }
+   ]
+  },
+  "r-sem-ip": {
+   "tipo": "resultado",
+   "titulo": "O computador não obteve IP",
+   "resumo": "IP começando em 169.254 indica que o DHCP não respondeu.",
+   "blocos": [
+    {
+     "tipo": "texto",
+     "conteudo": "O endereço que começa com 169.254 é criado pelo próprio Windows quando não consegue um IP do roteador. Isso aponta para falha entre o computador e o roteador."
+    },
+    {
+     "tipo": "passos",
+     "itens": [
+      "Confira o cabo e a porta do switch.",
+      "Reinicie o roteador da unidade, se houver autorização para isso.",
+      "Peça um novo IP à rede (a conexão cai por alguns segundos):"
+     ]
+    },
+    {
+     "tipo": "comando",
+     "conteudo": "ipconfig /release\nipconfig /renew"
+    },
+    {
+     "tipo": "aviso",
+     "variante": "observacao",
+     "conteudo": "Rode o Prompt de Comando como administrador para esses dois comandos."
+    }
+   ],
+   "encaminhar": {
+    "para": "TI local da unidade",
+    "texto": "Se continuar sem IP depois dos testes, o DHCP do roteador pode estar com problema. Encaminhe à TI local ou ao Suporte TI."
+   }
+  },
+  "r-gateway": {
+   "tipo": "resultado",
+   "titulo": "A máquina não alcança o gateway",
+   "resumo": "Problema entre a máquina e o roteador.",
+   "blocos": [
+    {
+     "tipo": "texto",
+     "conteudo": "A máquina tem IP, mas não consegue falar com o roteador. Pode ser cabo, switch, roteador desligado ou IP configurado errado."
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "Veja se o roteador e o switch estão ligados.",
+      "Teste com outro cabo ou outra porta.",
+      "Confira se outras máquinas da unidade têm internet. Se nenhuma tem, o problema está na rede da unidade."
+     ]
+    },
+    {
+     "tipo": "aviso",
+     "variante": "observacao",
+     "conteudo": "Se o IP, a máscara ou o gateway foram digitados à mão nessa máquina, confira com a TI se estão corretos para essa rede."
+    }
+   ],
+   "encaminhar": {
+    "para": "TI local da unidade",
+    "texto": "Se nenhuma máquina da unidade tem internet, siga o Guia: se o cliente consta na planilha de acessos, acione primeiro a TI local. Caso contrário, o Suporte TI."
+   }
+  },
+  "ping-externo": {
+   "tipo": "pergunta",
+   "titulo": "A máquina chega à internet?",
+   "opcoes": [
+    {
+     "rotulo": "Sim, responde",
+     "vai": "ping-nome"
+    },
+    {
+     "rotulo": "Não, \"Esgotado o tempo limite\" ou sem resposta",
+     "vai": "r-provedor"
+    }
+   ],
+   "texto": "Faça um ping a um endereço da internet, por IP.",
+   "blocos": [
+    {
+     "tipo": "comando",
+     "conteudo": "ping 8.8.8.8"
+    },
+    {
+     "tipo": "aviso",
+     "variante": "observacao",
+     "conteudo": "Algumas redes bloqueiam o ping. Se der sem resposta, mas os sites abrem normalmente, o bloqueio é só do ping e a internet está ok."
+    }
+   ]
+  },
+  "r-provedor": {
+   "tipo": "resultado",
+   "titulo": "O gateway responde, mas não há saída para a internet",
+   "resumo": "O problema está depois do roteador: provedor, link ou modem.",
+   "blocos": [
+    {
+     "tipo": "texto",
+     "conteudo": "A rede local funciona, mas a conexão com a internet não sai. Em geral é o provedor (link caído) ou o modem/roteador."
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "Veja se as luzes do modem/roteador estão normais (a luz de internet acesa).",
+      "Se outras máquinas também estão sem internet, o problema é da unidade, não desta máquina.",
+      "Quando for liberado pela unidade, reiniciar o modem/roteador resolve muitas vezes."
+     ]
+    }
+   ],
+   "encaminhar": {
+    "para": "TI local da unidade",
+    "texto": "Se o link continuar fora, é preciso acionar o provedor de internet da unidade. Informe à TI local ou ao Suporte TI o horário em que começou e o que foi testado."
+   }
+  },
+  "ping-nome": {
+   "tipo": "pergunta",
+   "titulo": "O ping por nome funciona?",
+   "opcoes": [
+    {
+     "rotulo": "Sim, responde",
+     "vai": "r-so-navegador"
+    },
+    {
+     "rotulo": "Não, \"não pôde encontrar o host\"",
+     "vai": "r-dns"
+    }
+   ],
+   "texto": "Agora teste por nome. Se o teste anterior funcionou e este não, o problema é de DNS.",
+   "blocos": [
+    {
+     "tipo": "comando",
+     "conteudo": "ping google.com"
+    }
+   ]
+  },
+  "r-dns": {
+   "tipo": "resultado",
+   "titulo": "Falha de DNS",
+   "resumo": "O IP funciona, o nome não.",
+   "blocos": [
+    {
+     "tipo": "texto",
+     "conteudo": "A conexão existe, mas o computador não consegue traduzir nomes em endereços. É o DNS."
+    },
+    {
+     "tipo": "passos",
+     "itens": [
+      "Limpe o cache de DNS:",
+      "Rode a consulta de DNS e veja se ela responde:",
+      "Teste de novo o ping por nome e abra um site."
+     ]
+    },
+    {
+     "tipo": "comando",
+     "conteudo": "ipconfig /flushdns"
+    },
+    {
+     "tipo": "comando",
+     "conteudo": "nslookup google.com"
+    },
+    {
+     "tipo": "aviso",
+     "variante": "atencao",
+     "conteudo": "Trocar o DNS do computador (por exemplo, para 8.8.8.8) é uma alteração de configuração. Só faça com orientação da TI."
+    }
+   ],
+   "encaminhar": {
+    "para": "TI local da unidade",
+    "texto": "Se o DNS continuar falhando depois de limpar o cache, a causa pode estar no DNS do roteador ou da rede. Encaminhe à TI local ou ao Suporte TI com o resultado do nslookup."
+   }
+  },
+  "r-so-navegador": {
+   "tipo": "resultado",
+   "titulo": "A internet funciona: o problema está no navegador ou no proxy",
+   "resumo": "Rede ok. Verifique navegador, cache e proxy.",
+   "blocos": [
+    {
+     "tipo": "texto",
+     "conteudo": "A rede está funcionando. Se algum site ou sistema não abre, o problema costuma estar no navegador da máquina."
+    },
+    {
+     "tipo": "passos",
+     "itens": [
+      "Abra o site em janela anônima ou em outro navegador.",
+      "Limpe o cache do navegador (Ctrl+Shift+Del) e teste de novo.",
+      "Se ainda falhar, veja se há proxy configurado:"
+     ]
+    },
+    {
+     "tipo": "comando",
+     "conteudo": "netsh winhttp show proxy"
+    },
+    {
+     "tipo": "aviso",
+     "variante": "observacao",
+     "conteudo": "Se aparecer \"Acesso direto (sem servidor proxy)\", não há proxy no sistema."
+    }
+   ],
+   "encaminhar": {
+    "para": "Suporte TI",
+    "texto": "Se persistir, encaminhe ao Suporte TI informando o navegador, o endereço que não abre e o print do erro."
+   }
+  },
+  "sistema": {
+   "tipo": "pergunta",
+   "titulo": "Outros sites abrem normalmente?",
+   "opcoes": [
+    {
+     "rotulo": "Sim, só esse sistema não abre",
+     "vai": "endereco"
+    },
+    {
+     "rotulo": "Não, nenhum site abre",
+     "vai": "sem-internet"
+    }
+   ],
+   "texto": "Teste abrir o Google ou outro site conhecido."
+  },
+  "endereco": {
+   "tipo": "pergunta",
+   "titulo": "O endereço está correto?",
+   "opcoes": [
+    {
+     "rotulo": "Corrigi o endereço e abriu",
+     "vai": "r-endereco"
+    },
+    {
+     "rotulo": "O endereço está correto e continua sem abrir",
+     "vai": "outra-maquina"
+    }
+   ],
+   "texto": "Confira o link digitado. Conforme o Guia rápido, o endereço da Telerradiologia é onelaudos.mobilemed.com.br. O endereço laudos.mobilemed.com.br é o portal geral da MobileMed e não é o correto."
+  },
+  "r-endereco": {
+   "tipo": "resultado",
+   "titulo": "Resolvido: endereço incorreto",
+   "resumo": "Era só o endereço.",
+   "blocos": [
+    {
+     "tipo": "texto",
+     "conteudo": "O acesso foi restabelecido com o endereço correto. Oriente o usuário a salvar o endereço certo nos favoritos para não repetir."
+    }
+   ]
+  },
+  "outra-maquina": {
+   "tipo": "pergunta",
+   "titulo": "Abre em outro navegador, em janela anônima ou em outra máquina?",
+   "opcoes": [
+    {
+     "rotulo": "Sim, abre em algum desses",
+     "vai": "r-local"
+    },
+    {
+     "rotulo": "Não abre em lugar nenhum",
+     "vai": "r-sistema-fora"
+    }
+   ],
+   "texto": "Teste os três cenários e veja onde funciona."
+  },
+  "r-local": {
+   "tipo": "resultado",
+   "titulo": "O problema está nessa máquina ou no navegador",
+   "resumo": "Cache, extensão ou configuração local.",
+   "blocos": [
+    {
+     "tipo": "passos",
+     "itens": [
+      "Limpe o cache do navegador (Ctrl+Shift+Del) e teste de novo.",
+      "Desative extensões, principalmente de bloqueio de anúncios e segurança.",
+      "Teste em outro navegador.",
+      "Se só esta máquina falha, rode os testes de proxy e de DNS:"
+     ]
+    },
+    {
+     "tipo": "comando",
+     "conteudo": "netsh winhttp show proxy"
+    },
+    {
+     "tipo": "comando",
+     "conteudo": "ipconfig /flushdns"
+    }
+   ],
+   "encaminhar": {
+    "para": "Suporte TI",
+    "texto": "Se persistir só nessa máquina, é problema local. Encaminhe ao Suporte TI com o navegador, o endereço e o print."
+   }
+  },
+  "r-sistema-fora": {
+   "tipo": "resultado",
+   "titulo": "O sistema não abre em nenhuma máquina",
+   "resumo": "Pode ser falha do sistema ou bloqueio da rede para o endereço.",
+   "blocos": [
+    {
+     "tipo": "texto",
+     "conteudo": "Se nenhum computador abre o sistema, mas outros sites abrem, a causa pode estar no próprio sistema ou em bloqueio da rede para aquele endereço."
+    },
+    {
+     "tipo": "passos",
+     "itens": [
+      "Use a aba \"Comandos\" para gerar os testes do endereço do sistema.",
+      "Rode o ping, o nslookup e o tracert para o endereço e guarde os resultados.",
+      "Use a aba \"Teste do navegador\" para medir o tempo de resposta ao endereço."
+     ]
+    },
+    {
+     "tipo": "aviso",
+     "variante": "importante",
+     "conteudo": "Se apenas um sistema não abre, não conclua que é problema de internet. Registre os testes antes de encaminhar."
+    }
+   ],
+   "encaminhar": {
+    "para": "MobileMed / Suporte TI",
+    "texto": "Conforme o Guia: a Telerradiologia que não abre após os testes básicos vai para a MobileMed ou o Suporte TI, conforme a origem da falha. Informe os resultados."
+   }
+  },
+  "lenta": {
+   "tipo": "pergunta",
+   "titulo": "Em quantas máquinas a lentidão acontece?",
+   "opcoes": [
+    {
+     "rotulo": "Em uma máquina só",
+     "vai": "r-lenta-uma"
+    },
+    {
+     "rotulo": "Em várias máquinas ou em toda a unidade",
+     "vai": "r-lenta-varias"
+    }
+   ],
+   "texto": "Peça para testar em outro computador da unidade, no mesmo horário."
+  },
+  "r-lenta-uma": {
+   "tipo": "resultado",
+   "titulo": "Lentidão em uma máquina",
+   "resumo": "Provável causa local: Wi-Fi, cabo, navegador ou a própria máquina.",
+   "blocos": [
+    {
+     "tipo": "lista",
+     "itens": [
+      "Se for Wi-Fi, teste ligado por cabo.",
+      "Feche programas pesados e abas abertas.",
+      "Limpe o cache do navegador.",
+      "Rode o ping contínuo por alguns minutos e observe perda ou picos de tempo:"
+     ]
+    },
+    {
+     "tipo": "comando",
+     "conteudo": "ping -t 8.8.8.8"
+    },
+    {
+     "tipo": "aviso",
+     "variante": "observacao",
+     "conteudo": "Para parar o ping contínuo, aperte Ctrl+C. No final, ele mostra o resumo com a perda de pacotes."
+    }
+   ],
+   "encaminhar": {
+    "para": "Suporte TI",
+    "texto": "Se houver perda de pacotes ou tempos muito altos só nessa máquina, informe o resultado ao Suporte TI."
+   }
+  },
+  "r-lenta-varias": {
+   "tipo": "resultado",
+   "titulo": "Lentidão em várias máquinas",
+   "resumo": "Provável causa na rede da unidade ou no link.",
+   "blocos": [
+    {
+     "tipo": "texto",
+     "conteudo": "Quando várias máquinas ficam lentas ao mesmo tempo, o problema costuma estar no link de internet, no roteador ou switch, ou no uso excessivo da banda (downloads, atualizações, envio de exames grandes)."
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "Veja se há downloads, atualizações ou envios grandes em andamento na unidade.",
+      "Rode o ping por alguns minutos e observe perda e tempos:",
+      "Rode o tracert para ver onde o tempo aumenta:"
+     ]
+    },
+    {
+     "tipo": "comando",
+     "conteudo": "ping -n 30 8.8.8.8"
+    },
+    {
+     "tipo": "comando",
+     "conteudo": "tracert 8.8.8.8"
+    }
+   ],
+   "encaminhar": {
+    "para": "TI local da unidade",
+    "texto": "Informe ao Suporte TI, conforme o Guia, se a lentidão acontece em uma ou várias máquinas e o resultado dos testes. Se o cliente consta na planilha de acessos, acione primeiro a TI local."
+   }
+  },
+  "router": {
+   "tipo": "pergunta",
+   "titulo": "O MobileRouter está em execução no computador da unidade?",
+   "opcoes": [
+    {
+     "rotulo": "Sim, está aberto ou em execução",
+     "vai": "router-eco"
+    },
+    {
+     "rotulo": "Não, está fechado ou parado",
+     "vai": "r-router-parado"
+    }
+   ],
+   "texto": "Veja se o programa MobileRouter está aberto ou se o serviço está em execução (Windows + R, digite services.msc)."
+  },
+  "r-router-parado": {
+   "tipo": "resultado",
+   "titulo": "O Router não está em execução",
+   "resumo": "Sem o Router, os exames não são recebidos.",
+   "blocos": [
+    {
+     "tipo": "passos",
+     "itens": [
+      "Abra o MobileRouter ou inicie o serviço em services.msc.",
+      "Se ele fechar sozinho, reinicie o computador e teste de novo.",
+      "Faça um novo envio de teste pelo equipamento."
+     ]
+    },
+    {
+     "tipo": "aviso",
+     "variante": "observacao",
+     "conteudo": "Quando o computador reinicia, confira se o Router voltou a rodar. Se não voltar sozinho, informe ao Nível 2."
+    }
+   ],
+   "encaminhar": {
+    "para": "MobileMed",
+    "texto": "Se o Router não inicia, encaminhe à MobileMed, conforme o Guia para exames que não sobem. Informe a mensagem de erro, se houver."
+   }
+  },
+  "router-eco": {
+   "tipo": "pergunta",
+   "titulo": "O equipamento consegue fazer o C-ECHO (Verify) para o Router?",
+   "opcoes": [
+    {
+     "rotulo": "Sim, o C-ECHO funciona",
+     "vai": "r-router-plataforma"
+    },
+    {
+     "rotulo": "Não, o C-ECHO falha",
+     "vai": "router-porta"
+    }
+   ],
+   "texto": "No equipamento (ou na estação de aquisição), procure a opção de teste de conexão DICOM, geralmente chamada de Verify, Echo ou Teste."
+  },
+  "r-router-plataforma": {
+   "tipo": "resultado",
+   "titulo": "O equipamento chega ao Router: o problema é depois",
+   "resumo": "Verifique a internet do computador do Router e o envio à plataforma.",
+   "blocos": [
+    {
+     "tipo": "texto",
+     "conteudo": "O equipamento está entregando as imagens ao Router. Se o exame ainda não aparece no portal, o problema está no envio do Router à plataforma."
+    },
+    {
+     "tipo": "passos",
+     "itens": [
+      "Confira se o computador do Router tem internet (ping 8.8.8.8 e abrir um site).",
+      "Confira se o Router está aberto e sem mensagem de erro.",
+      "Peça ao Nível 1 para conferir se o exame aparece no portal e se as imagens estão completas."
+     ]
+    },
+    {
+     "tipo": "comando",
+     "conteudo": "ping 8.8.8.8"
+    }
+   ],
+   "encaminhar": {
+    "para": "MobileMed",
+    "texto": "Se a internet do computador do Router está boa e o exame não sobe, encaminhe à MobileMed, conforme o Guia (exames que não sobem)."
+   }
+  },
+  "router-porta": {
+   "tipo": "pergunta",
+   "titulo": "A porta do Router responde?",
+   "opcoes": [
+    {
+     "rotulo": "Sim, TcpTestSucceeded : True",
+     "vai": "r-ae-title"
+    },
+    {
+     "rotulo": "Não, TcpTestSucceeded : False",
+     "vai": "r-firewall-porta"
+    }
+   ],
+   "texto": "Em um computador da mesma rede, abra o PowerShell e rode o teste com o IP do computador do Router e a porta DICOM configurada. A aba \"Comandos\" gera esse comando já preenchido.",
+   "blocos": [
+    {
+     "tipo": "comando",
+     "conteudo": "Test-NetConnection -ComputerName IP-DO-ROUTER -Port PORTA"
+    }
+   ]
+  },
+  "r-ae-title": {
+   "tipo": "resultado",
+   "titulo": "A porta está aberta: confira a configuração DICOM",
+   "resumo": "AE Title, IP ou porta divergentes no equipamento.",
+   "blocos": [
+    {
+     "tipo": "texto",
+     "conteudo": "A rede chega até a porta. Como o C-ECHO falha mesmo assim, a configuração DICOM dos dois lados deve estar divergente."
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "O AE Title no equipamento precisa ser igual ao cadastrado no Router (atenção a maiúsculas e minúsculas).",
+      "O IP do computador do Router no equipamento precisa estar correto. Se o IP mudou (DHCP), o ideal é usar IP fixo.",
+      "A porta no equipamento precisa ser a mesma configurada no Router.",
+      "Veja se o equipamento está liberado na lista de modalidades do Router."
+     ]
+    }
+   ],
+   "encaminhar": {
+    "para": "MobileMed",
+    "texto": "Se tudo conferir e o C-ECHO continuar falhando, encaminhe à MobileMed com os valores de AE Title, IP e porta usados nos dois lados."
+   }
+  },
+  "r-firewall-porta": {
+   "tipo": "resultado",
+   "titulo": "A porta está bloqueada ou o IP está errado",
+   "resumo": "Firewall, IP incorreto, cabo ou computador do Router desligado.",
+   "blocos": [
+    {
+     "tipo": "texto",
+     "conteudo": "A comunicação até o Router não está chegando. As causas mais comuns são firewall, IP errado ou cabo."
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "Confirme o IP do computador do Router (ipconfig) e se é o mesmo configurado no equipamento.",
+      "Confira se o Firewall do Windows está desativado no computador do Router, como pede o tutorial de instalação.",
+      "Verifique o cabo e o switch entre o equipamento e o Router.",
+      "Veja se o MobileRouter está em execução."
+     ]
+    },
+    {
+     "tipo": "comando",
+     "conteudo": "ipconfig"
+    },
+    {
+     "tipo": "aviso",
+     "variante": "atencao",
+     "conteudo": "Alterações em firewall e rede de um computador de cliente devem seguir o procedimento da TI."
+    }
+   ],
+   "encaminhar": {
+    "para": "Suporte TI",
+    "texto": "Se o IP e o firewall estão corretos e a porta continua fechada, encaminhe ao Suporte TI com o resultado do Test-NetConnection."
+   }
+  },
+  "worklist": {
+   "tipo": "pergunta",
+   "titulo": "O SQL Server e a Worklist estão em execução?",
+   "opcoes": [
+    {
+     "rotulo": "Sim, os serviços estão em execução",
+     "vai": "r-worklist-rede"
+    },
+    {
+     "rotulo": "Não, um deles está parado",
+     "vai": "r-worklist-servico"
+    }
+   ],
+   "texto": "Abra o services.msc (Windows + R) e procure o serviço do SQL Server da instância MOBILEMED e o da Worklist."
+  },
+  "r-worklist-servico": {
+   "tipo": "resultado",
+   "titulo": "Serviço da Worklist parado",
+   "resumo": "Sem o banco ou a Worklist, o equipamento não recebe a lista.",
+   "blocos": [
+    {
+     "tipo": "passos",
+     "itens": [
+      "Inicie o serviço do SQL Server (instância MOBILEMED), se estiver parado.",
+      "Em seguida, inicie o serviço da Worklist.",
+      "No equipamento, atualize a lista de exames e confira se o paciente apareceu."
+     ]
+    },
+    {
+     "tipo": "aviso",
+     "variante": "observacao",
+     "conteudo": "Se o serviço volta a parar, anote a mensagem de erro e o horário."
+    }
+   ],
+   "encaminhar": {
+    "para": "MobileMed",
+    "texto": "Se o serviço não inicia, encaminhe à MobileMed com a mensagem de erro, conforme o Guia."
+   }
+  },
+  "r-worklist-rede": {
+   "tipo": "resultado",
+   "titulo": "Serviços ok: teste a comunicação com o equipamento",
+   "resumo": "Rede, AE Title ou porta entre o equipamento e a Worklist.",
+   "blocos": [
+    {
+     "tipo": "texto",
+     "conteudo": "Com os serviços rodando, o equipamento ainda não vê os pacientes. O próximo ponto é a comunicação entre o equipamento e a Worklist."
+    },
+    {
+     "tipo": "lista",
+     "itens": [
+      "Faça o C-ECHO do equipamento para a Worklist.",
+      "Se falhar, teste a porta com Test-NetConnection (aba \"Comandos\").",
+      "Confira o AE Title, o IP e a porta da Worklist configurados no equipamento.",
+      "Confira se o paciente está agendado com os dados que o equipamento usa para filtrar (data, modalidade, AE Title)."
+     ]
+    }
+   ],
+   "encaminhar": {
+    "para": "MobileMed",
+    "texto": "Se a comunicação está ok e o paciente não aparece, a causa pode estar na configuração ou nos dados da Worklist (XML ou banco). Encaminhe à MobileMed, informando o paciente e o horário do teste."
+   }
+  }
+ },
+ "comandos": [
+  {
+   "cmd": "ipconfig /all",
+   "para": "Mostra IP, máscara, gateway, DNS e endereço MAC da máquina.",
+   "onde": "Prompt de Comando"
+  },
+  {
+   "cmd": "ping NUMERO-DO-GATEWAY",
+   "para": "Testa se a máquina fala com o roteador. O gateway aparece no ipconfig.",
+   "onde": "Prompt de Comando"
+  },
+  {
+   "cmd": "ping 8.8.8.8",
+   "para": "Testa a saída para a internet, por IP (sem depender do DNS).",
+   "onde": "Prompt de Comando"
+  },
+  {
+   "cmd": "ping google.com",
+   "para": "Testa a saída para a internet, por nome (depende do DNS).",
+   "onde": "Prompt de Comando"
+  },
+  {
+   "cmd": "ping -n 30 8.8.8.8",
+   "para": "Faz 30 pings e mostra a perda de pacotes e os tempos no final.",
+   "onde": "Prompt de Comando"
+  },
+  {
+   "cmd": "ping -t 8.8.8.8",
+   "para": "Ping contínuo. Para parar, Ctrl+C, e o resumo aparece.",
+   "onde": "Prompt de Comando"
+  },
+  {
+   "cmd": "tracert 8.8.8.8",
+   "para": "Mostra os saltos até o destino e onde a conexão para ou fica lenta.",
+   "onde": "Prompt de Comando"
+  },
+  {
+   "cmd": "nslookup google.com",
+   "para": "Consulta o DNS e mostra o IP do nome.",
+   "onde": "Prompt de Comando"
+  },
+  {
+   "cmd": "ipconfig /flushdns",
+   "para": "Limpa o cache de DNS da máquina.",
+   "onde": "Prompt de Comando"
+  },
+  {
+   "cmd": "ipconfig /release\nipconfig /renew",
+   "para": "Devolve e pede um novo IP ao roteador. A conexão cai por alguns segundos.",
+   "onde": "Prompt de Comando como administrador"
+  },
+  {
+   "cmd": "netsh winhttp show proxy",
+   "para": "Mostra se há proxy configurado no sistema.",
+   "onde": "Prompt de Comando"
+  },
+  {
+   "cmd": "arp -a",
+   "para": "Lista os dispositivos que a máquina enxerga na rede local, com IP e MAC.",
+   "onde": "Prompt de Comando"
+  },
+  {
+   "cmd": "Test-NetConnection -ComputerName IP-OU-NOME -Port PORTA",
+   "para": "Testa se uma porta específica responde (por exemplo, a do Router ou da Worklist). Procure por TcpTestSucceeded.",
+   "onde": "PowerShell"
+  },
+  {
+   "cmd": "netstat -ano | findstr :PORTA",
+   "para": "Mostra se algum programa desta máquina está escutando ou usando a porta.",
+   "onde": "Prompt de Comando"
+  }
+ ],
+ "leitura": [
+  [
+   "Resposta de ...: bytes=32 tempo=12ms",
+   "Está respondendo. O tempo é a latência."
+  ],
+  [
+   "Esgotado o tempo limite do pedido",
+   "Sem resposta. Pode ser destino desligado, rede fora do ar ou bloqueio do ping pelo firewall."
+  ],
+  [
+   "Host de destino inacessível",
+   "A máquina ou o roteador não sabe chegar ao destino. Veja o gateway e o cabo."
+  ],
+  [
+   "A solicitação de ping não pôde encontrar o host",
+   "O nome não foi traduzido em IP. É problema de DNS."
+  ],
+  [
+   "Falha geral",
+   "Costuma indicar problema no adaptador de rede da máquina."
+  ],
+  [
+   "Perda de 0%",
+   "Esperado. Perda constante, mesmo pequena, indica instabilidade (cabo, Wi-Fi, provedor)."
+  ],
+  [
+   "IP começando em 169.254",
+   "O Windows não conseguiu um IP do roteador (DHCP)."
+  ],
+  [
+   "TcpTestSucceeded : True",
+   "A porta respondeu. A rede até ela está ok."
+  ],
+  [
+   "TcpTestSucceeded : False",
+   "A porta não respondeu: firewall, IP errado, programa parado ou equipamento desligado."
+  ],
+  [
+   "tracert com * * *",
+   "O ponto não respondeu. Em alguns saltos é normal. Só importa se o destino final não for alcançado."
+  ],
+  [
+   "Tempos de ping (referência geral)",
+   "Abaixo de 50 ms é muito bom. Acima de 150 ms o uso de sistemas começa a ficar pesado."
+  ]
+ ]
+}

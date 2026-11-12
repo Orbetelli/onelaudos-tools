@@ -1,0 +1,482 @@
+{
+ "titulo": "Glossário",
+ "termos": [
+  {
+   "id": "dicom",
+   "termo": "DICOM",
+   "categoria": "Imagem e DICOM",
+   "definicao": "Padrão internacional para armazenar, enviar e consultar imagens médicas e os dados do paciente que acompanham cada imagem. É o \"idioma\" que os equipamentos, o Router e os sistemas usam para trocar exames.",
+   "extenso": "Digital Imaging and Communications in Medicine",
+   "dia": "Quando o exame não sobe, parte da investigação é saber se o equipamento está conseguindo enviar DICOM ao Router.",
+   "ver": [
+    "pacs",
+    "ae-title",
+    "c-echo",
+    "c-store"
+   ]
+  },
+  {
+   "id": "pacs",
+   "termo": "PACS",
+   "categoria": "Imagem e DICOM",
+   "definicao": "Sistema que armazena as imagens dos exames e as entrega para visualização e laudo.",
+   "extenso": "Picture Archiving and Communication System",
+   "ver": [
+    "dicom",
+    "ris"
+   ]
+  },
+  {
+   "id": "ris",
+   "termo": "RIS",
+   "categoria": "Imagem e DICOM",
+   "definicao": "Sistema que cuida do fluxo administrativo da radiologia: pedidos, agendamento, status do exame e laudos.",
+   "extenso": "Radiology Information System",
+   "ver": [
+    "pacs",
+    "his",
+    "worklist"
+   ]
+  },
+  {
+   "id": "his",
+   "termo": "HIS",
+   "categoria": "Imagem e DICOM",
+   "definicao": "Sistema de gestão do hospital ou da clínica (cadastro de pacientes, atendimentos, faturamento). Costuma enviar os pedidos para o RIS.",
+   "extenso": "Hospital Information System",
+   "ver": [
+    "ris",
+    "hl7"
+   ]
+  },
+  {
+   "id": "worklist",
+   "termo": "Worklist",
+   "categoria": "Imagem e DICOM",
+   "definicao": "Lista de exames agendados que o equipamento consulta para trazer os dados do paciente já preenchidos, sem digitação manual. Reduz erro de cadastro e exame sem identificação correta.",
+   "extenso": "DICOM Modality Worklist (MWL)",
+   "dia": "Se o técnico não vê o paciente na lista do equipamento, o problema pode estar na Worklist, no AE Title ou na rede.",
+   "ver": [
+    "c-find",
+    "ae-title",
+    "accession-number"
+   ]
+  },
+  {
+   "id": "modalidade",
+   "termo": "Modalidade",
+   "categoria": "Imagem e DICOM",
+   "definicao": "Tipo de equipamento ou de exame de imagem. Siglas comuns: CR e DX (radiografia), CT (tomografia), MR (ressonância), US (ultrassom), MG (mamografia).",
+   "dia": "Nas configurações do Router, as modalidades definem quais equipamentos enviam exames.",
+   "ver": [
+    "dicom"
+   ]
+  },
+  {
+   "id": "estudo-serie-e-imagem",
+   "termo": "Estudo, série e imagem",
+   "categoria": "Imagem e DICOM",
+   "definicao": "Hierarquia de um exame DICOM. O estudo é o exame completo do paciente. A série é um conjunto de imagens do mesmo tipo dentro do estudo. A imagem (ou instância) é cada arquivo individual.",
+   "dia": "\"Exame subiu com imagens faltando\" costuma significar que o número de imagens recebido é menor que o gerado no equipamento.",
+   "ver": [
+    "dicom"
+   ]
+  },
+  {
+   "id": "ae-title",
+   "termo": "AE Title",
+   "categoria": "Imagem e DICOM",
+   "definicao": "Nome que identifica um equipamento ou programa DICOM na rede. Precisa estar escrito igual nos dois lados (quem envia e quem recebe), inclusive maiúsculas e minúsculas.",
+   "extenso": "Application Entity Title",
+   "dia": "Um AE Title digitado diferente é causa comum de equipamento que \"não conversa\" com o Router.",
+   "ver": [
+    "dicom",
+    "porta",
+    "c-echo"
+   ]
+  },
+  {
+   "id": "c-echo",
+   "termo": "C-ECHO",
+   "categoria": "Imagem e DICOM",
+   "definicao": "Teste de comunicação do DICOM: equivale a um \"ping\" entre dois nós DICOM. Confirma que o equipamento e o servidor se enxergam e estão com IP, porta e AE Title corretos.",
+   "dia": "A maioria dos equipamentos tem uma opção \"Verify\" ou \"Echo\" para rodar esse teste.",
+   "ver": [
+    "ae-title",
+    "ping",
+    "porta"
+   ]
+  },
+  {
+   "id": "c-store",
+   "termo": "C-STORE",
+   "categoria": "Imagem e DICOM",
+   "definicao": "Operação DICOM de envio de imagens: é o que o equipamento faz para mandar o exame ao Router ou ao PACS.",
+   "ver": [
+    "c-echo",
+    "dicom"
+   ]
+  },
+  {
+   "id": "c-find",
+   "termo": "C-FIND",
+   "categoria": "Imagem e DICOM",
+   "definicao": "Operação DICOM de consulta. É a que o equipamento usa para pedir à Worklist a lista de exames agendados.",
+   "ver": [
+    "worklist"
+   ]
+  },
+  {
+   "id": "scu-e-scp",
+   "termo": "SCU e SCP",
+   "categoria": "Imagem e DICOM",
+   "definicao": "Papéis em uma comunicação DICOM. O SCU é quem solicita o serviço (por exemplo, o equipamento que envia imagens). O SCP é quem fornece o serviço (por exemplo, o Router que recebe).",
+   "extenso": "Service Class User / Provider",
+   "ver": [
+    "dicom",
+    "c-store"
+   ]
+  },
+  {
+   "id": "hl7",
+   "termo": "HL7",
+   "categoria": "Imagem e DICOM",
+   "definicao": "Padrão de mensagens para troca de dados clínicos e administrativos entre sistemas de saúde, como HIS e RIS.",
+   "extenso": "Health Level Seven",
+   "ver": [
+    "his",
+    "ris"
+   ]
+  },
+  {
+   "id": "accession-number",
+   "termo": "Accession Number",
+   "categoria": "Imagem e DICOM",
+   "definicao": "Número que identifica o pedido ou exame no RIS. Aparece também nos dados DICOM e ajuda a cruzar o exame com o cadastro certo.",
+   "extenso": "Número de acesso",
+   "ver": [
+    "worklist",
+    "ris"
+   ]
+  },
+  {
+   "id": "anonimizacao",
+   "termo": "Anonimização",
+   "categoria": "Imagem e DICOM",
+   "definicao": "Remoção dos dados que identificam o paciente (nome, documento, data de nascimento) de um exame, para uso em estudo, treinamento ou suporte."
+  },
+  {
+   "id": "laudo",
+   "termo": "Laudo",
+   "categoria": "Imagem e DICOM",
+   "definicao": "Documento com o resultado e a interpretação do exame, emitido pelo médico executante.",
+   "ver": [
+    "teleradiologia"
+   ]
+  },
+  {
+   "id": "teleradiologia",
+   "termo": "Teleradiologia",
+   "categoria": "Imagem e DICOM",
+   "definicao": "Serviço em que o exame é realizado em um local e o laudo é feito à distância por médico em outro, com as imagens enviadas pela internet.",
+   "ver": [
+    "laudo",
+    "dicom"
+   ]
+  },
+  {
+   "id": "ip",
+   "termo": "IP",
+   "categoria": "Rede",
+   "definicao": "Endereço numérico que identifica um computador ou equipamento na rede, como 192.168.0.25. Dois dispositivos na mesma rede não podem ter o mesmo IP.",
+   "extenso": "Internet Protocol",
+   "dia": "IP duplicado causa quedas intermitentes que parecem \"defeito\" do equipamento.",
+   "ver": [
+    "dhcp",
+    "mascara-de-rede",
+    "gateway"
+   ]
+  },
+  {
+   "id": "dhcp",
+   "termo": "DHCP",
+   "categoria": "Rede",
+   "definicao": "Serviço (normalmente do roteador) que entrega IP automaticamente aos dispositivos. O contrário é o IP fixo, configurado à mão. Equipamentos DICOM costumam usar IP fixo.",
+   "extenso": "Dynamic Host Configuration Protocol",
+   "ver": [
+    "ip"
+   ]
+  },
+  {
+   "id": "mascara-de-rede",
+   "termo": "Máscara de rede",
+   "categoria": "Rede",
+   "definicao": "Define quais IPs pertencem à mesma rede local. Exemplo comum: 255.255.255.0. Se estiver diferente entre dois dispositivos, eles podem não se enxergar.",
+   "extenso": "Máscara de sub-rede",
+   "ver": [
+    "ip",
+    "gateway"
+   ]
+  },
+  {
+   "id": "gateway",
+   "termo": "Gateway",
+   "categoria": "Rede",
+   "definicao": "Aparelho (em geral o roteador) pelo qual os computadores saem da rede local para a internet. É o primeiro ponto para testar quando \"a internet caiu\".",
+   "extenso": "Gateway padrão",
+   "dia": "Teste: se o ping ao gateway responde, a rede local está viva e o problema está depois dele.",
+   "ver": [
+    "ip",
+    "roteador-e-switch",
+    "ping"
+   ]
+  },
+  {
+   "id": "dns",
+   "termo": "DNS",
+   "categoria": "Rede",
+   "definicao": "\"Lista telefônica\" da internet: traduz nomes como onelaudos.mobilemed.com.br em endereços IP. Se o DNS falha, o ping por IP funciona, mas por nome não.",
+   "extenso": "Domain Name System",
+   "dia": "Sinal clássico: abre pelo IP e não abre pelo endereço.",
+   "ver": [
+    "nslookup",
+    "cache-de-dns"
+   ]
+  },
+  {
+   "id": "cache-de-dns",
+   "termo": "Cache de DNS",
+   "categoria": "Rede",
+   "definicao": "Memória local de endereços já consultados. Se ficar desatualizada, o computador pode tentar um endereço antigo. Limpa-se com ipconfig /flushdns.",
+   "ver": [
+    "dns"
+   ]
+  },
+  {
+   "id": "porta",
+   "termo": "Porta",
+   "categoria": "Rede",
+   "definicao": "Número que identifica um serviço específico em um IP. É como o \"ramal\" de um endereço. Equipamentos DICOM usam uma porta definida na configuração (por exemplo 104 ou 11112). Se o firewall bloqueia a porta, o serviço não responde.",
+   "dia": "Teste-NetConnection verifica se uma porta está acessível.",
+   "ver": [
+    "firewall",
+    "tcp-e-udp",
+    "ae-title"
+   ]
+  },
+  {
+   "id": "tcp-e-udp",
+   "termo": "TCP e UDP",
+   "categoria": "Rede",
+   "definicao": "Os dois principais modos de transporte de dados na rede. O TCP confirma a entrega (usado por sites e DICOM). O UDP não confirma e é mais leve (usado em DNS e voz).",
+   "ver": [
+    "porta"
+   ]
+  },
+  {
+   "id": "firewall",
+   "termo": "Firewall",
+   "categoria": "Rede",
+   "definicao": "Barreira que permite ou bloqueia o tráfego de rede por regra de IP, porta ou programa. Pode estar no Windows, no roteador ou na rede da unidade.",
+   "dia": "Na instalação do Router, o Firewall do Windows precisa estar desativado, conforme o tutorial.",
+   "ver": [
+    "porta"
+   ]
+  },
+  {
+   "id": "proxy",
+   "termo": "Proxy",
+   "categoria": "Rede",
+   "definicao": "Intermediário pelo qual o acesso à internet passa em algumas redes. Um proxy mal configurado faz sites e sistemas pararem de abrir só naquele computador.",
+   "ver": [
+    "dns"
+   ]
+  },
+  {
+   "id": "vpn",
+   "termo": "VPN",
+   "categoria": "Rede",
+   "definicao": "Conexão protegida que liga um computador ou unidade à rede de outro local pela internet.",
+   "extenso": "Virtual Private Network"
+  },
+  {
+   "id": "lan-e-wan",
+   "termo": "LAN e WAN",
+   "categoria": "Rede",
+   "definicao": "LAN é a rede local, dentro da unidade. WAN é a rede ampla que liga a unidade ao mundo (a internet, por exemplo).",
+   "ver": [
+    "gateway"
+   ]
+  },
+  {
+   "id": "roteador-e-switch",
+   "termo": "Roteador e switch",
+   "categoria": "Rede",
+   "definicao": "O roteador liga a rede local à internet. O switch distribui a rede local entre vários cabos. Um switch desligado derruba todas as máquinas ligadas a ele.",
+   "ver": [
+    "gateway"
+   ]
+  },
+  {
+   "id": "latencia",
+   "termo": "Latência",
+   "categoria": "Rede",
+   "definicao": "Tempo que um dado leva para ir e voltar, medido em milissegundos (ms) no ping. Quanto menor, melhor. Latência alta deixa os sistemas \"pesados\" mesmo com internet rápida.",
+   "ver": [
+    "ping",
+    "jitter"
+   ]
+  },
+  {
+   "id": "jitter",
+   "termo": "Jitter",
+   "categoria": "Rede",
+   "definicao": "Variação da latência de um pacote para outro. Muito jitter causa travamentos e quedas em conexões que parecem \"boas\" na média.",
+   "ver": [
+    "latencia"
+   ]
+  },
+  {
+   "id": "perda-de-pacotes",
+   "termo": "Perda de pacotes",
+   "categoria": "Rede",
+   "definicao": "Percentual de dados enviados que não chegam ao destino. Qualquer perda constante já indica problema (cabo, Wi-Fi, provedor ou equipamento).",
+   "dia": "O ping mostra a perda ao final: \"0% de perda\" é o esperado.",
+   "ver": [
+    "ping"
+   ]
+  },
+  {
+   "id": "largura-de-banda",
+   "termo": "Largura de banda",
+   "categoria": "Rede",
+   "definicao": "Quantidade de dados que a conexão leva por segundo, em Mbps. Banda baixa deixa o upload de exames grandes lento. É diferente de latência.",
+   "ver": [
+    "latencia"
+   ]
+  },
+  {
+   "id": "ping",
+   "termo": "Ping",
+   "categoria": "Rede",
+   "definicao": "Comando que envia pequenas mensagens a um endereço e mede se há resposta e em quanto tempo. É o teste mais básico de conectividade.",
+   "ver": [
+    "latencia",
+    "perda-de-pacotes"
+   ]
+  },
+  {
+   "id": "tracert",
+   "termo": "Tracert",
+   "categoria": "Rede",
+   "definicao": "Comando que mostra o caminho (os \"saltos\") que a conexão percorre até o destino. Ajuda a ver em qual ponto a comunicação para ou fica lenta.",
+   "extenso": "tracert (traceroute)",
+   "ver": [
+    "ping",
+    "gateway"
+   ]
+  },
+  {
+   "id": "nslookup",
+   "termo": "Nslookup",
+   "categoria": "Rede",
+   "definicao": "Comando que consulta o DNS e mostra qual IP corresponde a um nome.",
+   "ver": [
+    "dns"
+   ]
+  },
+  {
+   "id": "ipconfig",
+   "termo": "Ipconfig",
+   "categoria": "Rede",
+   "definicao": "Comando do Windows que mostra a configuração de rede do computador: IP, máscara, gateway e DNS.",
+   "ver": [
+    "ip",
+    "gateway",
+    "dns"
+   ]
+  },
+  {
+   "id": "endereco-mac",
+   "termo": "Endereço MAC",
+   "categoria": "Rede",
+   "definicao": "Identificador único gravado na placa de rede de cada dispositivo. É usado, por exemplo, para reservar um IP fixo no roteador.",
+   "ver": [
+    "ip",
+    "dhcp"
+   ]
+  },
+  {
+   "id": "mobilerouter",
+   "termo": "MobileRouter",
+   "categoria": "Operação e sistemas",
+   "definicao": "Programa instalado na unidade que recebe os exames dos equipamentos por DICOM e os envia para a plataforma. Também é chamado de Router.",
+   "dia": "Os tutoriais de instalação e configuração estão na aba Instalação.",
+   "ver": [
+    "dicom",
+    "ae-title",
+    "modalidade"
+   ]
+  },
+  {
+   "id": "sql-server",
+   "termo": "SQL Server",
+   "categoria": "Operação e sistemas",
+   "definicao": "Banco de dados da Microsoft. Na instalação da Worklist, é criada uma instância própria (MOBILEMED) para guardar os dados.",
+   "ver": [
+    "instancia",
+    "worklist"
+   ]
+  },
+  {
+   "id": "instancia",
+   "termo": "Instância",
+   "categoria": "Operação e sistemas",
+   "definicao": "Cópia independente do SQL Server no mesmo computador, com nome próprio. A Worklist se conecta pelo nome da instância.",
+   "ver": [
+    "sql-server"
+   ]
+  },
+  {
+   "id": "servico-do-windows",
+   "termo": "Serviço do Windows",
+   "categoria": "Operação e sistemas",
+   "definicao": "Programa que roda em segundo plano e inicia com o computador, sem precisar de login. Pode ser iniciado, parado e reiniciado em services.msc.",
+   "dia": "Se o Router ou o SQL Server parar, o serviço correspondente pode estar parado.",
+   "ver": [
+    "mobilerouter",
+    "sql-server"
+   ]
+  },
+  {
+   "id": "acesso-remoto",
+   "termo": "Acesso remoto",
+   "categoria": "Operação e sistemas",
+   "definicao": "Uso de um programa, como o AnyDesk, para controlar um computador à distância e resolver o problema. Só deve ser usado com autorização, e conforme o Guia, nem todo caso exige acessar a máquina."
+  },
+  {
+   "id": "nivel-1-e-nivel-2",
+   "termo": "Nível 1 e Nível 2",
+   "categoria": "Operação e sistemas",
+   "definicao": "Níveis de atendimento. O Nível 1 resolve o que dá para fazer dentro do portal (consulta de exames, usuários, cabeçalho e rodapé). O Nível 2 recebe o que depende de T.I. ou da Mobile (falha de envio, Router, Worklist, internet).",
+   "dia": "Veja a aba Sup 1 e Sup 2."
+  },
+  {
+   "id": "chamado",
+   "termo": "Chamado",
+   "categoria": "Operação e sistemas",
+   "definicao": "Registro formal de uma solicitação de atendimento, com descrição do problema, quem atendeu e o resultado.",
+   "dia": "Um bom chamado traz o que não funciona, quantas máquinas afetou, os testes feitos e o print do erro.",
+   "ver": [
+    "nivel-1-e-nivel-2"
+   ]
+  },
+  {
+   "id": "cache-do-navegador",
+   "termo": "Cache do navegador",
+   "categoria": "Operação e sistemas",
+   "definicao": "Arquivos que o navegador guarda para abrir sites mais rápido. Cache antigo pode causar erro de login ou tela quebrada mesmo com os dados corretos. Limpar e testar de novo é um dos primeiros passos.",
+   "dia": "Atalho: Ctrl+Shift+Del. Para recarregar ignorando o cache, Ctrl+Shift+R."
+  }
+ ]
+}
