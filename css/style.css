@@ -143,3 +143,12 @@ details.guia-sec[open]>summary::after{content:'▾'}
 .video-icone{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:46px;height:46px;border-radius:50%;background:rgba(15,23,32,.82);border:2px solid #fff;color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;padding-left:3px}
 .video-info{padding:10px 12px;display:flex;flex-direction:column;gap:6px;font-size:14px}
 .video-info a{font-size:12px}
+
+/* ---- Escala (Engenharia Clínica) ---- */
+.escala-regiao{background:#0f2236;color:var(--acc);text-align:center;letter-spacing:.03em}
+.escala td:nth-child(2),.escala td:nth-child(3),.escala th:nth-child(2),.escala th:nth-child(3){text-align:center;white-space:nowrap}
+.escala-selo{display:inline-block;margin-left:8px;font-size:11px;font-weight:700;border-radius:999px;padding:1px 8px}
+.escala-plantao{background:#2a2410;color:#e0a800;border:1px solid #6b5300}
+.escala-folga{background:#0e2216;color:#38ef7d;border:1px solid #1f6b3a}
+.escala-rodape{color:var(--mut);font-size:13px;margin:6px 0}
+@media(max-width:720px){.escala td,.escala th{padding:7px;font-size:13px}}

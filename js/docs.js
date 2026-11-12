@@ -1,5 +1,5 @@
 // Renderizador de conteúdo: carrega arquivos JSON e monta páginas com busca (search-first)
-// Blocos: texto, subtitulo, lista, passos, aviso, checklist, link, videos, tabela, contato, destaque, comando, imagem
+// Blocos: escala, texto, subtitulo, lista, passos, aviso, checklist, link, videos, tabela, contato, destaque, comando, imagem
 const Docs = {
   esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); },
   // Escapa primeiro e só depois aplica **negrito** (não abre brecha para HTML)
@@ -29,6 +29,19 @@ const Docs = {
         return `<p><a class="btn sec" href="${this.esc(h)}"${ext}>${this.esc(b.rotulo)}</a></p>`;
       }
       case 'videos': return `<div class="video-grid">${b.itens.filter(v => /^[\w-]{11}$/.test(String(v.id))).map(v => `<div class="video-card"><div class="video-quadro"><button type="button" class="video-play" data-yt="${this.esc(v.id)}" data-titulo="${this.esc(v.titulo)}" aria-label="Reproduzir: ${this.esc(v.titulo)}"><img src="https://i.ytimg.com/vi/${this.esc(v.id)}/hqdefault.jpg" alt="" loading="lazy"><span class="video-icone">▶</span></button></div><div class="video-info"><strong>${this.esc(v.titulo)}</strong><a href="https://www.youtube.com/watch?v=${this.esc(v.id)}" target="_blank" rel="noopener noreferrer">Abrir no YouTube</a></div></div>`).join('')}</div>`;
+      case 'escala': {
+        // Escala mensal: mes ("AAAA-MM") liga o destaque de "hoje"; plantoes no formato "07/08" (dias do mês)
+        const hoje = new Date(), mesAtual = hoje.getFullYear() + '-' + String(hoje.getMonth() + 1).padStart(2, '0'), dia = hoje.getDate();
+        const ehMes = b.mes === mesAtual;
+        const dias = t => (String(t || '').match(/\d+/g) || []).map(Number);
+        const tel = c => String(c || '').replace(/\D/g, '');
+        const linha = p => {
+          const plantaoHoje = ehMes && dias(p.plantoes).includes(dia), folgaHoje = ehMes && dias(p.folga).includes(dia);
+          const selo = (plantaoHoje ? '<span class="escala-selo escala-plantao">Plantão hoje</span>' : '') + (folgaHoje ? '<span class="escala-selo escala-folga">Folga hoje</span>' : '');
+          return `<tr><td data-rot="Nome">${this.esc(p.nome)}${selo}</td><td data-rot="Plantões">${this.esc(p.plantoes)}</td><td data-rot="Folgas">${this.esc(p.folga)}</td><td data-rot="Contato"><a href="tel:+55${tel(p.contato)}">${this.esc(p.contato)}</a><button type="button" class="sec mini" data-copy="${this.esc(p.contato)}">Copiar</button></td></tr>`;
+        };
+        return `<div class="escala"><h4>${this.esc(b.titulo)}</h4>${b.regioes.map(r => `<div class="tabela-wrap"><table><thead><tr><th colspan="4" class="escala-regiao">${this.esc(r.nome)}</th></tr><tr><th>Nome</th><th>Plantões</th><th>Folgas</th><th>Contato</th></tr></thead><tbody>${r.pessoas.map(linha).join('')}</tbody></table></div>`).join('')}${(b.rodape || []).map(t => `<p class="escala-rodape">${this.inline(t)}</p>`).join('')}</div>`;
+      }
       case 'tabela': return `<div class="tabela-wrap"><table><thead><tr>${b.colunas.map(c=>`<th>${this.esc(c)}</th>`).join('')}</tr></thead><tbody>${b.linhas.map(l=>`<tr>${l.map(c=>`<td>${this.inline(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
       case 'contato': return `<p class="contato">${this.esc(b.rotulo)}: <a href="mailto:${this.esc(b.valor)}">${this.esc(b.valor)}</a><button type="button" class="sec mini" data-copy="${this.esc(b.valor)}">Copiar</button></p>`;
       case 'destaque': {

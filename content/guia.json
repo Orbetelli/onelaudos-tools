@@ -551,7 +551,11 @@
     "escala",
     "contato",
     "acionamento",
-    "final de semana"
+    "final de semana",
+    "agenda",
+    "folga",
+    "folgas",
+    "telefone"
    ],
    "blocos": [
     {
@@ -601,9 +605,73 @@
      ]
     },
     {
-     "tipo": "aviso",
-     "variante": "observacao",
-     "conteudo": "A relação de contatos e a escala de plantões (Osasco e Zona Leste; São Bernardo do Campo) muda todo mês e consta no documento original do guia, na versão de novembro/2026. Nomes e telefones não são exibidos nesta página."
+     "tipo": "escala",
+     "titulo": "Prestação de serviço do mês de Novembro",
+     "mes": "2026-11",
+     "regioes": [
+      {
+       "nome": "Osasco e Zona Leste",
+       "pessoas": [
+        {
+         "nome": "Leandro",
+         "plantoes": "07/08",
+         "folga": "18",
+         "contato": "(11) 99188-4641"
+        },
+        {
+         "nome": "Rogério",
+         "plantoes": "14/15",
+         "folga": "19",
+         "contato": "(11) 95054-4937"
+        },
+        {
+         "nome": "Vitor",
+         "plantoes": "21/22",
+         "folga": "16",
+         "contato": "(11) 95985-7825"
+        }
+       ]
+      },
+      {
+       "nome": "São Bernardo do Campo",
+       "pessoas": [
+        {
+         "nome": "Eliseu",
+         "plantoes": "28/29",
+         "folga": "03",
+         "contato": "(11) 93297-4782"
+        },
+        {
+         "nome": "Nildenise",
+         "plantoes": "14/15",
+         "folga": "09",
+         "contato": "(11) 99293-3527"
+        },
+        {
+         "nome": "Enzo",
+         "plantoes": "21/22",
+         "folga": "06",
+         "contato": "(11) 98681-2945"
+        },
+        {
+         "nome": "Lucas",
+         "plantoes": "28/29",
+         "folga": "27",
+         "contato": "(11) 94801-1323"
+        },
+        {
+         "nome": "Marcos",
+         "plantoes": "07/08",
+         "folga": "23",
+         "contato": "(11) 97089-2369"
+        }
+       ]
+      }
+     ],
+     "rodape": [
+      "**Sujeito a alterações.**",
+      "**Atenção:** avisar os dias das folgas no dia 26 do mês subsequente."
+     ]
     }
    ]
   }
