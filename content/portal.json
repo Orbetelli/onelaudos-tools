@@ -193,7 +193,10 @@
         "usuario",
         "senha",
         "associar",
-        "alterar senha"
+        "alterar senha",
+        "grupo de usuarios",
+        "criar usuario",
+        "grupo"
       ],
       "blocos": [
         {
@@ -222,6 +225,14 @@
             {
               "id": "hqJKITFssTs",
               "titulo": "Como associar um usuário existente a uma nova unidade"
+            },
+            {
+              "id": "pIQwGDZcLdU",
+              "titulo": "Como criar um usuário"
+            },
+            {
+              "id": "zQidf-wyZMQ",
+              "titulo": "Como criar grupo de usuários"
             }
           ]
         },
