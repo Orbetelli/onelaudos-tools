@@ -1,177 +1,329 @@
 {
- "titulo": "Portal Onelaudos — tutorial",
- "objetivoTitulo": "Sobre este tutorial",
- "objetivo": [
-  "Guia de uso do portal Onelaudos, com as permissões de usuário e vídeos tutoriais. Novos tópicos serão adicionados aqui."
- ],
- "secoes": [
-  {
-   "id": "permissoes",
-   "numero": 1,
-   "titulo": "Permissões de usuário",
-   "resumo": "O que cada permissão faz: Técnico, Somente leitura, Médico executante, Gestor, Digitador e Financeiro.",
-   "tags": [
-    "permissao",
-    "permissoes",
-    "tecnico",
-    "somente leitura",
-    "medico executante",
-    "gestor",
-    "digitador",
-    "financeiro",
-    "relatorios",
-    "laudo",
-    "assinar",
-    "recepcao",
-    "acesso",
-    "usuario"
-   ],
-   "blocos": [
+  "titulo": "Portal Onelaudos — tutorial",
+  "objetivoTitulo": "Sobre este tutorial",
+  "objetivo": [
+    "Guia de uso do portal Onelaudos, com as permissões de usuário e vídeos tutoriais. Novos tópicos serão adicionados aqui."
+  ],
+  "secoes": [
     {
-     "tipo": "texto",
-     "conteudo": "Cada usuário do portal recebe uma permissão, que define o que ele pode ver e fazer. Veja o que cada uma libera:"
-    },
-    {
-     "tipo": "tabela",
-     "colunas": [
-      "Permissão",
-      "O que faz"
-     ],
-     "linhas": [
-      [
-       "Técnico",
-       "Preparo de exames (estudo, lateralidade e nome do paciente), conferência de imagens e consulta a pacientes."
+      "id": "permissoes",
+      "numero": 1,
+      "titulo": "Permissões de usuário",
+      "resumo": "O que cada permissão faz: Técnico, Somente leitura, Médico executante, Gestor, Digitador e Financeiro.",
+      "tags": [
+        "permissao",
+        "permissoes",
+        "tecnico",
+        "somente leitura",
+        "medico executante",
+        "gestor",
+        "digitador",
+        "financeiro",
+        "relatorios",
+        "laudo",
+        "assinar",
+        "recepcao",
+        "acesso",
+        "usuario"
       ],
-      [
-       "Somente leitura",
-       "Consulta a lista de exames liberados (ou não) e aos laudos. Pode ser usada por recepções e demais pessoas que só precisam visualizar o laudo."
-      ],
-      [
-       "Médico executante",
-       "Assina os laudos e visualiza as imagens."
-      ],
-      [
-       "Gestor",
-       "Acesso a todas as ferramentas do portal. É o perfil de T.I. e do gerente do contrato."
-      ],
-      [
-       "Digitador",
-       "Acesso aos exames para auxiliar os médicos nos laudos."
-      ],
-      [
-       "Financeiro",
-       "Acesso aos relatórios."
+      "blocos": [
+        {
+          "tipo": "texto",
+          "conteudo": "Cada usuário do portal recebe uma permissão, que define o que ele pode ver e fazer. Veja o que cada uma libera:"
+        },
+        {
+          "tipo": "tabela",
+          "colunas": [
+            "Permissão",
+            "O que faz"
+          ],
+          "linhas": [
+            [
+              "Técnico",
+              "Preparo de exames (estudo, lateralidade e nome do paciente), conferência de imagens e consulta a pacientes."
+            ],
+            [
+              "Somente leitura",
+              "Consulta a lista de exames liberados (ou não) e aos laudos. Pode ser usada por recepções e demais pessoas que só precisam visualizar o laudo."
+            ],
+            [
+              "Médico executante",
+              "Assina os laudos e visualiza as imagens."
+            ],
+            [
+              "Gestor",
+              "Acesso a todas as ferramentas do portal. É o perfil de T.I. e do gerente do contrato."
+            ],
+            [
+              "Digitador",
+              "Acesso aos exames para auxiliar os médicos nos laudos."
+            ],
+            [
+              "Financeiro",
+              "Acesso aos relatórios."
+            ]
+          ]
+        },
+        {
+          "tipo": "aviso",
+          "variante": "atencao",
+          "conteudo": "A permissão **Gestor** libera todas as ferramentas do portal. Conceda somente a T.I. e ao gerente do contrato, e confirme a autorização do responsável pela unidade antes de cadastrar."
+        },
+        {
+          "tipo": "link",
+          "rotulo": "Ver o procedimento de cadastro de usuários",
+          "href": "#/padronizacao"
+        }
       ]
-     ]
     },
     {
-     "tipo": "aviso",
-     "variante": "atencao",
-     "conteudo": "A permissão **Gestor** libera todas as ferramentas do portal. Conceda somente a T.I. e ao gerente do contrato, e confirme a autorização do responsável pela unidade antes de cadastrar."
+      "id": "videos-tecnico",
+      "numero": 2,
+      "titulo": "Vídeos: Técnico",
+      "resumo": "13 vídeos tutoriais da playlist de Técnicos: Mobile Router, filtros, atribuição de exames, cancelamento e mais.",
+      "tags": [
+        "video",
+        "videos",
+        "tutorial",
+        "tecnico",
+        "playlist",
+        "youtube",
+        "mobile router",
+        "senha",
+        "filtros",
+        "assinatura digital",
+        "lote",
+        "cancelar",
+        "duplicar",
+        "anexar",
+        "importar",
+        "atribuir"
+      ],
+      "blocos": [
+        {
+          "tipo": "texto",
+          "conteudo": "Vídeos tutoriais da playlist de Técnicos. Clique na miniatura para assistir aqui mesmo ou use “Abrir no YouTube”."
+        },
+        {
+          "tipo": "videos",
+          "itens": [
+            {
+              "id": "HHb8py4nP9M",
+              "titulo": "Como excluir exames do Mobile Router para reenviá-los"
+            },
+            {
+              "id": "hGzW7S2UoSI",
+              "titulo": "Como recuperar a senha"
+            },
+            {
+              "id": "E4ZHGjD5CxI",
+              "titulo": "Ferramentas do aplicativo"
+            },
+            {
+              "id": "6kFnWxkPy4w",
+              "titulo": "Filtros de pesquisa"
+            },
+            {
+              "id": "D51tUDbfaS4",
+              "titulo": "Como atribuir exames em lote para o médico solicitante"
+            },
+            {
+              "id": "RPgfnoNo-c8",
+              "titulo": "Como cancelar exames"
+            },
+            {
+              "id": "u0remZxy-tI",
+              "titulo": "Assinatura digital"
+            },
+            {
+              "id": "d1emIFEmf1s",
+              "titulo": "Como duplicar exames"
+            },
+            {
+              "id": "DlEzB8pTafY",
+              "titulo": "Como atribuir exames ao médico"
+            },
+            {
+              "id": "OXE9BUdLvm0",
+              "titulo": "Como reverter cancelamento de exame"
+            },
+            {
+              "id": "rO6OVwORSWM",
+              "titulo": "Como anexar documento ao exame"
+            },
+            {
+              "id": "jIm4AGaIGLg",
+              "titulo": "Como importar exames de forma manual"
+            },
+            {
+              "id": "St2bueT26CM",
+              "titulo": "Ferramentas do Mobile Router"
+            }
+          ]
+        },
+        {
+          "tipo": "aviso",
+          "variante": "observacao",
+          "conteudo": "A playlist completa tem 47 vídeos; esta lista traz 13 deles. Use o botão abaixo para ver todos."
+        },
+        {
+          "tipo": "link",
+          "rotulo": "Abrir a playlist completa de Técnicos no YouTube",
+          "href": "https://www.youtube.com/playlist?list=PL2giLlnYa_rgxJ1DzZm4jDaLvAYi04f7m"
+        }
+      ]
     },
     {
-     "tipo": "link",
-     "rotulo": "Ver o procedimento de cadastro de usuários",
-     "href": "#/padronizacao"
+      "id": "videos-gestor",
+      "numero": 3,
+      "titulo": "Vídeos: Gestor",
+      "resumo": "Vídeos tutoriais da playlist de Gestores: exame de unidade, cancelamento, unidades e usuários.",
+      "tags": [
+        "video",
+        "videos",
+        "tutorial",
+        "gestor",
+        "playlist",
+        "youtube",
+        "unidade",
+        "cadastro de unidade",
+        "exame",
+        "cancelamento",
+        "reverter",
+        "usuario",
+        "senha",
+        "associar",
+        "alterar senha"
+      ],
+      "blocos": [
+        {
+          "tipo": "texto",
+          "conteudo": "Vídeos tutoriais da playlist de Gestores. Clique na miniatura para assistir aqui mesmo ou use “Abrir no YouTube”."
+        },
+        {
+          "tipo": "videos",
+          "itens": [
+            {
+              "id": "a6PW8u0CIgs",
+              "titulo": "Como alterar exame de unidade"
+            },
+            {
+              "id": "OXE9BUdLvm0",
+              "titulo": "Como reverter cancelamento de exame"
+            },
+            {
+              "id": "A0ugP5J9gxg",
+              "titulo": "Cadastro de unidade"
+            },
+            {
+              "id": "UStPKonxoUM",
+              "titulo": "Como alterar senha do usuário"
+            },
+            {
+              "id": "hqJKITFssTs",
+              "titulo": "Como associar um usuário existente a uma nova unidade"
+            }
+          ]
+        },
+        {
+          "tipo": "aviso",
+          "variante": "observacao",
+          "conteudo": "Esta lista traz alguns vídeos da playlist de Gestores. Use o botão abaixo para ver todos."
+        },
+        {
+          "tipo": "link",
+          "rotulo": "Abrir a playlist completa de Gestores no YouTube",
+          "href": "https://www.youtube.com/playlist?list=PL2giLlnYa_rhcTCS9IB5Eh6eh9UmBwm5P"
+        }
+      ]
+    },
+    {
+      "id": "videos-medico",
+      "numero": 4,
+      "titulo": "Vídeos: Médico",
+      "resumo": "Vídeos tutoriais da playlist de Médicos: visualizador web, laudar, assinar, frases e transcrição de áudio.",
+      "tags": [
+        "video",
+        "videos",
+        "tutorial",
+        "medico",
+        "playlist",
+        "youtube",
+        "visualizador",
+        "viewer",
+        "laudar",
+        "laudo",
+        "assinar",
+        "frases",
+        "transcrever",
+        "audio",
+        "duplicar",
+        "reavaliacao",
+        "caso interessante",
+        "laudario",
+        "fila"
+      ],
+      "blocos": [
+        {
+          "tipo": "texto",
+          "conteudo": "Vídeos tutoriais da playlist de Médicos. Clique na miniatura para assistir aqui mesmo ou use “Abrir no YouTube”."
+        },
+        {
+          "tipo": "videos",
+          "itens": [
+            {
+              "id": "4XIo0UggKkA",
+              "titulo": "Ferramentas do visualizador web"
+            },
+            {
+              "id": "KzS0TqWHvQQ",
+              "titulo": "Marcar caso interessante ao exame"
+            },
+            {
+              "id": "joELLHOgLV0",
+              "titulo": "Como abrir o laudário do viewer no módulo recolhido"
+            },
+            {
+              "id": "VtklIGMED8A",
+              "titulo": "Como duplicar um exame assinado"
+            },
+            {
+              "id": "bt6dCufd1lA",
+              "titulo": "Como assinar um exame sem estudo no portal web"
+            },
+            {
+              "id": "wlYUTWHOZxQ",
+              "titulo": "Como criar frases no portal web"
+            },
+            {
+              "id": "PL14v0EjuJg",
+              "titulo": "Como transcrever um áudio"
+            },
+            {
+              "id": "shIvGIu8RMw",
+              "titulo": "Como cancelar a reavaliação médica"
+            },
+            {
+              "id": "rjl13rxbtyk",
+              "titulo": "Como laudar exames pelo portal web"
+            },
+            {
+              "id": "cJm1KZqaWAk",
+              "titulo": "Como assinar um exame e avançar para o próximo da fila"
+            }
+          ]
+        },
+        {
+          "tipo": "aviso",
+          "variante": "observacao",
+          "conteudo": "Esta lista traz alguns vídeos da playlist de Médicos. Use o botão abaixo para ver todos."
+        },
+        {
+          "tipo": "link",
+          "rotulo": "Abrir a playlist completa de Médicos no YouTube",
+          "href": "https://www.youtube.com/playlist?list=PL2giLlnYa_riAtsPRoXu49I8-4BE1M3fa"
+        }
+      ]
     }
-   ]
-  },
-  {
-   "id": "videos-tecnico",
-   "numero": 2,
-   "titulo": "Vídeos: Técnico",
-   "resumo": "13 vídeos tutoriais da playlist de Técnicos: Mobile Router, filtros, atribuição de exames, cancelamento e mais.",
-   "tags": [
-    "video",
-    "videos",
-    "tutorial",
-    "tecnico",
-    "playlist",
-    "youtube",
-    "mobile router",
-    "senha",
-    "filtros",
-    "assinatura digital",
-    "lote",
-    "cancelar",
-    "duplicar",
-    "anexar",
-    "importar",
-    "atribuir"
-   ],
-   "blocos": [
-    {
-     "tipo": "texto",
-     "conteudo": "Vídeos tutoriais da playlist de Técnicos. Clique na miniatura para assistir aqui mesmo ou use “Abrir no YouTube”."
-    },
-    {
-     "tipo": "videos",
-     "itens": [
-      {
-       "id": "HHb8py4nP9M",
-       "titulo": "Como excluir exames do Mobile Router para reenviá-los"
-      },
-      {
-       "id": "hGzW7S2UoSI",
-       "titulo": "Como recuperar a senha"
-      },
-      {
-       "id": "E4ZHGjD5CxI",
-       "titulo": "Ferramentas do aplicativo"
-      },
-      {
-       "id": "6kFnWxkPy4w",
-       "titulo": "Filtros de pesquisa"
-      },
-      {
-       "id": "D51tUDbfaS4",
-       "titulo": "Como atribuir exames em lote para o médico solicitante"
-      },
-      {
-       "id": "RPgfnoNo-c8",
-       "titulo": "Como cancelar exames"
-      },
-      {
-       "id": "u0remZxy-tI",
-       "titulo": "Assinatura digital"
-      },
-      {
-       "id": "d1emIFEmf1s",
-       "titulo": "Como duplicar exames"
-      },
-      {
-       "id": "DlEzB8pTafY",
-       "titulo": "Como atribuir exames ao médico"
-      },
-      {
-       "id": "OXE9BUdLvm0",
-       "titulo": "Como reverter cancelamento de exame"
-      },
-      {
-       "id": "rO6OVwORSWM",
-       "titulo": "Como anexar documento ao exame"
-      },
-      {
-       "id": "jIm4AGaIGLg",
-       "titulo": "Como importar exames de forma manual"
-      },
-      {
-       "id": "St2bueT26CM",
-       "titulo": "Ferramentas do Mobile Router"
-      }
-     ]
-    },
-    {
-     "tipo": "aviso",
-     "variante": "observacao",
-     "conteudo": "A playlist completa tem 47 vídeos; esta lista traz 13 deles. Use o botão abaixo para ver todos."
-    },
-    {
-     "tipo": "link",
-     "rotulo": "Abrir a playlist completa de Técnicos no YouTube",
-     "href": "https://www.youtube.com/playlist?list=PL2giLlnYa_rgxJ1DzZm4jDaLvAYi04f7m"
-    }
-   ]
-  }
- ]
+  ]
 }

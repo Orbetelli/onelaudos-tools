@@ -25,8 +25,8 @@ const Home = {
         ]},
         { titulo: 'Documentação', itens: [
             { rota: 'portal', icone: '🖥️', titulo: 'Portal (tutorial)',
-              descricao: 'Tutorial do portal Onelaudos: permissões de usuário e o que cada uma faz, mais vídeos tutoriais da playlist de Técnicos. Novos tópicos em breve.',
-              topicos: ['Permissões', 'Vídeos de Técnico', 'Mobile Router', 'Filtros'], pronto: false },
+              descricao: 'Tutorial do portal Onelaudos: permissões de usuário e o que cada uma faz, mais vídeos tutoriais das playlists de Técnicos, Gestores e Médicos. Novos tópicos em breve.',
+              topicos: ['Permissões', 'Vídeos de Técnico', 'Vídeos de Gestor', 'Vídeos de Médico'], pronto: false },
             { rota: 'padronizacao', icone: '📐', titulo: 'Padronização',
               descricao: 'Procedimentos operacionais padronizados: cadastro de usuários, cabeçalho e rodapé e alteração de senha.',
               topicos: ['Cadastro de usuários', 'Cabeçalho e rodapé', 'Alteração de senha', 'Checklist'], pronto: true },
