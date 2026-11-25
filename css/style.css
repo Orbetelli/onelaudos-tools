@@ -402,3 +402,68 @@ body.at-redimensionando{cursor:col-resize;user-select:none}
 .at-manual-aviso{align-self:stretch;background:#1b2633;border:1px dashed #3a4d63;color:#c9d6e2;border-radius:8px;padding:8px 12px;font-size:13px}
 #atNovoChamado{white-space:nowrap}
 .at-form .erro{color:#ff9aa8;font-size:13px}
+/* Atendimento: implantações (checklist por unidade) */
+.im-vista{flex:1;min-height:0;display:flex}
+.im-vista.hidden{display:none}
+.im-lista{width:330px;flex-shrink:0;border-right:1px solid var(--line);background:var(--card);display:flex;flex-direction:column;gap:10px;padding:14px;overflow:auto}
+.im-lista-topo{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.im-lista-topo h2{margin:0;font-size:16px}
+.im-lista-topo button{padding:7px 10px;font-size:13px}
+.im-lista select{padding:8px 10px}
+.im-cards{display:flex;flex-direction:column;gap:8px}
+.im-card{display:flex;flex-direction:column;gap:6px;text-align:left;width:100%;background:var(--bg);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.im-card.ativo{border-color:var(--acc);background:#132538}
+.im-card-topo{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.im-st{font-size:11px;font-weight:600;border-radius:999px;padding:2px 8px;white-space:nowrap}
+.im-st-andamento{background:#1f3a55;color:#9fd0ff}.im-st-planejada{background:#2a3340;color:#c9d6e2}
+.im-st-pausada{background:#3a2a12;color:#ffc77a}.im-st-concluida{background:#10281a;color:#7fe0a5}
+.im-barra{height:6px;background:#22303f;border-radius:4px;overflow:hidden}
+.im-barra i{display:block;height:100%;background:linear-gradient(90deg,#2f9bff,#2fbf71);border-radius:4px}
+.im-detalhe{flex:1;min-width:0;overflow:auto;padding:18px 20px;display:flex;flex-direction:column;gap:14px}
+.im-cab{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;align-items:flex-start}
+.im-cab h2{margin:0 0 2px;font-size:20px}
+.im-cab-acoes{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.im-cab-acoes select{width:auto;padding:8px 10px}
+.im-info{display:flex;flex-wrap:wrap;gap:14px;font-size:14px;color:#c9d6e2}
+.im-info:empty{display:none}
+.im-geral{display:flex;flex-direction:column;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.im-geral .im-barra{height:10px}
+.im-unidades{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.im-uni{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.im-uni.completa{border-color:#1f6b3a}
+.im-uni-topo{display:flex;justify-content:space-between;gap:8px}
+.im-itens{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.im-itens li{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 4px;border-radius:6px}
+.im-itens li:hover{background:#1b2633}
+.im-itens label{display:flex;align-items:center;gap:8px;margin:0;color:var(--txt);font-size:14px;cursor:pointer}
+.im-itens input{width:18px;height:18px;accent-color:#2fbf71}
+.im-itens li.feito span{color:#9fdcb6;text-decoration:line-through;text-decoration-color:#3a6b4f}
+.im-itens small{white-space:nowrap}
+.im-x{background:transparent;color:var(--mut);padding:2px 6px;font-size:13px;opacity:0;min-height:0}
+.im-itens li:hover .im-x,.im-x:focus{opacity:1}
+.im-add-item input,.im-add-unidade input{padding:8px 10px;font-size:14px;background:var(--bg)}
+.im-add-unidade{display:flex;gap:8px}
+.im-add-unidade input{flex:1}
+.im-unis-form{display:flex;flex-direction:column;gap:6px}
+.im-checks{display:flex;flex-direction:column;gap:6px}
+.im-checks label{display:flex;gap:8px;align-items:center;color:var(--txt);margin:0}
+.im-checks input{width:auto}
+.im-novo-check{display:flex;gap:8px;margin-top:6px}
+.im-novo-check input{flex:1}
+@media(max-width:900px){.im-vista{flex-direction:column}.im-lista{width:auto;max-height:260px;border-right:0;border-bottom:1px solid var(--line)}}
+/* Atendimento: aba "Todos" (todos os chamados e com quem estão) */
+.at-abas-fila{gap:6px;justify-content:flex-start;align-items:center}
+.at-abas-fila button{background:transparent;color:var(--mut);padding:6px 10px;border-radius:8px;font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px}
+.at-abas-fila button.ativo{background:var(--bg);color:var(--txt);border:1px solid var(--line)}
+.at-abas-fila .tag{margin-left:auto;font-size:12px}
+.at-todos-barra{padding:0 10px 8px;display:flex;flex-direction:column;gap:8px}
+.at-todos-barra.hidden{display:none}
+.at-resumo-equipe{display:flex;flex-wrap:wrap;gap:6px}
+.at-resumo-equipe span{font-size:12px;background:#1f3a55;color:#c9e4ff;border-radius:999px;padding:3px 9px}
+.at-resumo-equipe span.fila{background:#3a2a12;color:#ffc77a}
+.at-todos-filtros{display:flex;gap:6px}
+.at-todos-filtros select,.at-todos-filtros input{padding:7px 9px;font-size:13px;background:var(--bg);min-width:0}
+.at-todos-filtros select{flex:1}.at-todos-filtros input{flex:1.2}
+.at-chip-dono{font-size:12px;border-radius:6px;padding:2px 8px;background:#1f3a55;color:#c9e4ff;white-space:nowrap}
+.at-chip-dono.eu{background:#10281a;color:#7fe0a5}.at-chip-dono.fila{background:#3a2a12;color:#ffc77a}.at-chip-dono.fechado{background:#2a3340;color:#c9d6e2}
+.at-status-outro{background:#1f3a55;color:#c9e4ff}

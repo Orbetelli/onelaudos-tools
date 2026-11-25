@@ -521,6 +521,7 @@ const Atendimento = {
                 (this.demo ? '' : '<button type="button" class="sec at-menu-btn" id="atCadastros">📋 Cadastros <span class="at-badge hidden" id="atCadBadge">0</span></button>') +
                 '<button type="button" class="sec at-menu-btn" id="atAvaliacoes">⭐ Avaliações</button>' +
                 '<button type="button" class="sec at-menu-btn" id="atSom"></button>' +
+                (this.chamadosReais && typeof Implantacoes !== 'undefined' ? '<button type="button" class="sec at-menu-btn" id="atVista">🏗 Implantações</button>' : '') +
                 (this.chamadosReais ? '<button type="button" id="atNovoChamado" title="Registrar um atendimento que chegou pelo WhatsApp normal, telefone, e-mail...">+ Novo chamado</button>' : '') +
                 '<button type="button" class="sec" id="atSimular" title="Cria um chamado de teste na fila, como se um cliente tivesse chamado">+ Simular contato' + (this.chamadosReais ? ' (teste)' : '') + '</button>' +
                 '<span class="at-eu"><span class="at-avatar">' + iniciais + '</span>' + nome +
@@ -530,7 +531,18 @@ const Atendimento = {
               '<div class="at-colunas">' +
                 '<section class="at-col" id="atColMeus" aria-label="Seus chamados"><div class="at-col-topo"><h2>Seus chamados</h2><span class="at-conta" id="atContaMeus"></span></div><div class="at-lista" id="atMeus"></div></section>' +
                 '<div class="at-divisor" data-col="atColMeus" role="separator" aria-orientation="vertical" aria-label="Ajustar largura de Seus chamados" tabindex="0" title="Arraste para ajustar · duplo clique volta ao padrão"></div>' +
-                '<section class="at-col at-col-fila" id="atColFila" aria-label="Fila"><div class="at-col-topo"><h2 id="atTituloFila">Fila</h2><span class="at-conta at-conta-fila" id="atContaFila"></span></div><div class="at-lista" id="atFila"></div></section>' +
+                '<section class="at-col at-col-fila" id="atColFila" aria-label="Fila e todos os chamados">' +
+                  '<div class="at-col-topo at-abas-fila" role="tablist" aria-label="Fila ou todos os chamados">' +
+                    '<button type="button" role="tab" data-aba="fila">Fila <span class="at-conta at-conta-fila" id="atContaFila"></span></button>' +
+                    '<button type="button" role="tab" data-aba="todos" title="Todos os chamados do setor e com quem estão">Todos <span class="at-conta" id="atContaTodos"></span></button>' +
+                    '<span class="tag" id="atTituloFila"></span>' +
+                  '</div>' +
+                  '<div class="at-todos-barra hidden" id="atTodosBarra">' +
+                    '<div class="at-resumo-equipe" id="atResumoEquipe"></div>' +
+                    '<div class="at-todos-filtros"><label class="at-oculto" for="atTodosQuem">Filtrar</label><select id="atTodosQuem"></select>' +
+                    '<label class="at-oculto" for="atTodosBusca">Buscar</label><input type="search" id="atTodosBusca" placeholder="Buscar cliente ou unidade"></div>' +
+                  '</div>' +
+                  '<div class="at-lista" id="atFila"></div></section>' +
                 '<div class="at-divisor" data-col="atColFila" role="separator" aria-orientation="vertical" aria-label="Ajustar largura da Fila" tabindex="0" title="Arraste para ajustar · duplo clique volta ao padrão"></div>' +
                 '<section class="at-chat" aria-label="Chat">' +
                   '<div id="atChatTopo" class="at-chat-topo"></div>' +
@@ -556,6 +568,7 @@ const Atendimento = {
                   '<div class="at-aviso-fila" id="atAvisoFila">Este chamado ainda está na fila. Clique em "Pegar chamado" para responder.</div>' +
                 '</section>' +
               '</div>' +
+              '<div class="im-vista hidden" id="atImplView"></div>' +
             '</div>';
 
         el.querySelectorAll('[data-setor]').forEach(function (b) {
@@ -594,12 +607,27 @@ const Atendimento = {
             if (self.desligar) { self.desligar(); self.desligar = null; }
             self.desligarTempoReal();
             if (typeof AtendimentoReal !== 'undefined') AtendimentoReal.parar();
+            if (typeof Implantacoes !== 'undefined') Implantacoes.parar();
+            self.vista = 'chamados';
             AtendimentoDados = AtendimentoDemo; self.chamadosReais = false; self.realTentado = false; self.sel = null;
             Auth.sair().then(function () { self.render(el); });
         });
 
+        // Abas da coluna do meio: Fila | Todos
+        this.abaFila = this.abaFila || 'fila';
+        el.querySelectorAll('[data-aba]').forEach(function (b) {
+            b.addEventListener('click', function () { self.abaFila = b.dataset.aba; self.desenhar(); });
+        });
+        el.querySelector('#atTodosQuem').addEventListener('change', function () { self.todosQuem = this.value; self.desenhar(); });
+        el.querySelector('#atTodosBusca').addEventListener('input', function () { self.todosBusca = this.value; self.desenhar(); });
+
         var btnNovo = el.querySelector('#atNovoChamado');
         if (btnNovo) btnNovo.addEventListener('click', function () { self.abrirNovoChamado(); });
+
+        // Alterna entre Chamados e Implantações
+        var btnVista = el.querySelector('#atVista');
+        if (btnVista) btnVista.addEventListener('click', function () { self.mostrarVista(self.vista === 'impl' ? 'chamados' : 'impl'); });
+        if (this.vista === 'impl') this.mostrarVista('impl');
 
         el.querySelector('#atSimular').addEventListener('click', function () {
             Promise.resolve(AtendimentoDados.simularContato(self.setor)).catch(function (e) { alert(e.message); });
@@ -626,6 +654,10 @@ const Atendimento = {
                 }
                 AtendimentoDados.transferir(id, para).then(function () { self.sel = null; self.desenhar(); }).catch(function (e2) { alert(e2.message); });
             }
+            if (b.dataset.acao === 'assumir')
+                Promise.resolve(AtendimentoDados.transferir(id, AtendimentoDados.atendente())).then(function () { self.abaFila = 'fila'; self.desenhar(); }).catch(falhou);
+            if (b.dataset.acao === 'transferir-admin')
+                Promise.resolve(AtendimentoDados.transferir(id, b.dataset.para)).then(function () { self.desenhar(); }).catch(falhou);
             if (b.dataset.acao === 'devolver') AtendimentoDados.devolver(id).then(function () { self.sel = null; self.desenhar(); }).catch(function (e2) { alert(e2.message); });
             if (b.dataset.acao === 'ampliar') self.ampliar(b.dataset.src, b.dataset.nome);
             if (b.dataset.acao === 'solicitar-cadastro') self.abrirSolicitarCadastro(id);
@@ -755,6 +787,23 @@ const Atendimento = {
         });
     },
 
+    // ---------- Vistas: Chamados x Implantações ----------
+    mostrarVista: function (vista) {
+        var self = this, impl = vista === 'impl';
+        this.vista = vista;
+        var colunas = document.querySelector('.at-colunas'), caixa = document.getElementById('atImplView'), b = document.getElementById('atVista');
+        if (!colunas || !caixa) return;
+        colunas.classList.toggle('hidden', impl);
+        caixa.classList.toggle('hidden', !impl);
+        if (b) b.textContent = impl ? '💬 Chamados' : '🏗 Implantações';
+        ['atNovoChamado', 'atSimular'].forEach(function (id) { var x = document.getElementById(id); if (x) x.classList.toggle('hidden', impl); });
+        if (impl) Implantacoes.abrir(caixa, {
+            colegas: function () { return self.equipeCompleta || []; },
+            aviso: function (t) { self.aviso(t); },
+            modal: function (html, largo) { self.modal(html, largo); }
+        });
+    },
+
     // ---------- Chamado manual ----------
     rotuloCanal: function (canal) {
         return { whatsapp_pessoal: 'WhatsApp', telefone: 'telefone', email: 'e-mail', presencial: 'presencial', outro: 'outro canal', whatsapp: 'WhatsApp' }[canal] || 'outro canal';
@@ -813,9 +862,10 @@ const Atendimento = {
         Equipe.entrar(perfil);
         Equipe.aoMudar(function () { self.mostrarOnline(); });
         Equipe.colegas().then(function (lista) {
+            self.equipeCompleta = lista;
             self.colegasReais = lista.filter(function (x) { return x.id !== perfil.id; });
             self.colegas = self.colegasReais.map(function (x) { return x.nome; });
-            if (typeof AtendimentoReal !== 'undefined') AtendimentoReal.definirColegas(self.colegasReais);
+            if (typeof AtendimentoReal !== 'undefined') AtendimentoReal.definirColegas(self.equipeCompleta);
         }).catch(function (e) { console.warn('Colegas:', e.message); });
         CadastrosDB.aoNovo(function (linha) {
             if (self.setores.indexOf(linha.setor) < 0) return;
@@ -1463,6 +1513,74 @@ const Atendimento = {
             .catch(function (e) { alert(e.message); self.desenhar(); });
     },
 
+    // ---------- Aba "Todos": todos os chamados do setor e com quem estão ----------
+    desenharTodos: function (lista) {
+        var self = this, esc = Docs.esc.bind(Docs), eu = AtendimentoDados.atendente();
+        var dono = function (c) { return c.status === 'fila' ? 'Na fila' : (c.status === 'meu' ? eu : (c.atendente || '—')); };
+        var abertos = lista.filter(function (c) { return c.status !== 'fechado'; });
+
+        // Resumo: quantos chamados com cada um
+        var cont = {};
+        abertos.forEach(function (c) { var d = dono(c); cont[d] = (cont[d] || 0) + 1; });
+        var nomes = Object.keys(cont).sort(function (a, b) { return a === 'Na fila' ? -1 : b === 'Na fila' ? 1 : cont[b] - cont[a]; });
+        document.getElementById('atResumoEquipe').innerHTML = nomes.length
+            ? nomes.map(function (n) { return '<span class="' + (n === 'Na fila' ? 'fila' : '') + '">' + esc(n) + ' <b>' + cont[n] + '</b></span>'; }).join('')
+            : '<span>Nenhum chamado aberto</span>';
+
+        // Filtro por pessoa
+        var selQuem = document.getElementById('atTodosQuem'), atual = this.todosQuem || 'abertos';
+        var opcoes = [['abertos', 'Todos em aberto'], ['Na fila', 'Na fila']].concat(
+            nomes.filter(function (n) { return n !== 'Na fila'; }).map(function (n) { return [n, 'Com ' + n]; }), [['fechados', 'Encerrados (12h)']]);
+        if (!opcoes.some(function (o) { return o[0] === atual; })) atual = 'abertos';
+        selQuem.innerHTML = opcoes.map(function (o) { return '<option value="' + esc(o[0]) + '"' + (o[0] === atual ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join('');
+
+        var busca = String(this.todosBusca || '').toLowerCase().trim();
+        var mostrados = lista.filter(function (c) {
+            if (atual === 'fechados') { if (c.status !== 'fechado') return false; }
+            else if (c.status === 'fechado') return false;
+            else if (atual !== 'abertos' && dono(c) !== atual) return false;
+            return !busca || (c.nome + ' ' + c.local).toLowerCase().indexOf(busca) >= 0;
+        });
+        var ordem = { fila: 0, meu: 1, outro: 2, fechado: 3 };
+        mostrados.sort(function (a, b) { return (ordem[a.status] - ordem[b.status]) || String(dono(a)).localeCompare(dono(b)) || (a.id - b.id); });
+
+        document.getElementById('atFila').innerHTML = mostrados.length ? mostrados.map(function (c) {
+            var conversa = c.msgs.filter(function (m) { return m.de === 'cliente' || m.de === 'agente'; }), ult = conversa[conversa.length - 1];
+            var chip = c.status === 'fila' ? '<span class="at-chip-dono fila">Na fila · ' + esc(c.espera || '') + '</span>'
+                     : c.status === 'meu' ? '<span class="at-chip-dono eu">Com você</span>'
+                     : c.status === 'outro' ? '<span class="at-chip-dono">Com ' + esc(c.atendente || '—') + '</span>'
+                     : '<span class="at-chip-dono fechado">Encerrado</span>';
+            return '<div class="at-cartao' + (c.id === self.sel ? ' ativo' : '') + '">' +
+                     '<button type="button" class="at-abrir" data-acao="abrir" data-id="' + c.id + '">' +
+                       '<span class="at-nome">' + esc(c.nome) + (c.origem === 'manual' ? ' <span class="tag">📝</span>' : '') + '</span>' +
+                       '<span class="at-local">' + esc(c.local) + '</span>' +
+                       '<span class="at-resumo">' + esc(ult ? (ult.texto || '📷 Imagem') : '') + '</span>' +
+                     '</button>' +
+                     '<div class="at-cartao-rodape">' + chip + (c.status === 'fila' ? '<button type="button" data-acao="pegar" data-id="' + c.id + '">Pegar</button>' : '') + '</div>' +
+                   '</div>';
+        }).join('') : '<p class="at-vazio">Nenhum chamado ' + (atual === 'fechados' ? 'encerrado nas últimas 12 horas.' : 'com esse filtro.') + '</p>';
+    },
+
+    // Ações num chamado que está com outro atendente: admin pode assumir, transferir, devolver ou encerrar
+    acoesOutro: function (c, esc) {
+        if (!this.ehAdmin || !AtendimentoDados.real) return '<span class="tag">Você pode acompanhar e deixar nota interna.</span>';
+        var eu = AtendimentoDados.atendente();
+        var nomes = (this.colegas || []).filter(function (n) { return n !== c.atendente; });
+        return '<div class="at-acoes">' +
+            (AtendimentoDados.real ? '<button type="button" data-acao="assumir" data-id="' + c.id + '" title="Passa o chamado para você">Assumir</button>' : '') +
+            '<div class="at-transf"><button type="button" class="sec" data-acao="menu-transferir" data-id="' + c.id + '" aria-haspopup="true">Transferir ▾</button>' +
+              '<div class="at-menu-transf hidden" id="atMenuTransf" role="menu"><span>Transferir para:</span>' +
+                nomes.map(function (n) {
+                    var on = Atendimento.colegaOnline(n);
+                    return '<button type="button" role="menuitem" data-acao="transferir-admin" data-id="' + c.id + '" data-para="' + esc(n) + '">' +
+                           '<i class="at-dot' + (on ? ' on' : '') + '" aria-hidden="true"></i>' + esc(n) + '</button>';
+                }).join('') +
+              '</div></div>' +
+            '<button type="button" class="sec" data-acao="devolver" data-id="' + c.id + '">Devolver à fila</button>' +
+            '<button type="button" class="sec" data-acao="encerrar" data-id="' + c.id + '">Encerrar</button>' +
+        '</div>';
+    },
+
     cartao: function (c, naFila) {
         var esc = Docs.esc.bind(Docs);
         var conversa = c.msgs.filter(function (m) { return m.de === 'cliente' || m.de === 'agente'; });
@@ -1490,7 +1608,13 @@ const Atendimento = {
             var on = b.dataset.setor === self.setor;
             b.classList.toggle('ativo', on); b.setAttribute('aria-selected', on);
         });
-        document.getElementById('atTituloFila').textContent = 'Fila · ' + (this.setor === 'impl' ? 'Implantação' : 'Suporte Médico');
+        document.getElementById('atTituloFila').textContent = this.setor === 'impl' ? 'Implantação' : 'Suporte Médico';
+        var todos = this.abaFila === 'todos';
+        document.querySelectorAll('[data-aba]').forEach(function (b) {
+            var on = b.dataset.aba === (todos ? 'todos' : 'fila');
+            b.classList.toggle('ativo', on); b.setAttribute('aria-selected', String(on));
+        });
+        document.getElementById('atTodosBarra').classList.toggle('hidden', !todos);
 
         AtendimentoDados.listar(this.setor).then(function (lista) {
             var meus = lista.filter(function (c) { return c.status === 'meu'; });
@@ -1504,7 +1628,10 @@ const Atendimento = {
             document.getElementById('atMeus').innerHTML = meus.length
                 ? meus.map(function (c) { return self.cartao(c, false); }).join('')
                 : '<p class="at-vazio">Nenhum chamado com você. Pegue um chamado da fila.</p>';
-            document.getElementById('atFila').innerHTML = fila.length
+            var abertos = lista.filter(function (c) { return c.status !== 'fechado'; });
+            document.getElementById('atContaTodos').textContent = abertos.length;
+            if (todos) self.desenharTodos(lista);
+            else document.getElementById('atFila').innerHTML = fila.length
                 ? fila.map(function (c) { return self.cartao(c, true); }).join('')
                 : '<p class="at-vazio">Fila vazia. Use "+ Simular contato" para ver um chamado chegando.</p>';
 
@@ -1522,7 +1649,7 @@ const Atendimento = {
             envio.classList.add('hidden'); aviso.classList.add('hidden');
             return;
         }
-        var naFila = c.status === 'fila', fechado = c.status === 'fechado';
+        var naFila = c.status === 'fila', fechado = c.status === 'fechado', comOutro = c.status === 'outro';
         var av = c.avaliacao, rotuloFechado = 'Encerrado';
         if (av && av.status === 'aguardando') rotuloFechado = 'Encerrado · aguardando avaliação';
         else if (av && av.nota) rotuloFechado = 'Encerrado · nota ' + av.nota + ' ★';
@@ -1532,8 +1659,9 @@ const Atendimento = {
                                      : ' · WhatsApp ' + esc(c.fone)) + '</span></div>' +
             (fechado
                 ? '<span class="at-status at-status-fechado">' + esc(rotuloFechado) + '</span>'
+                : comOutro ? '<span class="at-status at-status-outro">Com ' + esc(c.atendente || 'outro atendente') + '</span>'
                 : '<span class="at-status ' + (naFila ? 'at-status-fila' : 'at-status-meu') + '">' + (naFila ? 'Na fila' : 'Com você') + '</span>') +
-            (fechado ? '' : naFila
+            (fechado ? '' : comOutro ? this.acoesOutro(c, esc) : naFila
                 ? '<button type="button" data-acao="pegar" data-id="' + c.id + '">Pegar chamado</button>'
                 : '<div class="at-acoes">' +
                     '<div class="at-transf"><button type="button" class="sec" data-acao="menu-transferir" data-id="' + c.id + '" aria-haspopup="true">Transferir ▾</button>' +
@@ -1583,6 +1711,13 @@ const Atendimento = {
         if (!teste && this.modo === 'cliente-teste') this.mudarModo('cliente');
         this.mudarModo(this.modo || 'cliente');   // atualiza textos (manual x WhatsApp)
         if (pesquisaAberta) { envio.classList.remove('hidden'); aviso.classList.add('hidden'); return; }
+        // Chamado com outro atendente: dá para acompanhar e deixar nota interna (responder, só quem está com ele)
+        if (comOutro) {
+            document.querySelectorAll('[data-modo="cliente"],[data-modo="cliente-teste"]').forEach(function (b) { b.classList.add('hidden'); });
+            if (this.modo !== 'interna') this.mudarModo('interna');
+            envio.classList.remove('hidden'); aviso.classList.add('hidden');
+            return;
+        }
         envio.classList.toggle('hidden', naFila || fechado);
         aviso.textContent = fechado
             ? 'Chamado encerrado. A pesquisa de satisfação foi enviada ao cliente; a nota aparece em ⭐ Avaliações.'
