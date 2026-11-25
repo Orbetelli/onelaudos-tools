@@ -17,7 +17,9 @@ const Auth = (function () {
 
     function iniciar() {
         if (cliente || !configurado()) return cliente;
-        cliente = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY, {
+        // Aceita a URL mesmo se vier com /rest/v1/ ou barra no final
+        var url = String(CONFIG.SUPABASE_URL).trim().replace(/\/(rest|auth)\/v1\/?$/, '').replace(/\/+$/, '');
+        cliente = window.supabase.createClient(url, String(CONFIG.SUPABASE_ANON_KEY).trim(), {
             auth: {
                 flowType: 'pkce',           // o link de e-mail volta como ?code= e não briga com as rotas #/
                 persistSession: true,
@@ -64,10 +66,11 @@ const Auth = (function () {
         timerInativo = setTimeout(function () {
             if (!perfil) return;
             sair().then(function () { alert('Você foi desconectado por inatividade.'); });
-        }, (CONFIG.INATIVIDADE_MIN || 30) * 60 * 1000);
+        }, CONFIG.INATIVIDADE_MIN * 60 * 1000);
     }
     var eventosAtividade = ['click', 'keydown', 'mousemove', 'scroll', 'touchstart'];
     function iniciarInatividade() {
+        if (!(CONFIG.INATIVIDADE_MIN > 0)) return;   // 0 = desligado: a sessão fica aberta enquanto a aba estiver aberta
         eventosAtividade.forEach(function (ev) { document.addEventListener(ev, reiniciarInatividade, { passive: true }); });
         reiniciarInatividade();
     }

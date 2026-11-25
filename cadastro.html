@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Cadastro de usuário · Onelaudos</title>
+  <style>
+    :root{--bg:#f4f6f8;--card:#fff;--line:#d9e0e7;--txt:#16202a;--mut:#5b6672;--acc:#0f6e8c;--erro:#b3261e;--ok:#17663a}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,Segoe UI,Arial,sans-serif;font-size:15px}
+    main{max-width:560px;margin:0 auto;padding:24px 16px 48px}
+    .topo{margin-bottom:16px}
+    .marca{font-weight:700;font-size:20px}.marca span{color:var(--acc)}
+    h1{font-size:22px;margin:14px 0 6px}
+    .sub{color:var(--mut);margin:0;line-height:1.5}
+    form{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:14px;margin-top:16px}
+    label{font-weight:600;font-size:14px;display:block;margin-bottom:5px}
+    .dica{font-weight:400;color:var(--mut);font-size:13px;display:block;margin-top:2px}
+    input[type=text],input[type=email],input[type=tel],select{width:100%;padding:11px 12px;border:1px solid #b8c3ce;border-radius:8px;font-size:16px;background:#fff;color:var(--txt)}
+    input:focus,select:focus{outline:2px solid var(--acc);outline-offset:1px;border-color:var(--acc)}
+    .erro{color:var(--erro);font-size:13px;min-height:0;margin-top:4px}
+    .invalido{border-color:var(--erro)!important}
+    .linha{display:grid;grid-template-columns:2fr 1fr;gap:10px}
+    .opcoes{display:flex;gap:16px}
+    .opcoes label,.consent label{font-weight:400;display:flex;align-items:center;gap:8px;margin:0}
+    .consent{background:#eef4f7;border-radius:8px;padding:12px;font-size:13px;line-height:1.5;color:#2d3a45}
+    button{background:var(--acc);color:#fff;border:0;border-radius:8px;padding:13px;font-size:16px;font-weight:600;cursor:pointer;min-height:48px}
+    button:disabled{opacity:.6;cursor:wait}
+    .hidden{display:none!important}
+    .feito{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:28px;text-align:center;margin-top:16px}
+    .feito strong{display:block;font-size:20px;color:var(--ok);margin-bottom:8px}
+    .demo{background:#fff4dd;border:1px solid #e8c066;color:#6b4a00;border-radius:8px;padding:10px 12px;font-size:13px;margin-top:12px}
+    @media(max-width:420px){.linha{grid-template-columns:1fr}}
+    /* Modo lote (implantação nova) */
+    main.largo{max-width:1180px}
+    button.sec,.btn.sec{background:#fff;color:var(--acc);border:1px solid var(--acc)}
+    .btn{display:inline-flex;align-items:center;justify-content:center;border-radius:8px;padding:10px 14px;font-size:14px;font-weight:600;cursor:pointer;min-height:44px}
+    .ferramentas{display:flex;flex-wrap:wrap;gap:8px}
+    .ferramentas button,.ferramentas .btn{font-size:14px;padding:10px 14px;min-height:44px}
+    fieldset{border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+    legend{font-weight:600;font-size:14px;padding:0 4px}
+    @media(max-width:700px){fieldset{grid-template-columns:1fr}}
+    .tabela-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+    table{border-collapse:collapse;width:100%;min-width:980px;font-size:14px}
+    th{background:#eef2f5;text-align:left;padding:8px;font-size:13px;white-space:nowrap}
+    td{border-top:1px solid var(--line);padding:4px}
+    td input{width:100%;padding:8px;border:1px solid transparent;border-radius:6px;font-size:14px;background:transparent}
+    td input:hover{border-color:var(--line)}
+    td input.invalido{background:#fdecea}
+    td.num{color:var(--mut);text-align:center;width:34px}
+    td .tirar{background:transparent;color:var(--erro);min-height:0;padding:6px 8px;font-size:16px}
+    #colarBox textarea{width:100%;min-height:110px;padding:10px;border:1px solid #b8c3ce;border-radius:8px;font:13px monospace}
+    #resumo{font-size:14px}
+    #resumo .ruim{color:var(--erro)}
+  </style>
+</head>
+<body>
+<main>
+  <div class="topo">
+    <div class="marca">Onelaudos <span>Telerradiologia</span></div>
+    <h1>Cadastro de usuário no portal</h1>
+    <p class="sub">Preencha um formulário por pessoa. Com esses dados, a equipe da Onelaudos cria o acesso ao portal e envia as orientações.</p>
+    <div class="demo hidden" id="avisoDemo">Demonstração: os dados não são enviados para nenhum servidor.</div>
+  </div>
+
+  <form id="form" novalidate>
+    <div>
+      <label for="nome">Nome completo <span class="dica">Sem abreviar.</span></label>
+      <input type="text" id="nome" autocomplete="name" required>
+      <div class="erro" id="e-nome"></div>
+    </div>
+    <div>
+      <label for="email">E-mail <span class="dica">Pessoal ou corporativo. Será o seu login.</span></label>
+      <input type="email" id="email" autocomplete="email" required>
+      <div class="erro" id="e-email"></div>
+    </div>
+    <div>
+      <label for="telefone">Telefone celular <span class="dica">Com DDD, para contato por WhatsApp.</span></label>
+      <input type="tel" id="telefone" autocomplete="tel" inputmode="numeric" placeholder="(11) 91234-5678" required>
+      <div class="erro" id="e-telefone"></div>
+    </div>
+    <div>
+      <label for="cpf">CPF <span class="dica">Necessário para o cadastro no portal.</span></label>
+      <input type="text" id="cpf" inputmode="numeric" placeholder="000.000.000-00" required>
+      <div class="erro" id="e-cpf"></div>
+    </div>
+    <div>
+      <label for="cargo">Função na unidade</label>
+      <select id="cargo" required>
+        <option value="">Selecione...</option>
+        <option>Médico(a)</option>
+        <option>Coordenador(a)</option>
+        <option>Biomédico(a)</option>
+        <option>Enfermeiro(a)</option>
+        <option>Gerente</option>
+        <option>Recepcionista</option>
+        <option>Técnico(a) de Enfermagem</option>
+        <option>Técnico(a) de Radiologia</option>
+        <option>TI</option>
+        <option>Auxiliar Administrativo</option>
+        <option>Faturista</option>
+      </select>
+      <div class="erro" id="e-cargo"></div>
+    </div>
+    <div class="linha hidden" id="blocoCrm">
+      <div>
+        <label for="crm">CRM</label>
+        <input type="text" id="crm" inputmode="numeric">
+      </div>
+      <div>
+        <label for="crmUf">UF</label>
+        <select id="crmUf"></select>
+      </div>
+      <div class="erro" id="e-crm"></div>
+    </div>
+    <div>
+      <label for="unidade">Unidade <span class="dica">Como aparece no portal. Se ainda não tiver acesso, o nome da clínica/hospital.</span></label>
+      <input type="text" id="unidade" required>
+      <div class="erro" id="e-unidade"></div>
+    </div>
+    <div>
+      <label>Já possui usuário no portal?</label>
+      <div class="opcoes" role="radiogroup">
+        <label><input type="radio" name="possui" value="Não" checked> Não</label>
+        <label><input type="radio" name="possui" value="Sim"> Sim</label>
+      </div>
+    </div>
+    <div class="consent">
+      <label><input type="checkbox" id="consent" required> Autorizo a Onelaudos a usar estes dados somente para criar e manter meu acesso ao portal e para treinamentos, conforme a LGPD.</label>
+      <div class="erro" id="e-consent"></div>
+    </div>
+    <button type="submit" id="enviar">Enviar cadastro</button>
+    <div class="erro" id="e-geral" role="alert"></div>
+  </form>
+
+  <form id="formLote" class="hidden" novalidate>
+    <div>
+      <label for="lUnidade">Unidade <span class="dica">Como aparece no portal (ou o nome da clínica/hospital).</span></label>
+      <input type="text" id="lUnidade" required>
+    </div>
+    <fieldset>
+      <legend>Quem está enviando (normalmente o T.I.)</legend>
+      <div><label for="lRespNome">Nome</label><input type="text" id="lRespNome" autocomplete="name"></div>
+      <div><label for="lRespEmail">E-mail</label><input type="email" id="lRespEmail" autocomplete="email"></div>
+      <div><label for="lRespTel">Telefone</label><input type="tel" id="lRespTel" autocomplete="tel"></div>
+    </fieldset>
+    <div>
+      <label>Usuários <span class="dica">Preencha na tabela, cole as linhas do Excel ou envie a planilha modelo preenchida.</span></label>
+      <div class="ferramentas">
+        <button type="button" class="sec" id="baixarModelo">⬇ Baixar planilha modelo</button>
+        <label class="btn sec" for="arquivo">⬆ Enviar planilha (.csv ou .xlsx)</label>
+        <input type="file" id="arquivo" accept=".csv,.xlsx,.xls" hidden>
+        <button type="button" class="sec" id="colarBtn">📋 Colar do Excel</button>
+        <button type="button" class="sec hidden" id="exemplo">Preencher exemplo (demonstração)</button>
+      </div>
+    </div>
+    <div id="colarBox" class="hidden">
+      <label for="colarTxt">Copie as linhas no Excel (com ou sem cabeçalho) e cole aqui. Ordem: Nome, E-mail, Telefone, CPF, Função, CRM/UF</label>
+      <textarea id="colarTxt"></textarea>
+      <button type="button" id="colarOk">Adicionar linhas</button>
+    </div>
+    <datalist id="funcoes">
+      <option>Médico(a)</option><option>Coordenador(a)</option><option>Biomédico(a)</option><option>Enfermeiro(a)</option>
+      <option>Gerente</option><option>Recepcionista</option><option>Técnico(a) de Enfermagem</option>
+      <option>Técnico(a) de Radiologia</option><option>TI</option><option>Auxiliar Administrativo</option><option>Faturista</option>
+    </datalist>
+    <div class="tabela-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Nome completo</th><th>E-mail</th><th>Telefone</th><th>CPF</th><th>Função</th><th>CRM/UF (médicos)</th><th></th></tr></thead>
+        <tbody id="linhas"></tbody>
+      </table>
+    </div>
+    <div><button type="button" class="sec" id="addLinha">+ Adicionar pessoa</button></div>
+    <div id="resumo" role="status"></div>
+    <div class="consent">
+      <label><input type="checkbox" id="lConsent"> Declaro que as pessoas listadas autorizaram o envio dos seus dados à Onelaudos, somente para criar o acesso ao portal e para treinamentos, conforme a LGPD.</label>
+    </div>
+    <button type="submit" id="lEnviar">Enviar usuários</button>
+    <div class="erro" id="lErro" role="alert"></div>
+  </form>
+
+  <div class="feito hidden" id="feito" role="status">
+    <strong>Cadastro enviado ✅</strong>
+    A equipe da Onelaudos vai criar o seu acesso e retornar pelo WhatsApp.<br>
+    Precisa cadastrar outra pessoa? <a href="#" id="outro">Preencher novamente</a>.
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="js/config.js"></script>
+<script>
+(function () {
+  // Link: cadastro.html#t=TOKEN&u=Nome%20da%20Unidade
+  var params = new URLSearchParams(location.hash.slice(1));
+  var token = params.get('t') || '';
+  var $ = function (id) { return document.getElementById(id); };
+  var emIframe = window.parent !== window;
+  var configurado = typeof CONFIG !== 'undefined' && CONFIG.SUPABASE_URL && CONFIG.SUPABASE_ANON_KEY && window.supabase;
+  if (!configurado) $('avisoDemo').classList.remove('hidden');
+  if (params.get('u')) $('unidade').value = params.get('u');
+
+  ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO']
+    .forEach(function (uf) { var o = document.createElement('option'); o.textContent = uf; if (uf === 'SP') o.selected = true; $('crmUf').appendChild(o); });
+
+  var digitos = function (s) { return String(s).replace(/\D/g, ''); };
+  function cpfValido(c) {
+    c = digitos(c);
+    if (c.length !== 11 || /^(\d)\1{10}$/.test(c)) return false;
+    for (var t = 9; t < 11; t++) {
+      var s = 0;
+      for (var i = 0; i < t; i++) s += Number(c[i]) * (t + 1 - i);
+      if (((s * 10) % 11) % 10 !== Number(c[t])) return false;
+    }
+    return true;
+  }
+  // Máscaras
+  $('cpf').addEventListener('input', function (e) {
+    var d = digitos(e.target.value).slice(0, 11);
+    e.target.value = d.replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+  });
+  $('telefone').addEventListener('input', function (e) {
+    var d = digitos(e.target.value).slice(0, 11);
+    e.target.value = d.length > 10 ? d.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3')
+                   : d.replace(/(\d{2})(\d{0,4})(\d{0,4})/, function (m, a, b, c) { return '(' + a + (b ? ') ' + b : '') + (c ? '-' + c : ''); });
+  });
+  $('cargo').addEventListener('change', function () { $('blocoCrm').classList.toggle('hidden', this.value !== 'Médico(a)'); });
+
+  function marcar(id, msg) {
+    $('e-' + id).textContent = msg || '';
+    var campo = $(id); if (campo) campo.classList.toggle('invalido', !!msg);
+    return !msg;
+  }
+  function validar() {
+    var ok = true, v = function (id) { return $(id).value.trim(); };
+    ok = marcar('nome', v('nome').split(/\s+/).length < 2 ? 'Informe o nome completo.' : '') && ok;
+    ok = marcar('email', /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v('email')) ? '' : 'E-mail inválido.') && ok;
+    var tel = digitos(v('telefone'));
+    ok = marcar('telefone', tel.length < 10 || tel.length > 11 ? 'Informe o telefone com DDD.' : '') && ok;
+    ok = marcar('cpf', cpfValido(v('cpf')) ? '' : 'CPF inválido. Confira os números.') && ok;
+    ok = marcar('cargo', v('cargo') ? '' : 'Selecione a função.') && ok;
+    if (v('cargo') === 'Médico(a)') ok = marcar('crm', digitos(v('crm')).length >= 4 ? '' : 'Informe o número do CRM.') && ok;
+    else marcar('crm', '');
+    ok = marcar('unidade', v('unidade').length < 3 ? 'Informe a unidade.' : '') && ok;
+    ok = marcar('consent', $('consent').checked ? '' : 'É preciso autorizar o uso dos dados para o cadastro.') && ok;
+    return ok;
+  }
+
+  $('form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    $('e-geral').textContent = '';
+    if (!validar()) { var p = document.querySelector('.invalido'); if (p) p.focus(); return; }
+    var dados = {
+      nome: $('nome').value.trim(), email: $('email').value.trim().toLowerCase(),
+      telefone: $('telefone').value.trim(), cpf: $('cpf').value.trim(),
+      cargo: $('cargo').value, crm: $('cargo').value === 'Médico(a)' ? digitos($('crm').value) + '/' + $('crmUf').value : '',
+      unidade: $('unidade').value.trim(),
+      possui_usuario: document.querySelector('[name=possui]:checked').value,
+      consentimento: true
+    };
+    var btn = $('enviar'); btn.disabled = true; btn.textContent = 'Enviando...';
+    try {
+      if (configurado) {
+        var cli = window.supabase.createClient(String(CONFIG.SUPABASE_URL).replace(/\/(rest|auth)\/v1\/?$/, '').replace(/\/+$/, ''), CONFIG.SUPABASE_ANON_KEY, { auth: { persistSession: false } });
+        var r = await cli.rpc('enviar_cadastro', { p_token: token, p_dados: dados });
+        if (r.error && !emIframe) throw new Error(/expirad|inválid/i.test(r.error.message) ? 'Este link expirou ou é inválido. Peça um novo link no WhatsApp.' : 'Não foi possível enviar. Tente de novo em instantes.');
+      }
+      // Aberto dentro do painel ("Abrir como o cliente"): entrega também para o chat (mesma origem)
+      if (emIframe) window.parent.postMessage({ tipo: 'onelaudos-cadastro', token: token, dados: dados }, location.origin);
+      $('form').classList.add('hidden'); $('feito').classList.remove('hidden');
+    } catch (err) {
+      $('e-geral').textContent = err.message;
+    } finally {
+      btn.disabled = false; btn.textContent = 'Enviar cadastro';
+    }
+  });
+  $('outro').addEventListener('click', function (e) {
+    e.preventDefault();
+    var unidade = $('unidade').value;
+    $('form').reset(); $('unidade').value = unidade; $('blocoCrm').classList.add('hidden');
+    $('feito').classList.add('hidden'); $('form').classList.remove('hidden'); $('nome').focus();
+  });
+  // =====================================================================
+  // MODO LOTE: cadastro.html#t=TOKEN&u=Unidade&m=lote
+  // =====================================================================
+  if (params.get('m') !== 'lote') return;
+  document.querySelector('main').classList.add('largo');
+  document.querySelector('h1').textContent = 'Cadastro de usuários da implantação';
+  document.querySelector('.sub').textContent = 'Cadastre todas as pessoas que vão usar o portal de uma vez: preencha na tabela, cole do Excel ou envie a planilha modelo.';
+  $('form').classList.add('hidden');
+  $('formLote').classList.remove('hidden');
+  $('lUnidade').value = params.get('u') || '';
+  if (!configurado || emIframe) $('exemplo').classList.remove('hidden');
+
+  var COLS = ['nome', 'email', 'telefone', 'cpf', 'cargo', 'crm'];
+  var TITULOS = ['Nome completo', 'E-mail', 'Telefone', 'CPF', 'Função', 'CRM/UF'];
+  var pessoas = [];
+  var norm = function (x) { return String(x || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim(); };
+  var ehMedico = function (c) { return /medic/.test(norm(c)); };
+
+  function errosDe(p, i) {
+    var e = {}, tel = digitos(p.telefone);
+    if (String(p.nome || '').trim().split(/\s+/).length < 2) e.nome = 'Nome completo';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(p.email || '').trim())) e.email = 'E-mail inválido';
+    if (tel.length < 10 || tel.length > 11) e.telefone = 'Telefone com DDD';
+    if (!cpfValido(p.cpf)) e.cpf = 'CPF inválido';
+    if (!String(p.cargo || '').trim()) e.cargo = 'Informe a função';
+    if (ehMedico(p.cargo) && digitos(p.crm).length < 4) e.crm = 'CRM obrigatório para médico';
+    pessoas.forEach(function (o, j) {   // duplicados na mesma lista
+      if (j === i) return;
+      if (digitos(o.cpf).length === 11 && digitos(o.cpf) === digitos(p.cpf)) e.cpf = 'CPF repetido na linha ' + (j + 1);
+      if (o.email && norm(o.email) === norm(p.email)) e.email = 'E-mail repetido na linha ' + (j + 1);
+    });
+    return e;
+  }
+  var vazia = function (p) { return COLS.every(function (c) { return !String(p[c] || '').trim(); }); };
+
+  function desenhar() {
+    $('linhas').innerHTML = '';
+    pessoas.forEach(function (p, i) {
+      var tr = document.createElement('tr');
+      var td = document.createElement('td'); td.className = 'num'; td.textContent = i + 1; tr.appendChild(td);
+      COLS.forEach(function (c, k) {
+        var cel = document.createElement('td'), inp = document.createElement('input');
+        inp.type = c === 'email' ? 'email' : 'text';
+        inp.value = p[c] || ''; inp.dataset.i = i; inp.dataset.c = c;
+        inp.setAttribute('aria-label', TITULOS[k] + ', linha ' + (i + 1));
+        if (c === 'cargo') inp.setAttribute('list', 'funcoes');
+        if (c === 'crm') inp.placeholder = '123456/SP';
+        cel.appendChild(inp); tr.appendChild(cel);
+      });
+      var tdx = document.createElement('td'), x = document.createElement('button');
+      x.type = 'button'; x.className = 'tirar'; x.textContent = '✕'; x.dataset.tirar = i; x.setAttribute('aria-label', 'Remover linha ' + (i + 1));
+      tdx.appendChild(x); tr.appendChild(tdx);
+      $('linhas').appendChild(tr);
+    });
+    revisar();
+  }
+  // Marca as células com erro e atualiza o resumo
+  function revisar() {
+    var validos = 0, comErro = 0;
+    pessoas.forEach(function (p, i) {
+      var e = vazia(p) ? {} : errosDe(p, i);
+      if (!vazia(p)) { if (Object.keys(e).length) comErro++; else validos++; }
+      document.querySelectorAll('#linhas input[data-i="' + i + '"]').forEach(function (inp) {
+        var msg = e[inp.dataset.c] || '';
+        inp.classList.toggle('invalido', !!msg); inp.title = msg;
+      });
+    });
+    $('resumo').innerHTML = '<strong>' + (validos + comErro) + '</strong> usuário(s) · ' + validos + ' ok' +
+      (comErro ? ' · <span class="ruim">' + comErro + ' com erro (passe o mouse na célula vermelha)</span>' : '');
+    $('lEnviar').textContent = 'Enviar ' + (validos + comErro) + ' usuário(s)';
+    return { validos: validos, comErro: comErro };
+  }
+  $('linhas').addEventListener('input', function (e) {
+    var inp = e.target; if (!inp.dataset.c) return;
+    var p = pessoas[Number(inp.dataset.i)];
+    if (inp.dataset.c === 'cpf') { var d = digitos(inp.value).slice(0, 11); if (d.length === 11) inp.value = d.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4'); }
+    p[inp.dataset.c] = inp.value;
+    revisar();
+  });
+  $('linhas').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-tirar]'); if (!b) return;
+    pessoas.splice(Number(b.dataset.tirar), 1);
+    if (!pessoas.length) pessoas.push({});
+    desenhar();
+  });
+  $('addLinha').addEventListener('click', function () {
+    pessoas.push({}); desenhar();
+    var ult = document.querySelector('#linhas tr:last-child input'); if (ult) ult.focus();
+  });
+
+  // Linhas (array de arrays) -> pessoas. Reconhece o cabeçalho; sem cabeçalho, usa a ordem do modelo.
+  var MAPA = { 'nome completo': 'nome', 'nome': 'nome', 'e-mail': 'email', 'email': 'email', 'telefone': 'telefone', 'celular': 'telefone',
+               'numero de telefone': 'telefone', 'cpf': 'cpf', 'funcao': 'cargo', 'cargo': 'cargo', 'crm': 'crm', 'crm/uf': 'crm', 'crm/uf (medicos)': 'crm' };
+  function adicionarLinhas(linhas) {
+    linhas = linhas.filter(function (l) { return l.some(function (v) { return String(v || '').trim(); }); });
+    if (!linhas.length) return 0;
+    var ordem = COLS, cab = linhas[0].map(norm);
+    if (cab.some(function (h) { return MAPA[h]; })) { ordem = cab.map(function (h) { return MAPA[h] || null; }); linhas = linhas.slice(1); }
+    pessoas = pessoas.filter(function (p) { return !vazia(p); });
+    linhas.forEach(function (l) {
+      var p = {};
+      ordem.forEach(function (c, k) { if (c) p[c] = String(l[k] == null ? '' : l[k]).trim(); });
+      if (p.cpf) { var d = digitos(p.cpf); if (d.length < 11 && d.length >= 9) d = ('00' + d).slice(-11); if (d.length === 11) p.cpf = d.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4'); }
+      pessoas.push(p);
+    });
+    if (!pessoas.length) pessoas.push({});
+    desenhar();
+    return linhas.length;
+  }
+  function lerCSV(texto) {
+    var sep = (texto.split('\n')[0].match(/;/g) || []).length >= (texto.split('\n')[0].match(/,/g) || []).length ? ';' : ',';
+    return texto.split(/\r?\n/).map(function (linha) {
+      var out = [], atual = '', aspas = false;
+      for (var i = 0; i < linha.length; i++) {
+        var ch = linha[i];
+        if (ch === '"') { if (aspas && linha[i + 1] === '"') { atual += '"'; i++; } else aspas = !aspas; }
+        else if (ch === sep && !aspas) { out.push(atual); atual = ''; }
+        else atual += ch;
+      }
+      out.push(atual); return out;
+    });
+  }
+
+  // Planilha modelo em CSV com ";" (abre direto no Excel em português)
+  $('baixarModelo').addEventListener('click', function () {
+    var csv = '﻿' + TITULOS.join(';') + '\r\n' + 'Maria Silva Souza;maria.souza@clinica.com.br;(11) 91234-5678;000.000.000-00;Recepcionista;\r\n';
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+    a.download = 'modelo-usuarios-onelaudos.csv'; document.body.appendChild(a); a.click(); a.remove();
+  });
+  $('arquivo').addEventListener('change', function (e) {
+    var f = e.target.files[0]; e.target.value = ''; if (!f) return;
+    var leitor = new FileReader();
+    if (/\.csv$/i.test(f.name)) {
+      leitor.onload = function () { var n = adicionarLinhas(lerCSV(String(leitor.result))); $('lErro').textContent = n ? '' : 'Não encontrei linhas na planilha.'; };
+      leitor.readAsText(f, 'utf-8');
+    } else {
+      if (typeof XLSX === 'undefined') { $('lErro').textContent = 'Não consegui abrir arquivos .xlsx agora. No Excel, use "Salvar como → CSV" e envie de novo.'; return; }
+      leitor.onload = function () {
+        var wb = XLSX.read(new Uint8Array(leitor.result), { type: 'array' });
+        var n = adicionarLinhas(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: false }));
+        $('lErro').textContent = n ? '' : 'Não encontrei linhas na planilha.';
+      };
+      leitor.readAsArrayBuffer(f);
+    }
+  });
+  $('colarBtn').addEventListener('click', function () { $('colarBox').classList.toggle('hidden'); $('colarTxt').focus(); });
+  $('colarOk').addEventListener('click', function () {
+    var linhas = $('colarTxt').value.split(/\r?\n/).map(function (l) { return l.split('\t'); });
+    if (adicionarLinhas(linhas)) { $('colarTxt').value = ''; $('colarBox').classList.add('hidden'); }
+  });
+  $('exemplo').addEventListener('click', function () {
+    adicionarLinhas([
+      ['Carlos Eduardo Lima', 'carlos.lima@exemplo.com.br', '11912345678', '52998224725', 'TI', ''],
+      ['Juliana Martins Rocha', 'juliana.rocha@exemplo.com.br', '11923456789', '11144477735', 'Recepcionista', ''],
+      ['Dr. Rafael Nogueira Prado', 'rafael.prado@exemplo.com.br', '11934567890', '12345678909', 'Médico(a)', '123456/SP'],
+      ['Patrícia Gomes', 'patricia.gomes@exemplo.com.br', '11945678901', '98765432100', 'Técnico(a) de Radiologia', ''],
+      ['Marcos Vinícius Alves', 'marcos.alves@exemplo', '1191234', '11122233344', 'Faturista', '']
+    ]);
+    if (!$('lRespNome').value) { $('lRespNome').value = 'Carlos Eduardo Lima'; $('lRespEmail').value = 'carlos.lima@exemplo.com.br'; $('lRespTel').value = '(11) 91234-5678'; }
+  });
+
+  $('formLote').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    $('lErro').textContent = '';
+    var lista = pessoas.filter(function (p) { return !vazia(p); });
+    var r = revisar();
+    if (!lista.length) { $('lErro').textContent = 'Adicione pelo menos uma pessoa.'; return; }
+    if (lista.length > 200) { $('lErro').textContent = 'Máximo de 200 pessoas por envio.'; return; }
+    if (r.comErro) { $('lErro').textContent = 'Corrija as células em vermelho antes de enviar (' + r.comErro + ' linha(s) com erro).'; var c = document.querySelector('#linhas .invalido'); if (c) c.focus(); return; }
+    if ($('lUnidade').value.trim().length < 3) { $('lErro').textContent = 'Informe a unidade.'; $('lUnidade').focus(); return; }
+    if (!$('lConsent').checked) { $('lErro').textContent = 'Marque a declaração de autorização (LGPD).'; return; }
+    var lote = {
+      unidade: $('lUnidade').value.trim(),
+      responsavel: { nome: $('lRespNome').value.trim(), email: $('lRespEmail').value.trim(), telefone: $('lRespTel').value.trim() },
+      usuarios: lista.map(function (p) { return { nome: p.nome.trim(), email: p.email.trim().toLowerCase(), telefone: p.telefone.trim(), cpf: p.cpf.trim(), cargo: p.cargo.trim(), crm: (p.crm || '').trim() }; }),
+      consentimento: true
+    };
+    var btn = $('lEnviar'); btn.disabled = true; btn.textContent = 'Enviando...';
+    try {
+      if (configurado) {
+        var cli = window.supabase.createClient(String(CONFIG.SUPABASE_URL).replace(/\/(rest|auth)\/v1\/?$/, '').replace(/\/+$/, ''), CONFIG.SUPABASE_ANON_KEY, { auth: { persistSession: false } });
+        var res = await cli.rpc('enviar_cadastro_lote', { p_token: token, p_lote: lote });
+        if (res.error && !emIframe) throw new Error(/expirad|inválid/i.test(res.error.message) ? 'Este link expirou ou é inválido. Peça um novo link no WhatsApp.' : 'Não foi possível enviar. Tente de novo em instantes.');
+      }
+      if (emIframe) window.parent.postMessage({ tipo: 'onelaudos-cadastro-lote', token: token, lote: lote }, location.origin);
+      $('formLote').classList.add('hidden');
+      $('feito').querySelector('strong').textContent = lote.usuarios.length + ' usuário(s) enviado(s) ✅';
+      $('feito').classList.remove('hidden');
+      $('outro').parentNode.innerHTML = 'Precisa incluir mais gente depois? É só abrir este mesmo link de novo.';
+    } catch (err) {
+      $('lErro').textContent = err.message;
+    } finally {
+      btn.disabled = false; revisar();
+    }
+  });
+
+  pessoas.push({}, {}, {});
+  desenhar();
+})();
+</script>
+</body>
+</html>

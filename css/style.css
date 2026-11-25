@@ -340,3 +340,65 @@ body.at-redimensionando{cursor:col-resize;user-select:none}
 .at-estrelas span{color:#3a4d63}
 @media(max-width:600px){.at-resumo-aval{grid-template-columns:1fr}}
 .at-status-fechado{background:#2a3340;color:#c9d6e2}
+/* Atendimento: solicitação de cadastro */
+.at-form{display:flex;flex-direction:column;gap:8px}
+.at-form label{margin:6px 0 0}
+.at-form select,.at-form input[type=text],.at-form textarea{background:var(--bg)}
+.at-form textarea{min-height:140px;font-size:13px;color:var(--mut)}
+.at-form button[type=submit]{margin-top:10px;padding:11px}
+.at-formato{border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:6px 0 0;display:flex;flex-direction:column;gap:8px}
+.at-formato legend{font-size:13px;color:var(--mut);padding:0 4px}
+.at-formato label{display:flex;gap:8px;align-items:flex-start;color:var(--txt);font-size:14px;margin:0}
+.at-formato input{margin-top:3px}
+.at-form-enviado{align-self:center;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;background:var(--card);border:1px dashed var(--line);border-radius:10px;padding:8px 12px;font-size:13px;color:var(--mut)}
+.at-form-enviado button{padding:5px 10px;font-size:12px}
+.at-iframe{width:100%;height:70vh;border:1px solid var(--line);border-radius:8px;background:#fff}
+.at-ficha{align-self:stretch;max-width:560px;margin-left:auto;background:#122235;border:1px solid #2f6ea8;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.at-ficha.feito{border-color:#1f6b3a;background:#10241a}
+.at-ficha-topo{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.at-ficha dl{display:grid;grid-template-columns:120px 1fr;gap:4px 10px;margin:0;font-size:14px}
+.at-ficha dt{color:var(--mut)}
+.at-ficha dd{margin:0;word-break:break-word}
+.at-ficha .at-link{padding:0 4px;font-size:12px}
+.at-checks{display:flex;flex-wrap:wrap;gap:6px}
+.at-checks span{font-size:12px;border-radius:999px;padding:2px 9px}
+.at-checks .ok{background:#10281a;color:#7fe0a5}
+.at-checks .ruim{background:#3a1218;color:#ff9aa8}
+.at-ficha-acoes{display:flex;flex-wrap:wrap;gap:6px}
+.at-ficha-acoes button{padding:6px 10px;font-size:13px}
+/* Atendimento: cadastro em lote */
+.at-ficha-lote{max-width:none}
+.at-checks .neutro{background:#1f2d3b;color:#c9d6e2}
+.at-lote-wrap{overflow-x:auto;max-height:320px;overflow-y:auto;border:1px solid var(--line);border-radius:8px}
+.at-lote{font-size:13px;min-width:640px}
+.at-lote th{position:sticky;top:0;background:#16283a;font-size:12px;padding:6px 8px;border:0;border-bottom:1px solid var(--line)}
+.at-lote td{padding:6px 8px;border:0;border-bottom:1px solid #1e2c3b;vertical-align:middle}
+.at-lote tr.ok td{color:#9fdcb6}
+.at-chip{font-size:11px;border-radius:999px;padding:2px 8px;white-space:nowrap}
+.at-chip.ok{background:#10281a;color:#7fe0a5}
+.at-chip.ruim{background:#3a1218;color:#ff9aa8}
+.at-modal-largo{max-width:1180px}
+.at-ficha{min-width:0;box-sizing:border-box}
+.at-ficha-lote{width:100%;margin-left:0}
+.at-lote td:nth-child(5){white-space:nowrap}
+.at-lote td:nth-child(2){min-width:140px}
+/* Atendimento: tempo real, cadastros recebidos */
+.at-demo-info{color:#9fd0ff;background:#1f3a55}
+.at-badge{display:inline-block;min-width:18px;padding:0 6px;margin-left:4px;border-radius:999px;background:#e5484d;color:#fff;font-size:11px;font-weight:700;line-height:18px;text-align:center}
+.at-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#4b5b6b;margin-right:8px;vertical-align:middle}
+.at-dot.on{background:#2fbf71}
+.at-toast{position:fixed;right:20px;bottom:20px;z-index:60;background:var(--card);border:1px solid var(--acc);color:var(--txt);border-radius:10px;padding:12px 16px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.4);transition:opacity .4s}
+.at-toast.sai{opacity:0}
+.at-cad-barra{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.at-cad-barra select{width:auto;padding:8px 10px}
+.at-cad-barra button{margin-left:auto}
+#atCadLista{display:flex;flex-direction:column;gap:12px}
+#atCadNovoBox{margin-bottom:12px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px}
+.at-cad-pronto{display:flex;flex-direction:column;gap:8px}
+.at-cad-pronto textarea{min-height:140px;font-size:13px;background:var(--card)}
+.at-envio-box.teste{background:#14261d;border-top-color:#1f6b3a}
+.at-envio-box.teste #atEnviar{background:#1f8a4c}
+.at-modos button[data-modo=cliente-teste].ativo{background:#10281a;border-color:#1f6b3a;color:#7fe0a5}
+.at-manual-aviso{align-self:stretch;background:#1b2633;border:1px dashed #3a4d63;color:#c9d6e2;border-radius:8px;padding:8px 12px;font-size:13px}
+#atNovoChamado{white-space:nowrap}
+.at-form .erro{color:#ff9aa8;font-size:13px}

@@ -7,9 +7,20 @@
 //         sem mexer na tela (Atendimento).
 // ========================================
 
+// Se js/atendimento-db.js não carregou (arquivo fora da pasta ou index.html antigo),
+// o painel continua funcionando, só sem as partes em tempo real, e avisa no console.
+if (typeof CadastrosDB === 'undefined' || typeof Equipe === 'undefined') {
+    console.error('Onelaudos Atendimento: js/atendimento-db.js não foi carregado. Confira se o arquivo está na pasta js/ e se o index.html tem a linha <script src="js/atendimento-db.js">.');
+    var semDB = function () { return Promise.reject(new Error('O arquivo js/atendimento-db.js não foi carregado. Confira a pasta js/ e o index.html.')); };
+    window.CadastrosDB = { ativo: function () { return false; }, criarLink: semDB, listar: semDB, marcar: semDB,
+                           contarPendentes: function () { return Promise.resolve(0); }, aoNovo: function () {}, desligar: function () {}, faltando: true };
+    window.Equipe = { entrar: function () {}, sair: function () {}, online: function () { return []; }, estaOnline: function () { return false; },
+                      aoMudar: function () {}, colegas: semDB };
+}
+
 // ---------- Camada de dados (demonstração) ----------
 // Toda função devolve Promise, igual será com o Supabase.
-const AtendimentoDados = (function () {
+const AtendimentoDemo = (function () {
     var ATENDENTE = 'Demonstração'; // com login, vem do cadastro (Auth.perfil().nome)
     var TEXTO_AUTO = 'Somos a Onelaudos. Recebemos sua mensagem e já iremos dar sequência no seu chamado.';
     var ouvintes = [];
@@ -29,6 +40,7 @@ const AtendimentoDados = (function () {
         '<text x="60" y="136" font-family="Arial" font-size="13" fill="#555">C-STORE recusado: tempo esgotado (timeout).</text>' +
         '<rect x="340" y="176" width="80" height="28" rx="4" fill="#1565c0"/><text x="368" y="195" font-family="Arial" font-size="13" fill="#fff">OK</text></svg>');
     var COLEGAS = ['Ana', 'Bruno', 'Carla'];  // com login, vem da tabela atendentes
+    var solicitacoes = {};                     // token do formulário de cadastro -> chamado
 
     // Pesquisa de satisfação enviada ao encerrar (no real: o webhook trata a resposta)
     var TEXTO_PESQUISA = 'Seu atendimento foi encerrado ✅\nComo você avalia o atendimento de {atendente}?\n\n5 - Excelente\n4 - Bom\n3 - Regular\n2 - Ruim\n1 - Péssimo\n\nResponda só com o número.';
@@ -190,6 +202,94 @@ const AtendimentoDados = (function () {
             // Fora disso (já concluída), no real uma nova mensagem abre um novo chamado
         },
 
+        // ---------- Solicitação de cadastro de usuários ----------
+        // Gera um link único (token) por chamado. O cliente preenche cadastro.html e os dados
+        // voltam para o chamado como uma "ficha". No real: tabela solicitacoes_cadastro (03_cadastro.sql).
+        solicitarCadastro: function (id, opcoes) {
+            var c = achar(id);
+            if (!c || c.status !== 'meu') return Promise.reject(new Error('Pegue o chamado antes de enviar o formulário.'));
+            var token = opcoes.token || (Math.random().toString(36).slice(2, 10) + Date.now().toString(36));
+            solicitacoes[token] = { chamado: id, unidade: opcoes.unidade, formato: opcoes.formato };
+            var montado = opcoes.montar(token);   // { texto, link } — a tela monta o link com o token
+            c.msgs.push({ de: 'agente', autor: ATENDENTE, texto: montado.texto, hora: agora() });
+            c.msgs.push({ de: 'formulario', token: token, formato: opcoes.formato, lote: !!opcoes.lote, link: montado.link || '', hora: agora() });
+            avisar({ tipo: 'mensagem', id: id, de: 'agente', setor: c.setor, status: c.status });
+            // Demonstração: no formato texto, o cliente responde preenchido sozinho
+            if (opcoes.formato === 'texto') {
+                var self = this;
+                setTimeout(function () { avisar({ tipo: 'digitando', id: id }); }, 900);
+                setTimeout(function () {
+                    var resposta = 'Nome completo: Fernanda Ribeiro Alves\nNumero de telefone: (11) 98765-4321\nCPF: 123.456.789-09\n' +
+                                   'Email: fernanda.alves@exemplo.com.br\nFunção: Recepcionista\nUnidade: ' + (opcoes.unidade || c.local) + '\nCRM (caso seja médico):';
+                    c.msgs.push({ de: 'cliente', texto: resposta, hora: agora() });
+                    self.lerCadastroTexto(id, resposta);
+                }, 3000);
+            }
+            return Promise.resolve(token);
+        },
+
+        // Dados que chegaram pelo formulário (cadastro.html)
+        receberCadastro: function (token, dados) {
+            var sol = solicitacoes[token], c = sol && achar(sol.chamado);
+            if (!c) return false;
+            c.msgs.push({ de: 'cadastro', dados: dados, origem: 'formulário', status: 'pendente', hora: agora() });
+            avisar({ tipo: 'mensagem', id: c.id, de: 'cliente', setor: c.setor, status: c.status });
+            return true;
+        },
+
+        // Lote de usuários (implantação nova): uma ficha só, com a lista toda
+        receberCadastroLote: function (token, lote) {
+            var sol = solicitacoes[token], c = sol && achar(sol.chamado);
+            if (!c || !lote || !lote.usuarios) return false;
+            lote.usuarios.forEach(function (u) { u.status = 'pendente'; });
+            c.msgs.push({ de: 'cadastro-lote', lote: lote, hora: agora() });
+            avisar({ tipo: 'mensagem', id: c.id, de: 'cliente', setor: c.setor, status: c.status });
+            return true;
+        },
+
+        // indiceUsuario = número da linha, ou 'todos'
+        marcarLote: function (id, indiceMsg, indiceUsuario) {
+            var c = achar(id), m = c && c.msgs[indiceMsg];
+            if (!m || m.de !== 'cadastro-lote') return Promise.resolve();
+            var alvo = indiceUsuario === 'todos' ? m.lote.usuarios : [m.lote.usuarios[indiceUsuario]];
+            alvo.forEach(function (u) { if (u) u.status = 'cadastrado'; });
+            if (indiceUsuario === 'todos') c.msgs.push({ de: 'nota', texto: ATENDENTE + ' cadastrou os ' + m.lote.usuarios.length + ' usuários do lote no portal', hora: agora() });
+            avisar({ tipo: 'cadastro', id: id });
+            return Promise.resolve();
+        },
+
+        // Lê uma resposta em texto ("Nome completo: ...") e transforma em ficha(s)
+        lerCadastroTexto: function (id, texto) {
+            var c = achar(id); if (!c) return 0;
+            var chaves = { 'nome completo': 'nome', 'nome': 'nome', 'numero de telefone': 'telefone', 'telefone': 'telefone', 'celular': 'telefone',
+                           'cpf': 'cpf', 'email': 'email', 'e-mail': 'email', 'funcao': 'cargo', 'cargo': 'cargo', 'unidade': 'unidade',
+                           'crm (caso seja medico)': 'crm', 'crm': 'crm' };
+            var norm = function (x) { return x.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim(); };
+            var pessoas = [], atual = null;
+            texto.split(/\r?\n/).forEach(function (linha) {
+                var m = linha.match(/^\s*([^:]{2,40}):\s*(.*)$/); if (!m) return;
+                var campo = chaves[norm(m[1])]; if (!campo) return;
+                if (campo === 'nome' && atual && atual.nome) atual = null;   // começou outra pessoa
+                if (!atual) { atual = {}; pessoas.push(atual); }
+                atual[campo] = m[2].trim();
+            });
+            pessoas = pessoas.filter(function (p) { return p.nome || p.email; });
+            pessoas.forEach(function (p) {
+                c.msgs.push({ de: 'cadastro', dados: p, origem: 'resposta no WhatsApp', status: 'pendente', hora: agora() });
+            });
+            if (pessoas.length) avisar({ tipo: 'mensagem', id: id, de: 'cliente', setor: c.setor, status: c.status });
+            return pessoas.length;
+        },
+
+        marcarCadastrado: function (id, indice) {
+            var c = achar(id), m = c && c.msgs[indice];
+            if (!m || m.de !== 'cadastro') return Promise.resolve();
+            m.status = 'cadastrado';
+            c.msgs.push({ de: 'nota', texto: ATENDENTE + ' cadastrou ' + (m.dados.nome || 'o usuário') + ' no portal', hora: agora() });
+            avisar({ tipo: 'cadastro', id: id });
+            return Promise.resolve();
+        },
+
         avaliacoes: function (setor) {
             return Promise.resolve(avaliacoes.filter(function (a) { return a.setor === setor; }));
         },
@@ -208,6 +308,9 @@ const AtendimentoDados = (function () {
 })();
 
 // ---------- Tela ----------
+// Camada em uso: começa na demonstração; com login e o 06 rodado, troca para AtendimentoReal
+var AtendimentoDados = AtendimentoDemo;
+
 // ---------- Sons de aviso (gerados pelo navegador, sem arquivo de áudio) ----------
 const AtendimentoSom = (function () {
     var ctx = null, naoLidas = 0, tituloOriginal = document.title;
@@ -261,6 +364,20 @@ const Atendimento = {
     desligar: null,
 
     render: function (el) {
+        if (!this.ouvindoFormulario) {
+            this.ouvindoFormulario = true;
+            window.addEventListener('message', function (e) {
+                if (e.origin !== location.origin || !e.data) return;
+                if (e.data.tipo === 'onelaudos-cadastro') AtendimentoDados.receberCadastro(String(e.data.token), e.data.dados || {});
+                else if (e.data.tipo === 'onelaudos-cadastro-lote') AtendimentoDados.receberCadastroLote(String(e.data.token), e.data.lote);
+                else return;
+                // Fecha a janela do formulário logo depois do "Cadastro enviado ✅"
+                setTimeout(function () {
+                    var fr = document.querySelector('.at-iframe'), fundo = fr && fr.closest('.at-modal-fundo');
+                    if (fundo) fundo.remove();
+                }, 1500);
+            });
+        }
         var self = this;
         if (this.desligar) { this.desligar(); this.desligar = null; }
         if (!this.ouvindoAuth) {
@@ -285,6 +402,18 @@ const Atendimento = {
         this.setores = this.ehAdmin ? TODOS : (p.setores || []).filter(function (x) { return TODOS.indexOf(x) >= 0; });
         if (!this.setores.length) { el.innerHTML = '<p class="vazio">Seu cadastro não tem setor definido. Fale com o administrador.</p>'; return; }
         if (this.setores.indexOf(this.setor) < 0) this.setor = this.setores[0];
+        // Com login, tenta os chamados reais (precisa do 06_chamados.sql); senão, segue com os exemplos
+        if (!demo && p && typeof AtendimentoReal !== 'undefined' && !this.realTentado) {
+            this.realTentado = true;
+            el.innerHTML = '<p class="vazio">Carregando chamados...</p>';
+            AtendimentoReal.iniciar(p).then(function () {
+                AtendimentoDados = AtendimentoReal; self.chamadosReais = true;
+            }).catch(function (e) {
+                console.warn('Chamados reais desligados:', e.message);
+                AtendimentoDados = AtendimentoDemo; self.chamadosReais = false; self.motivoExemplo = e.message;
+            }).then(function () { if (location.hash.indexOf('#/atendimento') === 0) self.abrirPainel(el, demo); });
+            return;
+        }
         if (p) AtendimentoDados.definirAtendente(p.nome);
         AtendimentoDados.colegas().then(function (l) { self.colegas = l; });
         this.desligar = AtendimentoDados.aoMudar(function (ev) {
@@ -297,6 +426,8 @@ const Atendimento = {
         });
         this.montar(el);
         this.desenhar();
+        if (!demo && p) this.ligarTempoReal(p);   // depois de montar: precisa do selo e do contador na tela
+        if (!demo && CadastrosDB.faltando) this.aviso('⚠️ Falta o arquivo js/atendimento-db.js: cadastros e equipe online desligados.');
     },
 
     // ---------- Login ----------
@@ -381,14 +512,17 @@ const Atendimento = {
               '<div class="at-topo">' +
                 '<button type="button" class="sec at-menu-btn" id="atMenu"></button>' +
                 '<h1>Atendimento</h1>' +
-                (this.demo ? '<span class="at-demo" title="' + Docs.esc(Auth.motivoDemo()) + '">Modo demonstração (passe o mouse para ver o motivo)</span>' : '') +
+                (this.demo ? '<span class="at-demo" title="' + Docs.esc(Auth.motivoDemo()) + '">Modo demonstração (passe o mouse para ver o motivo)</span>'
+                           : (this.chamadosReais ? '' : '<span class="at-demo at-demo-info" title="' + Docs.esc('Os chamados da fila ainda são exemplos (cada pessoa vê a sua cópia). ' + (this.motivoExemplo || '')) + '">Chamados de exemplo</span>')) +
                 '<div class="at-setores" role="tablist" aria-label="Setor">' +
                   this.setores.map(function (st) { return '<button type="button" data-setor="' + st + '">' + (st === 'med' ? 'Suporte Médico' : 'Implantação') + '</button>'; }).join('') +
                 '</div>' +
                 '<span class="at-equipe" id="atEquipe"></span>' +
+                (this.demo ? '' : '<button type="button" class="sec at-menu-btn" id="atCadastros">📋 Cadastros <span class="at-badge hidden" id="atCadBadge">0</span></button>') +
                 '<button type="button" class="sec at-menu-btn" id="atAvaliacoes">⭐ Avaliações</button>' +
                 '<button type="button" class="sec at-menu-btn" id="atSom"></button>' +
-                '<button type="button" class="sec" id="atSimular">+ Simular novo contato</button>' +
+                (this.chamadosReais ? '<button type="button" id="atNovoChamado" title="Registrar um atendimento que chegou pelo WhatsApp normal, telefone, e-mail...">+ Novo chamado</button>' : '') +
+                '<button type="button" class="sec" id="atSimular" title="Cria um chamado de teste na fila, como se um cliente tivesse chamado">+ Simular contato' + (this.chamadosReais ? ' (teste)' : '') + '</button>' +
                 '<span class="at-eu"><span class="at-avatar">' + iniciais + '</span>' + nome +
                   (this.ehAdmin && !this.demo ? '<span class="at-papel">Admin</span>' : '') + '</span>' +
                 (this.demo ? '' : '<button type="button" class="sec at-menu-btn" id="atSair">Sair</button>') +
@@ -405,6 +539,7 @@ const Atendimento = {
                     '<div class="at-modos" role="tablist" aria-label="Tipo de mensagem">' +
                       '<button type="button" class="ativo" data-modo="cliente" role="tab" aria-selected="true">Responder ao cliente</button>' +
                       '<button type="button" data-modo="interna" role="tab" aria-selected="false">🔒 Nota interna</button>' +
+                      '<button type="button" data-modo="cliente-teste" role="tab" aria-selected="false" class="hidden" title="Só em chamados de teste: escreve como se fosse o cliente (para testar respostas e a pesquisa de satisfação)">🧪 Como cliente (teste)</button>' +
                     '</div>' +
                     '<div class="at-rapidas hidden" id="atRapidasMenu" role="listbox" aria-label="Respostas rápidas"></div>' +
                     '<div class="at-anexo hidden" id="atAnexo"><img id="atAnexoImg" alt="Imagem a enviar"><span id="atAnexoNome"></span>' +
@@ -442,6 +577,8 @@ const Atendimento = {
         this.ativarDivisores(el);
 
         el.querySelector('#atAvaliacoes').addEventListener('click', function () { self.abrirAvaliacoes(); });
+        var btnCad = el.querySelector('#atCadastros');
+        if (btnCad) btnCad.addEventListener('click', function () { self.abrirCadastros(); });
 
         var btnSom = el.querySelector('#atSom');
         var mostrarSom = function () {
@@ -455,19 +592,28 @@ const Atendimento = {
         var btnSair = el.querySelector('#atSair');
         if (btnSair) btnSair.addEventListener('click', function () {
             if (self.desligar) { self.desligar(); self.desligar = null; }
+            self.desligarTempoReal();
+            if (typeof AtendimentoReal !== 'undefined') AtendimentoReal.parar();
+            AtendimentoDados = AtendimentoDemo; self.chamadosReais = false; self.realTentado = false; self.sel = null;
             Auth.sair().then(function () { self.render(el); });
         });
 
-        el.querySelector('#atSimular').addEventListener('click', function () { AtendimentoDados.simularContato(self.setor); });
+        var btnNovo = el.querySelector('#atNovoChamado');
+        if (btnNovo) btnNovo.addEventListener('click', function () { self.abrirNovoChamado(); });
+
+        el.querySelector('#atSimular').addEventListener('click', function () {
+            Promise.resolve(AtendimentoDados.simularContato(self.setor)).catch(function (e) { alert(e.message); });
+        });
 
         // Um ouvinte só para as listas e o topo do chat (delegação)
         el.querySelector('.at-colunas').addEventListener('click', function (e) {
             var b = e.target.closest('[data-acao]');
             if (!b) return;
             var id = Number(b.dataset.id);
-            if (b.dataset.acao === 'abrir') { self.sel = id; self.desenhar(); }
+            if (b.dataset.acao === 'abrir') { if (self.sel !== id) self.modo = 'cliente'; self.sel = id; self.desenhar(); }
             if (b.dataset.acao === 'pegar') self.pegar(id);
-            if (b.dataset.acao === 'encerrar') AtendimentoDados.encerrar(id).then(function () { self.desenhar(); });
+            var falhou = function (e2) { alert(e2.message); };
+            if (b.dataset.acao === 'encerrar') Promise.resolve(AtendimentoDados.encerrar(id)).then(function () { self.desenhar(); }).catch(falhou);
             if (b.dataset.acao === 'menu-transferir') { var m = document.getElementById('atMenuTransf'); if (m) m.classList.toggle('hidden'); }
             if (b.dataset.acao === 'transferir') {
                 var para = b.dataset.para, menu = document.getElementById('atMenuTransf');
@@ -482,6 +628,17 @@ const Atendimento = {
             }
             if (b.dataset.acao === 'devolver') AtendimentoDados.devolver(id).then(function () { self.sel = null; self.desenhar(); }).catch(function (e2) { alert(e2.message); });
             if (b.dataset.acao === 'ampliar') self.ampliar(b.dataset.src, b.dataset.nome);
+            if (b.dataset.acao === 'solicitar-cadastro') self.abrirSolicitarCadastro(id);
+            if (b.dataset.acao === 'simular-form') self.simularFormulario(b.dataset.token, b.dataset.link);
+            if (b.dataset.acao === 'cpf') { var cel = b.parentNode.querySelector('.at-cpf'); var vis = cel.dataset.vis === '1';
+                cel.textContent = vis ? cel.dataset.mask : cel.dataset.full; cel.dataset.vis = vis ? '0' : '1'; b.textContent = vis ? 'mostrar' : 'ocultar'; }
+            if (b.dataset.acao === 'copiar-ficha') self.copiarFicha(Number(b.dataset.i), b);
+            if (b.dataset.acao === 'csv-ficha') self.exportarFicha(Number(b.dataset.i));
+            if (b.dataset.acao === 'cadastrado') Promise.resolve(AtendimentoDados.marcarCadastrado(self.sel, Number(b.dataset.i))).catch(falhou);
+            if (b.dataset.acao === 'lote-um') Promise.resolve(AtendimentoDados.marcarLote(self.sel, Number(b.dataset.i), Number(b.dataset.u))).catch(falhou);
+            if (b.dataset.acao === 'lote-todos') Promise.resolve(AtendimentoDados.marcarLote(self.sel, Number(b.dataset.i), 'todos')).catch(falhou);
+            if (b.dataset.acao === 'lote-csv') self.exportarLote(Number(b.dataset.i));
+            if (b.dataset.acao === 'lote-copiar') self.copiarLote(Number(b.dataset.i), b);
         });
 
         var campo = el.querySelector('#atTexto');
@@ -489,6 +646,14 @@ const Atendimento = {
             var t = campo.value.trim(), img = self.anexo;
             if ((!t && !img) || self.sel == null) return;
             var interna = self.modo === 'interna';
+            if (self.modo === 'cliente-teste') {
+                if (!t) return;
+                campo.value = ''; self.ajustarAltura();
+                var manual = self.ultimoChat && self.ultimoChat.origem === 'manual';
+                Promise.resolve(manual ? AtendimentoDados.registrarFala(self.sel, t) : AtendimentoDados.respostaDoCliente(self.sel, t))
+                    .catch(function (e) { alert(e.message); });
+                return;
+            }
             campo.value = '';
             self.ajustarAltura(); self.fecharRapidas();
             self.limparAnexo();
@@ -590,6 +755,477 @@ const Atendimento = {
         });
     },
 
+    // ---------- Chamado manual ----------
+    rotuloCanal: function (canal) {
+        return { whatsapp_pessoal: 'WhatsApp', telefone: 'telefone', email: 'e-mail', presencial: 'presencial', outro: 'outro canal', whatsapp: 'WhatsApp' }[canal] || 'outro canal';
+    },
+    ehManual: function () { return !!(this.ultimoChat && this.ultimoChat.origem === 'manual'); },
+
+    abrirNovoChamado: function () {
+        var self = this;
+        this.modal(
+            '<h2>+ Novo chamado</h2>' +
+            '<p class="tag">Registre um atendimento que chegou fora do sistema. O histórico fica no painel; nada é enviado ao cliente por aqui.</p>' +
+            '<form class="at-form" id="atNovoForm">' +
+              (this.setores.length > 1 ? '<label for="atNSetor">Setor</label><select id="atNSetor">' + this.setores.map(function (st) {
+                  return '<option value="' + st + '"' + (st === self.setor ? ' selected' : '') + '>' + (st === 'med' ? 'Suporte Médico' : 'Implantação') + '</option>'; }).join('') + '</select>' : '') +
+              '<label for="atNNome">Cliente (nome de quem chamou)</label><input type="text" id="atNNome" required>' +
+              '<label for="atNLocal">Unidade</label><input type="text" id="atNLocal" placeholder="Clínica, hospital...">' +
+              '<label for="atNFone">Telefone (opcional)</label><input type="text" id="atNFone" placeholder="(11) 91234-5678">' +
+              '<label for="atNCanal">Por onde entrou em contato</label><select id="atNCanal">' +
+                '<option value="whatsapp_pessoal">WhatsApp</option><option value="telefone">Telefone</option><option value="email">E-mail</option>' +
+                '<option value="presencial">Presencial</option><option value="outro">Outro</option></select>' +
+              '<label for="atNTexto">O que o cliente pediu</label><textarea id="atNTexto" rows="4" placeholder="Ex.: o Router parou de enviar exames desde ontem"></textarea>' +
+              '<fieldset class="at-formato"><legend>Depois de registrar</legend>' +
+                '<label><input type="radio" name="atNDest" value="comigo" checked> <span><strong>Fica comigo</strong>: já vou atender.</span></label>' +
+                '<label><input type="radio" name="atNDest" value="fila"> <span><strong>Vai para a fila</strong>: alguém da equipe pega.</span></label>' +
+              '</fieldset>' +
+              '<div class="erro" id="atNErro" role="alert"></div>' +
+              '<button type="submit">Registrar chamado</button>' +
+            '</form>');
+        document.getElementById('atNNome').focus();
+        document.getElementById('atNovoForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            var v = function (id) { var x = document.getElementById(id); return x ? x.value.trim() : ''; };
+            var erro = document.getElementById('atNErro'), btn = e.target.querySelector('button[type=submit]');
+            if (v('atNNome').length < 2) { erro.textContent = 'Informe o nome do cliente.'; return; }
+            if (v('atNTexto').length < 3) { erro.textContent = 'Descreva o que o cliente pediu.'; return; }
+            var comigo = document.querySelector('[name=atNDest]:checked').value === 'comigo';
+            var setor = v('atNSetor') || self.setor;
+            btn.disabled = true; btn.textContent = 'Registrando...';
+            AtendimentoDados.criarChamado({ setor: setor, nome: v('atNNome'), local: v('atNLocal'), fone: v('atNFone'), canal: v('atNCanal'), texto: v('atNTexto'), comigo: comigo })
+                .then(function (id) {
+                    document.querySelector('.at-modal-fundo').remove();
+                    if (setor !== self.setor) { self.setor = setor; }
+                    if (comigo) self.sel = id;
+                    self.desenhar();
+                    self.aviso(comigo ? '📝 Chamado registrado e já está com você.' : '📝 Chamado registrado na fila.');
+                })
+                .catch(function (e2) { erro.textContent = e2.message; btn.disabled = false; btn.textContent = 'Registrar chamado'; });
+        });
+    },
+
+    // ---------- Tempo real: equipe online e cadastros (só com login) ----------
+    ligarTempoReal: function (perfil) {
+        var self = this;
+        if (this.tempoRealLigado) { this.atualizarBadge(); return; }
+        this.tempoRealLigado = true;
+        Equipe.entrar(perfil);
+        Equipe.aoMudar(function () { self.mostrarOnline(); });
+        Equipe.colegas().then(function (lista) {
+            self.colegasReais = lista.filter(function (x) { return x.id !== perfil.id; });
+            self.colegas = self.colegasReais.map(function (x) { return x.nome; });
+            if (typeof AtendimentoReal !== 'undefined') AtendimentoReal.definirColegas(self.colegasReais);
+        }).catch(function (e) { console.warn('Colegas:', e.message); });
+        CadastrosDB.aoNovo(function (linha) {
+            if (self.setores.indexOf(linha.setor) < 0) return;
+            AtendimentoSom.tocar('novo');
+            var d = linha.dados || {};
+            self.aviso('📋 Cadastro recebido: ' + (d.nome || 'novo usuário') + (d.unidade ? ' · ' + d.unidade : ''));
+            self.atualizarBadge();
+            if (document.getElementById('atCadLista')) self.carregarCadastros();
+        });
+        this.atualizarBadge();
+    },
+
+    desligarTempoReal: function () {
+        if (!this.tempoRealLigado) return;
+        this.tempoRealLigado = false;
+        Equipe.sair(); CadastrosDB.desligar();
+        this.colegasReais = null;
+    },
+
+    mostrarOnline: function () {
+        var alvo = document.getElementById('atEquipe'); if (!alvo || this.demo) return;
+        var meus = this.setores, lista = Equipe.online().filter(function (p) {
+            return p.papel === 'admin' || (p.setores || []).some(function (x) { return meus.indexOf(x) >= 0; });
+        });
+        alvo.textContent = lista.length + ' online' + (lista.length ? ': ' + lista.map(function (p) { return p.nome; }).join(', ') : '');
+        alvo.title = 'Atendentes com o painel aberto agora';
+    },
+
+    colegaOnline: function (nome) {
+        var c = (this.colegasReais || []).find(function (x) { return x.nome === nome; });
+        return c ? Equipe.estaOnline(c.id) : this.demo;
+    },
+
+    atualizarBadge: function () {
+        var b = document.getElementById('atCadBadge'); if (!b || !CadastrosDB.ativo()) return;
+        CadastrosDB.contarPendentes(this.setores).then(function (n) {
+            b.textContent = n; b.classList.toggle('hidden', !n);
+        });
+    },
+
+    // Aviso rápido no canto da tela
+    aviso: function (texto) {
+        var t = document.createElement('div');
+        t.className = 'at-toast'; t.setAttribute('role', 'status'); t.textContent = texto;
+        document.body.appendChild(t);
+        setTimeout(function () { t.classList.add('sai'); }, 4500);
+        setTimeout(function () { t.remove(); }, 5000);
+    },
+
+    // ---------- Lista de cadastros recebidos (banco) ----------
+    abrirCadastros: function () {
+        var self = this, esc = Docs.esc.bind(Docs);
+        this.cadFiltro = this.cadFiltro || 'pendente';
+        this.modal(
+            '<h2>📋 Cadastros recebidos</h2>' +
+            '<p class="tag">Tudo o que os clientes enviaram pelo formulário, ao vivo. Use o link mesmo pelo WhatsApp normal: as fichas chegam aqui.</p>' +
+            '<div class="at-cad-barra">' +
+              (this.setores.length > 1 ? '<select id="atCadSetor" aria-label="Setor">' + this.setores.map(function (st) {
+                  return '<option value="' + st + '"' + (st === self.setor ? ' selected' : '') + '>' + (st === 'med' ? 'Suporte Médico' : 'Implantação') + '</option>'; }).join('') + '</select>' : '') +
+              '<select id="atCadFiltro" aria-label="Filtro"><option value="pendente">Pendentes</option><option value="todos">Todos</option></select>' +
+              '<button type="button" id="atCadNovo">+ Gerar link de cadastro</button>' +
+            '</div>' +
+            '<div id="atCadNovoBox" class="hidden"></div>' +
+            '<div id="atCadLista"><p class="vazio">Carregando...</p></div>', true);
+        document.getElementById('atCadFiltro').value = this.cadFiltro;
+        document.getElementById('atCadFiltro').addEventListener('change', function () { self.cadFiltro = this.value; self.carregarCadastros(); });
+        var selSetor = document.getElementById('atCadSetor');
+        if (selSetor) selSetor.addEventListener('change', function () { self.carregarCadastros(); });
+        document.getElementById('atCadNovo').addEventListener('click', function () { self.formNovoLink(); });
+        document.getElementById('atCadLista').addEventListener('click', function (e) {
+            var b = e.target.closest('[data-cad]'); if (!b) return;
+            var ids = String(b.dataset.ids).split(',').map(Number);
+            if (b.dataset.cad === 'marcar') CadastrosDB.marcar(ids, 'cadastrado').then(function () { self.carregarCadastros(); self.atualizarBadge(); }).catch(function (e2) { alert(e2.message); });
+            if (b.dataset.cad === 'csv') self.cadCsv(ids);
+            if (b.dataset.cad === 'copiar') self.cadCopiar(ids, b);
+            if (b.dataset.cad === 'cpf') { var cel = b.parentNode.querySelector('.at-cpf'), vis = cel.dataset.vis === '1';
+                cel.textContent = vis ? cel.dataset.mask : cel.dataset.full; cel.dataset.vis = vis ? '0' : '1'; b.textContent = vis ? 'mostrar' : 'ocultar'; }
+        });
+        this.carregarCadastros();
+    },
+
+    cadSetor: function () { var s = document.getElementById('atCadSetor'); return s ? s.value : this.setor; },
+
+    carregarCadastros: function () {
+        var self = this, alvo = document.getElementById('atCadLista'); if (!alvo) return;
+        CadastrosDB.listar(this.cadSetor(), this.cadFiltro === 'pendente').then(function (linhas) {
+            self.cadLinhas = linhas;
+            if (!linhas.length) { alvo.innerHTML = '<p class="vazio">' + (self.cadFiltro === 'pendente' ? 'Nenhum cadastro pendente. 🎉' : 'Nenhum cadastro recebido ainda.') + '</p>'; return; }
+            // Agrupa: cada lote vira um bloco; avulsos ficam sozinhos
+            var grupos = [], porLote = {};
+            linhas.forEach(function (l) {
+                if (l.lote) { if (!porLote[l.lote]) { porLote[l.lote] = { lote: true, itens: [] }; grupos.push(porLote[l.lote]); } porLote[l.lote].itens.push(l); }
+                else grupos.push({ lote: false, itens: [l] });
+            });
+            alvo.innerHTML = grupos.map(function (g) { return self.cadBloco(g); }).join('');
+        }).catch(function (e) { alvo.innerHTML = '<p class="vazio">' + Docs.esc(e.message) + '</p>'; });
+    },
+
+    cadBloco: function (g) {
+        var self = this, esc = Docs.esc.bind(Docs), primeiro = g.itens[0], d0 = primeiro.dados || {};
+        var ids = g.itens.map(function (l) { return l.id; }).join(',');
+        var pend = g.itens.filter(function (l) { return l.status === 'pendente'; });
+        var quando = new Date(primeiro.recebido_em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+        var mascara = function (cpf) { var dg = String(cpf || '').replace(/\D/g, ''); return dg.length === 11 ? '***.' + dg.slice(3, 6) + '.' + dg.slice(6, 9) + '-**' : (cpf ? '***' : '—'); };
+        var linhas = g.itens.map(function (l) {
+            var d = l.dados || {}, erros = self.checarPessoa(d);
+            return '<tr class="' + (l.status === 'cadastrado' ? 'ok' : '') + '"><td>' + esc(d.nome) + '</td><td>' + esc(d.email) + '</td><td>' + esc(d.telefone) + '</td>' +
+                   '<td><span class="at-cpf" data-mask="' + esc(mascara(d.cpf)) + '" data-full="' + esc(d.cpf || '') + '" data-vis="0">' + esc(mascara(d.cpf)) + '</span> ' +
+                     (d.cpf ? '<button type="button" class="at-link" data-cad="cpf" data-ids="' + l.id + '">mostrar</button>' : '') + '</td>' +
+                   '<td>' + esc(d.cargo) + (d.crm ? '<br><span class="tag">CRM ' + esc(d.crm) + '</span>' : '') + '</td>' +
+                   '<td>' + (erros.length ? '<span class="at-chip ruim">✗ ' + esc(erros.join(', ')) + '</span>' : '<span class="at-chip ok">✓</span>') + '</td>' +
+                   '<td>' + (l.status === 'cadastrado' ? '<span class="at-chip ok">Cadastrado</span>' : '<button type="button" class="at-link" data-cad="marcar" data-ids="' + l.id + '">marcar</button>') + '</td></tr>';
+        }).join('');
+        var resp = primeiro.responsavel && primeiro.responsavel.nome ? ' · enviado por ' + esc(primeiro.responsavel.nome) : '';
+        return '<div class="at-ficha at-ficha-lote' + (pend.length ? '' : ' feito') + '">' +
+            '<div class="at-ficha-topo"><strong>' + (g.lote ? '📋 Lote · ' : '📋 ') + esc(d0.unidade || 'Sem unidade') + '</strong>' +
+              '<span class="at-status ' + (pend.length ? 'at-status-fila' : 'at-status-meu') + '">' + (g.itens.length - pend.length) + ' de ' + g.itens.length + ' cadastrados</span></div>' +
+            '<small class="tag">Recebido em ' + esc(quando) + resp + '</small>' +
+            '<div class="at-lote-wrap"><table class="at-lote"><thead><tr><th>Nome</th><th>E-mail</th><th>Telefone</th><th>CPF</th><th>Função</th><th>Conferência</th><th></th></tr></thead><tbody>' + linhas + '</tbody></table></div>' +
+            '<div class="at-ficha-acoes">' +
+              '<button type="button" class="sec" data-cad="csv" data-ids="' + ids + '">CSV p/ Gerador de senhas</button>' +
+              '<button type="button" class="sec" data-cad="copiar" data-ids="' + ids + '">Copiar tabela</button>' +
+              (pend.length ? '<button type="button" data-cad="marcar" data-ids="' + pend.map(function (l) { return l.id; }).join(',') + '">Marcar ' + (pend.length > 1 ? 'todos ' : '') + 'como cadastrado' + (pend.length > 1 ? 's' : '') + '</button>' : '') +
+            '</div></div>';
+    },
+
+    cadSelecionar: function (ids) {
+        return (this.cadLinhas || []).filter(function (l) { return ids.indexOf(l.id) >= 0; }).map(function (l) { return l.dados || {}; });
+    },
+
+    cadCsv: function (ids) {
+        var self = this, lista = this.cadSelecionar(ids).filter(function (d) { return !self.checarPessoa(d).length; });
+        if (!lista.length) { alert('Nenhum usuário válido para exportar.'); return; }
+        var cel = function (v) { v = String(v || ''); if (/^[=+\-@]/.test(v)) v = "'" + v; return '"' + v.replace(/"/g, '""') + '"'; };
+        var csv = '﻿' + ['Nome completo', 'E-mail', 'Telefone', 'Função', 'CRM', 'Unidade'].join(',') + '\r\n' +
+                  lista.map(function (d) { return [d.nome, d.email, d.telefone, d.cargo, d.crm, d.unidade].map(cel).join(','); }).join('\r\n') + '\r\n';
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+        a.download = 'cadastros-' + new Date().toISOString().slice(0, 10) + '.csv';
+        document.body.appendChild(a); a.click(); a.remove();
+    },
+
+    cadCopiar: function (ids, botao) {
+        var linhas = [['Nome completo', 'E-mail', 'Telefone', 'CPF', 'Função', 'CRM', 'Unidade'].join('\t')].concat(
+            this.cadSelecionar(ids).map(function (d) { return [d.nome, d.email, d.telefone, d.cpf, d.cargo, d.crm, d.unidade].join('\t'); }));
+        navigator.clipboard.writeText(linhas.join('\n')).then(function () {
+            var antes = botao.textContent; botao.textContent = 'Copiado ✓'; setTimeout(function () { botao.textContent = antes; }, 1500);
+        }, function () { alert('Não consegui copiar.'); });
+    },
+
+    // Gera um link avulso, sem chamado (para mandar pelo WhatsApp normal, e-mail etc.)
+    formNovoLink: function () {
+        var self = this, box = document.getElementById('atCadNovoBox');
+        box.classList.remove('hidden');
+        box.innerHTML = '<form class="at-form at-cad-novo" id="atCadNovoForm">' +
+            '<label for="atCadUni">Unidade</label><input type="text" id="atCadUni" placeholder="Nome da clínica/hospital" required>' +
+            '<fieldset class="at-formato"><legend>Tipo</legend>' +
+              '<label><input type="radio" name="atCadTipo" value="um" checked> <span>Um usuário</span></label>' +
+              '<label><input type="radio" name="atCadTipo" value="lote"> <span>Implantação nova (vários usuários)</span></label></fieldset>' +
+            '<button type="submit">Gerar link</button></form>';
+        document.getElementById('atCadUni').focus();
+        document.getElementById('atCadNovoForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            var uni = document.getElementById('atCadUni').value.trim(), tipo = document.querySelector('[name=atCadTipo]:checked').value;
+            if (uni.length < 3) { alert('Informe a unidade.'); return; }
+            CadastrosDB.criarLink(self.cadSetor(), uni, tipo).then(function (token) {
+                var link = self.linkCadastro(token, uni, tipo === 'lote');
+                var texto = self.textoCadastro('link', uni, tipo === 'lote').replace('[LINK]', link);
+                box.innerHTML = '<div class="at-cad-pronto"><strong>Link criado ✅</strong><span class="tag">Vale 7 dias. Copie a mensagem e mande pelo WhatsApp ou e-mail.</span>' +
+                    '<textarea readonly rows="7" id="atCadTexto"></textarea>' +
+                    '<div class="at-ficha-acoes"><button type="button" id="atCadCopTexto">Copiar mensagem</button><button type="button" class="sec" id="atCadCopLink">Copiar só o link</button></div></div>';
+                document.getElementById('atCadTexto').value = texto;
+                var copiar = function (v, b) { navigator.clipboard.writeText(v).then(function () { var a = b.textContent; b.textContent = 'Copiado ✓'; setTimeout(function () { b.textContent = a; }, 1500); }); };
+                document.getElementById('atCadCopTexto').addEventListener('click', function () { copiar(texto, this); });
+                document.getElementById('atCadCopLink').addEventListener('click', function () { copiar(link, this); });
+            }).catch(function (e2) { alert(e2.message); });
+        });
+    },
+
+    // ---------- Solicitação de cadastro ----------
+    linkCadastro: function (token, unidade, lote) {
+        var base = location.origin + location.pathname.replace(/[^/]*$/, '');
+        return base + 'cadastro.html#t=' + encodeURIComponent(token) + '&u=' + encodeURIComponent(unidade || '') + (lote ? '&m=lote' : '');
+    },
+
+    textoCadastro: function (formato, unidade, lote) {
+        var h = new Date().getHours(), sd = h < 12 ? 'Bom dia' : (h < 18 ? 'Boa tarde' : 'Boa noite');
+        if (lote) {
+            return sd + '! Para a implantação, cadastre de uma vez todas as pessoas que vão usar o portal:\n\n[LINK]\n\n' +
+                   'Dá para preencher na tela, colar as linhas do Excel ou baixar a planilha modelo, preencher e enviar. ' +
+                   'Se faltar alguém, é só abrir o mesmo link de novo.\n\nOs dados são usados somente para o cadastro no portal e para o treinamento.';
+        }
+        if (formato === 'link') {
+            return sd + '! Para criarmos o acesso ao portal, preencha o formulário de cadastro abaixo (um por pessoa):\n\n[LINK]\n\n' +
+                   'Os dados são usados somente para o cadastro no portal e para o treinamento.';
+        }
+        return sd + '! Para criarmos o acesso ao portal, copie a mensagem abaixo, preencha e envie de volta (uma por pessoa):\n\n' +
+               'Nome completo:\nNumero de telefone:\nCPF:\nEmail:\nFunção:\nUnidade: ' + (unidade || '') + '\nCRM (caso seja médico):';
+    },
+
+    abrirSolicitarCadastro: function (id) {
+        var self = this, esc = Docs.esc.bind(Docs);
+        AtendimentoDados.listar(this.setor).then(function (lista) {
+            var meus = lista.filter(function (c) { return c.status === 'meu'; });
+            if (!meus.length) { alert('Pegue um chamado antes de enviar o formulário.'); return; }
+            var atual = meus.find(function (c) { return c.id === id; }) || meus[0];
+            self.modal(
+                '<h2>📋 Solicitar cadastro de usuário</h2>' +
+                '<p class="tag">O cliente recebe o formulário no WhatsApp e os dados voltam para o chamado como uma ficha.</p>' +
+                '<form class="at-form" id="atSolForm">' +
+                  '<label for="atSolChamado">Enviar para o chamado</label>' +
+                  '<select id="atSolChamado">' + meus.map(function (c) {
+                      return '<option value="' + c.id + '"' + (c.id === atual.id ? ' selected' : '') + ' data-local="' + esc(c.local) + '">' + esc(c.nome) + ' · ' + esc(c.local) + '</option>';
+                  }).join('') + '</select>' +
+                  '<label for="atSolUnidade">Unidade</label>' +
+                  '<input type="text" id="atSolUnidade" value="' + esc(atual.local) + '">' +
+                  '<fieldset class="at-formato"><legend>Tipo de solicitação</legend>' +
+                    '<label><input type="radio" name="atSolTipo" value="um" checked> <span><strong>Um usuário</strong>: cadastro avulso.</span></label>' +
+                    '<label><input type="radio" name="atSolTipo" value="lote"> <span><strong>Implantação nova (vários usuários)</strong>: o T.I. da unidade cadastra todo mundo de uma vez, na tela, colando do Excel ou enviando a planilha.</span></label>' +
+                  '</fieldset>' +
+                  '<fieldset class="at-formato" id="atSolFmtBox"><legend>Formato</legend>' +
+                    '<label><input type="radio" name="atSolFmt" value="link" checked> <span><strong>Link do formulário</strong> (recomendado). Valida CPF, e-mail e telefone e pede o consentimento LGPD.</span></label>' +
+                    '<label><input type="radio" name="atSolFmt" value="texto"> <span><strong>Texto no WhatsApp</strong>. O cliente copia, preenche e responde; o sistema lê a resposta.</span></label>' +
+                  '</fieldset>' +
+                  '<label for="atSolPrevia">Mensagem que será enviada</label>' +
+                  '<textarea id="atSolPrevia" rows="7" readonly></textarea>' +
+                  '<button type="submit">Enviar ao cliente</button>' +
+                '</form>'
+            );
+            var sel = document.getElementById('atSolChamado'), uni = document.getElementById('atSolUnidade'), prev = document.getElementById('atSolPrevia');
+            var ehLote = function () { return document.querySelector('[name=atSolTipo]:checked').value === 'lote'; };
+            var fmt = function () { return ehLote() ? 'link' : document.querySelector('[name=atSolFmt]:checked').value; };
+            var atualizar = function () {
+                document.getElementById('atSolFmtBox').classList.toggle('hidden', ehLote());   // lote é sempre por link
+                prev.value = self.textoCadastro(fmt(), uni.value, ehLote()).replace('[LINK]', '(o link é gerado ao enviar)');
+            };
+            document.querySelectorAll('[name=atSolTipo]').forEach(function (r) { r.addEventListener('change', atualizar); });
+            sel.addEventListener('change', function () { uni.value = sel.selectedOptions[0].dataset.local; atualizar(); });
+            uni.addEventListener('input', atualizar);
+            document.querySelectorAll('[name=atSolFmt]').forEach(function (r) { r.addEventListener('change', atualizar); });
+            atualizar();
+            document.getElementById('atSolForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                var chamado = Number(sel.value), f = fmt(), unidade = uni.value.trim(), lote = ehLote();
+                var botao = e.target.querySelector('button[type=submit]');
+                botao.disabled = true; botao.textContent = 'Gerando link...';
+                // Com login, o link é criado no banco (vale de verdade); na demonstração, só no navegador
+                var pegarToken = CadastrosDB.ativo() ? CadastrosDB.criarLink(self.setor, unidade, lote ? 'lote' : 'um', AtendimentoDados.real ? chamado : null) : Promise.resolve(null);
+                pegarToken.then(function (token) {
+                  document.querySelector('.at-modal-fundo').remove();
+                  self.sel = chamado;
+                  return AtendimentoDados.solicitarCadastro(chamado, {
+                    token: token, formato: f, unidade: unidade, lote: lote,
+                    montar: function (token) {
+                        var link = f === 'link' ? self.linkCadastro(token, unidade, lote) : '';
+                        return { texto: self.textoCadastro(f, unidade, lote).replace('[LINK]', link), link: link };
+                    }
+                  });
+                }).catch(function (e2) { alert(e2.message); botao.disabled = false; botao.textContent = 'Enviar ao cliente'; });
+            });
+        });
+    },
+
+    cartaoFormulario: function (m) {
+        var esc = Docs.esc.bind(Docs);
+        return '<div class="at-form-enviado"><span>📋 ' + (m.lote ? 'Formulário de implantação (vários usuários)' : 'Formulário de cadastro') + ' enviado (' + (m.formato === 'link' ? 'link' : 'texto') + ') · ' + esc(m.hora) + '</span>' +
+               (m.formato === 'link' && m.link
+                   ? '<button type="button" class="sec" data-acao="simular-form" data-token="' + esc(m.token) + '" data-link="' + esc(m.link) + '">Abrir como o cliente</button>'
+                   : '<span class="tag">Aguardando a resposta do cliente</span>') + '</div>';
+    },
+
+    // Demonstração: abre o formulário real (cadastro.html) dentro do painel
+    simularFormulario: function (token, link) {
+        if (!/^https?:\/\//.test(link)) return;
+        this.modal('<h2>Formulário como o cliente vê</h2><iframe class="at-iframe" src="' + Docs.esc(link) + '" title="Formulário de cadastro"></iframe>', /m=lote/.test(link));
+    },
+
+    cpfValido: function (c) {
+        c = String(c || '').replace(/\D/g, '');
+        if (c.length !== 11 || /^(\d)\1{10}$/.test(c)) return false;
+        for (var t = 9; t < 11; t++) {
+            var s = 0;
+            for (var i = 0; i < t; i++) s += Number(c[i]) * (t + 1 - i);
+            if (((s * 10) % 11) % 10 !== Number(c[t])) return false;
+        }
+        return true;
+    },
+
+    fichaCadastro: function (m, i) {
+        var esc = Docs.esc.bind(Docs), d = m.dados || {};
+        var cpf = String(d.cpf || ''), dig = cpf.replace(/\D/g, '');
+        var mascara = dig.length === 11 ? '***.' + dig.slice(3, 6) + '.' + dig.slice(6, 9) + '-**' : (cpf ? '***' : '');
+        var tel = String(d.telefone || '').replace(/\D/g, '');
+        var checks = [
+            ['CPF', this.cpfValido(cpf)],
+            ['E-mail', /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email || '')],
+            ['Telefone', tel.length >= 10 && tel.length <= 11],
+            ['Nome completo', String(d.nome || '').trim().split(/\s+/).length >= 2]
+        ];
+        if (/m[eé]dic/i.test(d.cargo || '')) checks.push(['CRM', String(d.crm || '').replace(/\D/g, '').length >= 4]);
+        var linha = function (rot, val) { return '<dt>' + rot + '</dt><dd>' + (val ? esc(val) : '<span class="tag">—</span>') + '</dd>'; };
+        var feito = m.status === 'cadastrado';
+        return '<div class="at-ficha' + (feito ? ' feito' : '') + '">' +
+            '<div class="at-ficha-topo"><strong>📋 Solicitação de cadastro</strong><span class="at-status ' + (feito ? 'at-status-meu' : 'at-status-fila') + '">' + (feito ? 'Cadastrado' : 'Pendente') + '</span></div>' +
+            '<dl>' + linha('Nome', d.nome) + linha('E-mail', d.email) + linha('Telefone', d.telefone) +
+              '<dt>CPF</dt><dd><span class="at-cpf" data-mask="' + esc(mascara) + '" data-full="' + esc(cpf) + '" data-vis="0">' + esc(mascara || '—') + '</span>' +
+                (cpf ? ' <button type="button" class="at-link" data-acao="cpf">mostrar</button>' : '') + '</dd>' +
+              linha('Função', d.cargo) + (d.crm ? linha('CRM', d.crm) : '') + linha('Unidade', d.unidade) +
+              (d.possui_usuario ? linha('Já tem usuário?', d.possui_usuario) : '') + '</dl>' +
+            '<div class="at-checks">' + checks.map(function (c) { return '<span class="' + (c[1] ? 'ok' : 'ruim') + '">' + (c[1] ? '✓ ' : '✗ ') + c[0] + (c[1] ? '' : ' inválido') + '</span>'; }).join('') + '</div>' +
+            '<div class="at-ficha-acoes">' +
+              '<button type="button" class="sec" data-acao="copiar-ficha" data-i="' + i + '">Copiar dados</button>' +
+              '<button type="button" class="sec" data-acao="csv-ficha" data-i="' + i + '" title="Planilha para importar no Gerador de senhas">CSV p/ Gerador de senhas</button>' +
+              (feito ? '' : '<button type="button" data-acao="cadastrado" data-i="' + i + '">Marcar como cadastrado</button>') +
+            '</div>' +
+            '<small class="tag">Recebido por ' + esc(m.origem || '') + ' · ' + esc(m.hora) + ' · visível só para a equipe</small>' +
+        '</div>';
+    },
+
+    checarPessoa: function (d) {
+        var tel = String(d.telefone || '').replace(/\D/g, ''), erros = [];
+        if (!this.cpfValido(d.cpf)) erros.push('CPF');
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email || '')) erros.push('E-mail');
+        if (tel.length < 10 || tel.length > 11) erros.push('Telefone');
+        if (String(d.nome || '').trim().split(/\s+/).length < 2) erros.push('Nome');
+        if (/m[eé]dic/i.test(d.cargo || '') && String(d.crm || '').replace(/\D/g, '').length < 4) erros.push('CRM');
+        return erros;
+    },
+
+    fichaLote: function (m, i) {
+        var self = this, esc = Docs.esc.bind(Docs), l = m.lote, us = l.usuarios;
+        var feitos = us.filter(function (u) { return u.status === 'cadastrado'; }).length;
+        var comErro = us.filter(function (u) { return self.checarPessoa(u).length; }).length;
+        var porCargo = {};
+        us.forEach(function (u) { porCargo[u.cargo || '—'] = (porCargo[u.cargo || '—'] || 0) + 1; });
+        var tudo = feitos === us.length;
+        var linhas = us.map(function (u, k) {
+            var erros = self.checarPessoa(u), dig = String(u.cpf || '').replace(/\D/g, '');
+            var cpf = dig.length === 11 ? '***.' + dig.slice(3, 6) + '.' + dig.slice(6, 9) + '-**' : esc(u.cpf || '—');
+            return '<tr class="' + (u.status === 'cadastrado' ? 'ok' : '') + '"><td>' + (k + 1) + '</td><td>' + esc(u.nome) + '</td><td>' + esc(u.email) + '</td>' +
+                   '<td>' + esc(u.cargo) + (u.crm ? '<br><span class="tag">CRM ' + esc(u.crm) + '</span>' : '') + '</td><td>' + cpf + '</td>' +
+                   '<td>' + (erros.length ? '<span class="at-chip ruim">✗ ' + esc(erros.join(', ')) + '</span>' : '<span class="at-chip ok">✓ ok</span>') + '</td>' +
+                   '<td>' + (u.status === 'cadastrado' ? '<span class="at-chip ok">Cadastrado</span>'
+                        : '<button type="button" class="at-link" data-acao="lote-um" data-i="' + i + '" data-u="' + k + '">marcar</button>') + '</td></tr>';
+        }).join('');
+        return '<div class="at-ficha at-ficha-lote' + (tudo ? ' feito' : '') + '">' +
+            '<div class="at-ficha-topo"><strong>📋 Cadastro em lote · ' + esc(l.unidade) + '</strong>' +
+              '<span class="at-status ' + (tudo ? 'at-status-meu' : 'at-status-fila') + '">' + feitos + ' de ' + us.length + ' cadastrados</span></div>' +
+            '<div class="at-checks"><span class="ok">' + us.length + ' usuários</span>' +
+              (comErro ? '<span class="ruim">' + comErro + ' com erro</span>' : '<span class="ok">✓ todos válidos</span>') +
+              Object.keys(porCargo).map(function (k) { return '<span class="neutro">' + porCargo[k] + ' ' + esc(k) + '</span>'; }).join('') + '</div>' +
+            (l.responsavel && l.responsavel.nome ? '<small class="tag">Enviado por ' + esc(l.responsavel.nome) + (l.responsavel.email ? ' · ' + esc(l.responsavel.email) : '') + (l.responsavel.telefone ? ' · ' + esc(l.responsavel.telefone) : '') + '</small>' : '') +
+            '<div class="at-lote-wrap"><table class="at-lote"><thead><tr><th>#</th><th>Nome</th><th>E-mail</th><th>Função</th><th>CPF</th><th>Conferência</th><th></th></tr></thead><tbody>' + linhas + '</tbody></table></div>' +
+            '<div class="at-ficha-acoes">' +
+              '<button type="button" class="sec" data-acao="lote-csv" data-i="' + i + '" title="Planilha para importar no Gerador de senhas (aba Implantação)">CSV p/ Gerador de senhas</button>' +
+              '<button type="button" class="sec" data-acao="lote-copiar" data-i="' + i + '">Copiar tabela</button>' +
+              (tudo ? '' : '<button type="button" data-acao="lote-todos" data-i="' + i + '">Marcar todos como cadastrados</button>') +
+            '</div>' +
+            '<small class="tag">Recebido por formulário · ' + esc(m.hora) + ' · visível só para a equipe</small>' +
+        '</div>';
+    },
+
+    // CSV do lote (só os válidos), no formato que o Gerador de senhas importa
+    exportarLote: function (i) {
+        var self = this, m = this.ultimoChat && this.ultimoChat.msgs[i]; if (!m) return;
+        var validos = m.lote.usuarios.filter(function (u) { return !self.checarPessoa(u).length; });
+        var fora = m.lote.usuarios.length - validos.length;
+        if (!validos.length) { alert('Nenhum usuário válido para exportar.'); return; }
+        if (fora && !confirm(fora + ' usuário(s) com erro ficarão de fora do arquivo. Continuar?')) return;
+        var cel = function (v) { v = String(v || ''); if (/^[=+\-@]/.test(v)) v = "'" + v; return '"' + v.replace(/"/g, '""') + '"'; };
+        var csv = '﻿' + ['Nome completo', 'E-mail', 'Telefone', 'Função', 'CRM', 'Unidade'].join(',') + '\r\n' +
+                  validos.map(function (u) { return [u.nome, u.email, u.telefone, u.cargo, u.crm, m.lote.unidade].map(cel).join(','); }).join('\r\n') + '\r\n';
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+        a.download = 'lote-' + String(m.lote.unidade || 'unidade').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-') + '.csv';
+        document.body.appendChild(a); a.click(); a.remove();
+    },
+
+    // Copia a tabela com tabulação (cola certinho no Excel)
+    copiarLote: function (i, botao) {
+        var m = this.ultimoChat && this.ultimoChat.msgs[i]; if (!m) return;
+        var linhas = [['Nome completo', 'E-mail', 'Telefone', 'CPF', 'Função', 'CRM', 'Unidade'].join('\t')].concat(
+            m.lote.usuarios.map(function (u) { return [u.nome, u.email, u.telefone, u.cpf, u.cargo, u.crm, m.lote.unidade].join('\t'); }));
+        navigator.clipboard.writeText(linhas.join('\n')).then(function () {
+            var antes = botao.textContent; botao.textContent = 'Copiado ✓'; setTimeout(function () { botao.textContent = antes; }, 1500);
+        }, function () { alert('Não consegui copiar.'); });
+    },
+
+    copiarFicha: function (i, botao) {
+        var m = this.ultimoChat && this.ultimoChat.msgs[i]; if (!m) return;
+        var d = m.dados;
+        var txt = ['Nome completo: ' + (d.nome || ''), 'E-mail: ' + (d.email || ''), 'Telefone: ' + (d.telefone || ''), 'CPF: ' + (d.cpf || ''),
+                   'Função: ' + (d.cargo || ''), 'CRM: ' + (d.crm || ''), 'Unidade: ' + (d.unidade || '')].join('\n');
+        navigator.clipboard.writeText(txt).then(function () {
+            var antes = botao.textContent; botao.textContent = 'Copiado ✓'; setTimeout(function () { botao.textContent = antes; }, 1500);
+        }, function () { alert('Não consegui copiar. Selecione e copie manualmente.'); });
+    },
+
+    // CSV com as colunas que o Gerador de senhas reconhece (Nome completo, E-mail). Sem CPF: o gerador não precisa dele.
+    exportarFicha: function (i) {
+        var m = this.ultimoChat && this.ultimoChat.msgs[i]; if (!m) return;
+        var d = m.dados, cel = function (v) { v = String(v || ''); if (/^[=+\-@]/.test(v)) v = "'" + v; return '"' + v.replace(/"/g, '""') + '"'; };
+        var csv = '\uFEFF' + ['Nome completo', 'E-mail', 'Telefone', 'Função', 'CRM', 'Unidade'].join(',') + '\r\n' +
+                  [d.nome, d.email, d.telefone, d.cargo, d.crm, d.unidade].map(cel).join(',') + '\r\n';
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+        a.download = 'cadastro-' + String(d.nome || 'usuario').toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.csv';
+        document.body.appendChild(a); a.click(); a.remove();
+    },
+
     // ---------- Pesquisa de satisfação: painel ----------
     // Admin vê a equipe toda do setor; atendente vê só as próprias avaliações.
     abrirAvaliacoes: function () {
@@ -641,10 +1277,10 @@ const Atendimento = {
     },
 
     // Janela por cima do painel (fecha no ✕, no fundo ou com Esc)
-    modal: function (html) {
+    modal: function (html, largo) {
         var fundo = document.createElement('div');
         fundo.className = 'at-modal-fundo';
-        fundo.innerHTML = '<div class="at-modal" role="dialog" aria-modal="true"><button type="button" class="sec at-modal-x" aria-label="Fechar">✕</button>' + html + '</div>';
+        fundo.innerHTML = '<div class="at-modal' + (largo ? ' at-modal-largo' : '') + '" role="dialog" aria-modal="true"><button type="button" class="sec at-modal-x" aria-label="Fechar">✕</button>' + html + '</div>';
         var sair = function () { fundo.remove(); document.removeEventListener('keydown', esc); };
         var esc = function (e) { if (e.key === 'Escape') sair(); };
         fundo.addEventListener('click', function (e) { if (e.target === fundo || e.target.closest('.at-modal-x')) sair(); });
@@ -777,10 +1413,12 @@ const Atendimento = {
         var box = document.getElementById('atEnvio'), campo = document.getElementById('atTexto'), btn = document.getElementById('atEnviar');
         if (!box) return;
         box.classList.toggle('interna', interna);
+        box.classList.toggle('teste', modo === 'cliente-teste');
         btn.textContent = interna ? 'Salvar nota' : 'Enviar';
         if (!this.anexo) campo.placeholder = interna
             ? 'Nota interna: só a equipe vê. Ex.: "aguardando teste de envio"'
-            : 'Digite sua resposta e pressione Enter';
+            : modo === 'cliente-teste' ? (this.ehManual() ? 'O que o cliente disse? (fica só no histórico)' : 'Escreva como se fosse o cliente (teste)')
+            : this.ehManual() ? 'Registre o que você respondeu ao cliente (não é enviado)' : 'Digite sua resposta e pressione Enter';
     },
 
     // Há nota interna minha nas últimas mensagens deste chamado?
@@ -861,13 +1499,14 @@ const Atendimento = {
 
             document.getElementById('atContaMeus').textContent = meus.length;
             document.getElementById('atContaFila').textContent = fila.length;
-            document.getElementById('atEquipe').textContent = '4 atendentes online · ' + equipe + ' com a equipe';
+            if (self.demo) document.getElementById('atEquipe').textContent = '4 atendentes online · ' + equipe + ' com a equipe';
+            else self.mostrarOnline();
             document.getElementById('atMeus').innerHTML = meus.length
                 ? meus.map(function (c) { return self.cartao(c, false); }).join('')
                 : '<p class="at-vazio">Nenhum chamado com você. Pegue um chamado da fila.</p>';
             document.getElementById('atFila').innerHTML = fila.length
                 ? fila.map(function (c) { return self.cartao(c, true); }).join('')
-                : '<p class="at-vazio">Fila vazia. Use "Simular novo contato" para ver um chamado chegando.</p>';
+                : '<p class="at-vazio">Fila vazia. Use "+ Simular contato" para ver um chamado chegando.</p>';
 
             var c = lista.find(function (x) { return x.id === self.sel; });
             self.desenharChat(c, esc);
@@ -888,7 +1527,9 @@ const Atendimento = {
         if (av && av.status === 'aguardando') rotuloFechado = 'Encerrado · aguardando avaliação';
         else if (av && av.nota) rotuloFechado = 'Encerrado · nota ' + av.nota + ' ★';
         topo.innerHTML =
-            '<div class="at-quem"><strong>' + esc(c.nome) + '</strong><span>' + esc(c.local) + ' · WhatsApp ' + esc(c.fone) + '</span></div>' +
+            '<div class="at-quem"><strong>' + esc(c.nome) + '</strong><span>' + esc(c.local) +
+              (c.origem === 'manual' ? (c.fone && c.fone !== '—' ? ' · ' + esc(c.fone) : '') + ' · 📝 via ' + esc(this.rotuloCanal(c.canal)) + (c.registradoPor ? ' (registrado por ' + esc(c.registradoPor) + ')' : '')
+                                     : ' · WhatsApp ' + esc(c.fone)) + '</span></div>' +
             (fechado
                 ? '<span class="at-status at-status-fechado">' + esc(rotuloFechado) + '</span>'
                 : '<span class="at-status ' + (naFila ? 'at-status-fila' : 'at-status-meu') + '">' + (naFila ? 'Na fila' : 'Com você') + '</span>') +
@@ -897,15 +1538,24 @@ const Atendimento = {
                 : '<div class="at-acoes">' +
                     '<div class="at-transf"><button type="button" class="sec" data-acao="menu-transferir" data-id="' + c.id + '" aria-haspopup="true">Transferir ▾</button>' +
                       '<div class="at-menu-transf hidden" id="atMenuTransf" role="menu"><span>Transferir para:</span>' +
-                        (this.colegas || []).map(function (n) { return '<button type="button" role="menuitem" data-acao="transferir" data-id="' + c.id + '" data-para="' + esc(n) + '">' + esc(n) + '</button>'; }).join('') +
+                        ((this.colegas || []).length ? '' : '<span>Nenhum colega no setor.</span>') +
+                        (this.colegas || []).map(function (n) {
+                            var on = Atendimento.colegaOnline(n);
+                            return '<button type="button" role="menuitem" data-acao="transferir" data-id="' + c.id + '" data-para="' + esc(n) + '">' +
+                                   '<i class="at-dot' + (on ? ' on' : '') + '" aria-hidden="true"></i>' + esc(n) + (on ? '' : ' <span class="tag">offline</span>') + '</button>';
+                        }).join('') +
                       '</div></div>' +
+                    '<button type="button" class="sec" data-acao="solicitar-cadastro" data-id="' + c.id + '">📋 Solicitar cadastro</button>' +
                     '<button type="button" class="sec" data-acao="devolver" data-id="' + c.id + '">Devolver à fila</button>' +
                     '<button type="button" class="sec" data-acao="encerrar" data-id="' + c.id + '">Encerrar</button>' +
                   '</div>');
         this.ultimoChat = c;
 
         var self = this;
-        var html = c.msgs.map(function (m) {
+        var html = c.msgs.map(function (m, i) {
+            if (m.de === 'formulario') return self.cartaoFormulario(m);
+            if (m.de === 'cadastro') return self.fichaCadastro(m, i);
+            if (m.de === 'cadastro-lote') return self.fichaLote(m, i);
             var img = self.imagemHtml(m.imagem), txt = m.texto ? '<span>' + esc(m.texto) + '</span>' : '';
             if (m.de === 'nota') return '<div class="at-nota">' + esc(m.texto) + ' · ' + esc(m.hora) + '</div>';
             if (m.de === 'bot') return '<div class="at-msg at-msg-bot"><small>Mensagem automática</small>' + esc(m.texto) + '<time>' + esc(m.hora) + '</time></div>';
@@ -913,10 +1563,26 @@ const Atendimento = {
             if (m.de === 'agente') return '<div class="at-msg at-msg-agente"><small>' + esc(m.autor || '') + '</small>' + img + txt + '<time>' + esc(m.hora) + '</time></div>';
             return '<div class="at-msg at-msg-cliente">' + img + txt + '<time>' + esc(m.hora) + '</time></div>';
         }).join('');
+        if (c.origem === 'manual') html = '<div class="at-manual-aviso">📝 Chamado registrado manualmente (contato por ' + esc(this.rotuloCanal(c.canal)) + '). As mensagens ficam só no histórico: nada é enviado ao cliente por aqui.</div>' + html;
         if (this.digitandoId === c.id) html += '<div class="at-digitando">' + esc(c.nome) + ' está digitando…</div>';
         msgs.innerHTML = html;
         msgs.scrollTop = msgs.scrollHeight;
 
+        // Conversa ainda não carregada (dados reais): pede e redesenha quando chegar
+        if (c.carregado === false && AtendimentoDados.abrir) AtendimentoDados.abrir(c.id);
+        // Teste sem WhatsApp: em chamado simulado dá para escrever como o cliente (inclusive responder a pesquisa)
+        var manual = c.origem === 'manual';
+        var teste = !!(AtendimentoDados.real && (c.origem === 'simulado' || (manual && !fechado)));
+        var bTeste = document.querySelector('[data-modo="cliente-teste"]');
+        if (bTeste) { bTeste.classList.toggle('hidden', !teste); bTeste.textContent = manual ? '🗣 Cliente disse' : '🧪 Como cliente (teste)'; }
+        var bResp = document.querySelector('[data-modo="cliente"]');
+        if (bResp) bResp.textContent = manual ? 'Registrar resposta' : 'Responder ao cliente';
+        var pesquisaAberta = teste && fechado && c.avaliacao && (c.avaliacao.status === 'aguardando' || c.avaliacao.status === 'comentario');
+        document.querySelectorAll('[data-modo="cliente"],[data-modo="interna"]').forEach(function (b) { b.classList.toggle('hidden', !!pesquisaAberta); });
+        if (pesquisaAberta && this.modo !== 'cliente-teste') this.mudarModo('cliente-teste');
+        if (!teste && this.modo === 'cliente-teste') this.mudarModo('cliente');
+        this.mudarModo(this.modo || 'cliente');   // atualiza textos (manual x WhatsApp)
+        if (pesquisaAberta) { envio.classList.remove('hidden'); aviso.classList.add('hidden'); return; }
         envio.classList.toggle('hidden', naFila || fechado);
         aviso.textContent = fechado
             ? 'Chamado encerrado. A pesquisa de satisfação foi enviada ao cliente; a nota aparece em ⭐ Avaliações.'
