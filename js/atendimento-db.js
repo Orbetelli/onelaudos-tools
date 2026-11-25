@@ -126,13 +126,38 @@ const AtendimentoReal = (function () {
         return new Error(m.replace(/^.*?exception:\s*/i, ''));
     }
 
+    // ---------- Imagens (bucket privado "anexos") ----------
+    // No banco fica só o caminho; para mostrar, o painel pede um link temporário (6 h).
+    var BUCKET = 'anexos', VALIDADE = 6 * 3600, links = {};   // path -> { url, expira }
+    function imagemDe(d) {
+        var im = d.imagem; if (!im || !im.path) return null;
+        var l = links[im.path];
+        return { path: im.path, nome: im.nome || 'imagem', url: l && l.expira > Date.now() ? l.url : null };
+    }
+    // Gera os links que faltam (em lote) e devolve true se algum foi criado
+    async function assinar(lista) {
+        var faltam = [];
+        (lista || []).forEach(function (m) { if (m.imagem && m.imagem.path && !m.imagem.url && faltam.indexOf(m.imagem.path) < 0) faltam.push(m.imagem.path); });
+        if (!faltam.length) return false;
+        var r = await cli().storage.from(BUCKET).createSignedUrls(faltam, VALIDADE);
+        if (r.error) { console.warn('Imagens:', r.error.message); return false; }
+        (r.data || []).forEach(function (x) {
+            if (x.signedUrl && !x.error) links[x.path] = { url: x.signedUrl, expira: Date.now() + (VALIDADE - 300) * 1000 };
+        });
+        lista.forEach(function (m) { if (m.imagem && links[m.imagem.path]) m.imagem.url = links[m.imagem.path].url; });
+        return true;
+    }
+    function assinarEAvisar(id) {
+        assinar(msgs[id]).then(function (mudou) { if (mudou) avisar({ tipo: 'mensagem', id: id }); });
+    }
+
     // Mensagem do banco -> formato que a tela usa
     function converter(m) {
         var d = m.dados || {}, base = { msgId: m.id, hora: hora(m.criado_em) };
         switch (m.tipo) {
-            case 'cliente':  return Object.assign(base, { de: 'cliente', texto: m.texto, imagem: d.imagem || null });
-            case 'agente':   return Object.assign(base, { de: 'agente', autor: m.autor_nome, texto: m.texto, imagem: d.imagem || null });
-            case 'interna':  return Object.assign(base, { de: 'interna', autor: m.autor_nome, texto: m.texto, imagem: d.imagem || null });
+            case 'cliente':  return Object.assign(base, { de: 'cliente', texto: m.texto, imagem: imagemDe(d) });
+            case 'agente':   return Object.assign(base, { de: 'agente', autor: m.autor_nome, texto: m.texto, imagem: imagemDe(d) });
+            case 'interna':  return Object.assign(base, { de: 'interna', autor: m.autor_nome, texto: m.texto, imagem: imagemDe(d) });
             case 'formulario': return Object.assign(base, { de: 'formulario', token: d.token, formato: d.formato, lote: !!d.lote, link: d.link || '' });
             case 'cadastro': return Object.assign(base, { de: 'cadastro', dados: d.dados || {}, status: d.status || 'pendente', origem: d.origem || 'formulário' });
             case 'cadastro-lote': return Object.assign(base, { de: 'cadastro-lote', lote: { unidade: d.unidade, responsavel: d.responsavel, usuarios: d.usuarios || [] } });
@@ -196,6 +221,7 @@ const AtendimentoReal = (function () {
                 if (lista) {
                     var conv = converter(m), i = lista.findIndex(function (x) { return x.msgId === m.id; });
                     if (i >= 0) lista[i] = conv; else lista.push(conv);
+                    if (conv.imagem && !conv.imagem.url) assinarEAvisar(m.chamado_id);
                 }
                 var c = acharCru(m.chamado_id);
                 if (p.eventType === 'INSERT' && m.tipo === 'cliente' && c)
@@ -244,6 +270,7 @@ const AtendimentoReal = (function () {
                 if (r.error) { console.warn(r.error.message); return; }
                 msgs[id] = (r.data || []).map(converter);
                 avisar({ tipo: 'abriu', id: id });
+                assinarEAvisar(id);
             });
         },
 
@@ -270,8 +297,28 @@ const AtendimentoReal = (function () {
 
         enviar: async function (id, texto, opcoes) {
             opcoes = opcoes || {};
-            if (opcoes.imagem) throw new Error('O envio de imagens com dados reais chega na próxima etapa (armazenamento seguro). Por enquanto, só texto.');
-            var r = await cli().from('mensagens').insert({ chamado_id: id, tipo: opcoes.interna ? 'interna' : 'agente', autor_id: eu.id, autor_nome: eu.nome, texto: texto });
+            var dados = null;
+            if (opcoes.imagem) {
+                var arq = opcoes.imagem.arquivo;
+                if (!arq) throw new Error('Imagem não encontrada. Anexe de novo.');
+                var ext = ({ 'image/png': 'png', 'image/jpeg': 'jpg', 'image/gif': 'gif', 'image/webp': 'webp' })[arq.type];
+                if (!ext) throw new Error('Envie uma imagem PNG, JPG, GIF ou WEBP.');
+                var nomeSeguro = (crypto.randomUUID ? crypto.randomUUID() : Date.now() + '-' + Math.random().toString(36).slice(2)) + '.' + ext;
+                var path = id + '/' + nomeSeguro;
+                var up = await cli().storage.from(BUCKET).upload(path, arq, { contentType: arq.type, upsert: false });
+                if (up.error) {
+                    var msg = up.error.message || '';
+                    if (/bucket not found/i.test(msg)) msg = 'Falta rodar o supabase/09_imagens.sql.';
+                    else if (/row-level security|unauthorized|403/i.test(msg)) msg = 'Sem permissão para enviar imagem neste chamado.';
+                    else if (/size|large/i.test(msg)) msg = 'A imagem passa do limite de 5 MB.';
+                    throw new Error('Não foi possível enviar a imagem: ' + msg);
+                }
+                dados = { imagem: { path: path, nome: opcoes.imagem.nome || 'imagem' } };
+                // já deixa o link pronto, para a imagem aparecer sem esperar
+                if (opcoes.imagem.url) links[path] = { url: opcoes.imagem.url, expira: Date.now() + 3600 * 1000 };
+            }
+            var r = await cli().from('mensagens').insert({ chamado_id: id, tipo: opcoes.interna ? 'interna' : 'agente', autor_id: eu.id, autor_nome: eu.nome,
+                                                           texto: texto || null, dados: dados });
             var e = erro(r, 'Pegue o chamado antes de responder.'); if (e) throw e;
             await depois(id, true);
         },

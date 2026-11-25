@@ -689,7 +689,7 @@ const Atendimento = {
             campo.value = '';
             self.ajustarAltura(); self.fecharRapidas();
             self.limparAnexo();
-            AtendimentoDados.enviar(self.sel, t, { imagem: img ? { url: img.url, nome: img.nome } : null, interna: interna })
+            AtendimentoDados.enviar(self.sel, t, { imagem: img ? { url: img.url, nome: img.nome, arquivo: img.arquivo } : null, interna: interna })
                 .catch(function (e) { alert(e.message); });
         };
         el.querySelector('#atEnviar').addEventListener('click', enviar);
@@ -1438,8 +1438,8 @@ const Atendimento = {
         if (!/^image\/(png|jpeg|gif|webp)$/.test(arquivo.type)) { alert('Envie uma imagem (PNG, JPG, GIF ou WEBP).'); return; }
         if (arquivo.size > this.ANEXO_MAX_MB * 1024 * 1024) { alert('A imagem passa de ' + this.ANEXO_MAX_MB + ' MB.'); return; }
         this.limparAnexo();
-        // Demonstração: link local do navegador. No real: upload para bucket PRIVADO do Supabase Storage.
-        this.anexo = { url: URL.createObjectURL(arquivo), nome: arquivo.name || 'imagem-colada.png' };
+        // Prévia com link local do navegador. No modo real, o arquivo sobe para o bucket PRIVADO "anexos" ao enviar.
+        this.anexo = { url: URL.createObjectURL(arquivo), nome: arquivo.name || 'imagem-colada.png', arquivo: arquivo };
         document.getElementById('atAnexoImg').src = this.anexo.url;
         document.getElementById('atAnexoNome').textContent = this.anexo.nome;
         document.getElementById('atAnexo').classList.remove('hidden');
@@ -1482,6 +1482,7 @@ const Atendimento = {
     urlSegura: function (u) { return /^(blob:|data:image\/|https:\/\/)/.test(String(u || '')); },
 
     imagemHtml: function (img) {
+        if (img && img.path && !img.url) return '<span class="at-img-carregando">📷 Carregando imagem…</span>';
         if (!img || !this.urlSegura(img.url)) return '';
         var esc = Docs.esc.bind(Docs);
         return '<button type="button" class="at-img-btn" data-acao="ampliar" data-src="' + esc(img.url) + '" data-nome="' + esc(img.nome || '') + '" aria-label="Ampliar imagem">' +
