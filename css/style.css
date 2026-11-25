@@ -191,3 +191,152 @@ select{width:100%;padding:11px 14px;border-radius:8px;border:1px solid var(--lin
 .diag-tab td:first-child{min-width:220px}
 #rSaida{min-height:260px;font-family:Consolas,monospace;font-size:13px}
 @media(max-width:720px){#buscaGlobal{margin-bottom:8px}}
+/* ---- Atendimento (fila de chamados) ---- */
+body[data-rota=atendimento] main{max-width:none;padding:0;height:100vh;overflow:hidden}
+.at{display:flex;flex-direction:column;height:100%}
+.at-topo{display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid var(--line)}
+.at-topo h1{margin:0;font-size:20px;margin-right:6px}
+.at-setores{display:flex;gap:4px;background:var(--bg);border:1px solid var(--line);padding:4px;border-radius:10px}
+.at-setores button{background:transparent;color:var(--mut);padding:7px 12px}
+.at-setores button.ativo{background:var(--acc);color:#fff}
+.at-equipe{flex:1;font-size:13px;color:var(--mut);text-align:right}
+.at-eu{display:flex;align-items:center;gap:8px;font-size:14px}
+.at-avatar{width:32px;height:32px;border-radius:50%;background:var(--acc);color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.at-colunas{flex:1;min-height:0;display:flex}
+.at-col{width:290px;flex-shrink:0;display:flex;flex-direction:column;background:var(--card)}
+.at-col-fila{background:#141e29}
+.at-col-topo{display:flex;align-items:center;justify-content:space-between;padding:14px 14px 8px}
+.at-col-topo h2{margin:0;font-size:15px}
+.at-conta{font-size:12px;font-weight:600;background:#1f3a55;color:#9fd0ff;border-radius:999px;padding:2px 9px}
+.at-conta-fila{background:#3a2a12;color:#ffc77a}
+.at-lista{flex:1;overflow:auto;padding:4px 10px 14px;display:flex;flex-direction:column;gap:8px}
+.at-cartao{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.at-cartao.ativo{border-color:var(--acc);background:#132538}
+.at-abrir{background:transparent;color:var(--txt);padding:0;text-align:left;display:flex;flex-direction:column;gap:3px;width:100%}
+.at-nome{display:flex;justify-content:space-between;gap:8px;font-weight:600;font-size:14px}
+.at-hora{font-weight:400;font-size:12px;color:var(--mut)}
+.at-local{font-size:12px;color:var(--mut)}
+.at-resumo{font-size:13px;color:#b9c7d4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.at-cartao-rodape{display:flex;align-items:center;justify-content:space-between}
+.at-espera{white-space:nowrap;font-size:12px;color:#ffc77a;background:#3a2a12;border-radius:6px;padding:2px 8px}
+.at-vazio{font-size:13px;color:var(--mut);padding:10px 4px;margin:0}
+.at-chat{flex:1;min-width:0;display:flex;flex-direction:column}
+.at-chat-topo{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line)}
+.at-chat-topo:empty{display:none}
+.at-quem{flex:1;min-width:200px;display:flex;flex-direction:column;gap:2px}
+.at-quem span{font-size:13px;color:var(--mut)}
+.at-status{font-size:12px;font-weight:600;border-radius:999px;padding:3px 10px}
+.at-status-fila{background:#3a2a12;color:#ffc77a}
+.at-status-meu{background:#10281a;color:#7fe0a5}
+.at-msgs{flex:1;min-height:0;overflow:auto;padding:18px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
+.at-msg{max-width:70%;padding:9px 12px;border-radius:12px;font-size:14px;line-height:1.45;white-space:pre-wrap;word-wrap:break-word}
+.at-msg small{display:block;font-size:11px;font-weight:600;margin-bottom:3px;opacity:.85}
+.at-msg time{display:block;font-size:11px;text-align:right;margin-top:3px;opacity:.7}
+.at-msg-cliente{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-bottom-left-radius:4px}
+.at-msg-bot{align-self:flex-end;background:#132538;border:1px dashed #2f6ea8;border-bottom-right-radius:4px}
+.at-msg-bot small{color:#9fd0ff;text-transform:uppercase;letter-spacing:.4px}
+.at-msg-agente{align-self:flex-end;background:var(--acc);color:#fff;border-bottom-right-radius:4px}
+.at-nota{align-self:center;font-size:12px;color:var(--mut);background:var(--card);border-radius:999px;padding:3px 12px}
+.at-digitando{font-size:13px;color:var(--mut);font-style:italic}
+.at-sem-chat{margin:auto;text-align:center;display:flex;flex-direction:column;gap:6px;max-width:320px;color:var(--mut);font-size:13px}
+.at-sem-chat strong{color:var(--txt);font-size:15px}
+.at-envio-box{border-top:1px solid var(--line);padding:8px 14px 12px;display:flex;flex-direction:column;gap:8px}
+.at-envio-box.interna{background:#2a2410;border-top-color:#8a6d1a}
+.at-envio{display:flex;gap:8px;align-items:center}
+.at-envio textarea{flex:1;resize:none;min-height:42px;max-height:180px;padding:10px 14px;line-height:1.4;overflow-y:auto}
+.at-aviso-fila{padding:14px 18px;border-top:1px solid var(--line);font-size:13px;color:var(--mut)}
+.at-oculto{position:absolute;left:-9999px}
+@media(max-width:900px){
+  body[data-rota=atendimento] main{height:auto;overflow:visible}
+  .at-colunas{flex-direction:column}
+  .at-col{width:auto!important;max-height:260px;border-bottom:1px solid var(--line)}
+  .at-divisor{display:none}
+  .at-chat{min-height:480px}
+}
+/* Atendimento: menu lateral recolhido (só nesta aba) */
+body[data-rota=atendimento].menu-recolhido .sidebar{display:none}
+.at-menu-btn{padding:7px 12px;font-size:13px;white-space:nowrap}
+/* Atendimento: login e troca de senha */
+.at-login{min-height:100%;display:flex;align-items:center;justify-content:center;padding:24px}
+.at-login-card{width:100%;max-width:380px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:28px;display:flex;flex-direction:column;gap:8px}
+.at-login-card .brand{margin-bottom:6px}
+.at-login-card h2{margin:4px 0 0;font-size:17px}
+.at-login-card .tag{margin:0 0 6px}
+.at-login-card label{margin:6px 0 0}
+.at-login-card input[type=email],.at-login-card input[type=password]{width:100%;padding:11px 14px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--txt);font-size:15px}
+.at-login-card button[type=submit]{margin-top:8px;padding:11px 14px;font-size:15px}
+.at-login-card button:disabled{opacity:.6;cursor:wait}
+.at-login-msg{font-size:13px;color:#ff9aa8;min-height:18px}
+.at-login-msg.ok{color:#7fe0a5}
+.at-link{background:transparent;color:var(--acc);padding:6px 0;font-size:13px}
+.at-link:hover{text-decoration:underline}
+.at-demo{font-size:12px;color:#ffc77a;background:#3a2a12;border-radius:6px;padding:3px 8px}
+/* Atendimento: divisores arrastáveis entre as colunas */
+.at-divisor{flex:0 0 6px;cursor:col-resize;background:var(--line);position:relative;touch-action:none;transition:background .15s}
+.at-divisor::after{content:'';position:absolute;top:50%;left:1px;width:4px;height:36px;margin-top:-18px;border-radius:2px;background:#3a4d63}
+.at-divisor:hover,.at-divisor.arrastando,.at-divisor:focus-visible{background:var(--acc);outline:none}
+.at-divisor:hover::after,.at-divisor.arrastando::after,.at-divisor:focus-visible::after{background:#fff}
+body.at-redimensionando{cursor:col-resize;user-select:none}
+/* Atendimento: nota interna, anexos, transferir */
+.at-modos{display:flex;gap:4px}
+.at-modos button{background:transparent;color:var(--mut);padding:5px 10px;font-size:13px;border-radius:6px}
+.at-modos button.ativo{background:var(--card);color:var(--txt);border:1px solid var(--line)}
+.at-envio-box.interna .at-modos button.ativo{background:#4a3b0e;border-color:#8a6d1a;color:#ffe08a}
+.at-envio-box.interna textarea{border-color:#8a6d1a}
+.at-envio-box.interna #atEnviar{background:#b8860b}
+.at-clipe{display:flex;align-items:center;justify-content:center;width:42px;height:42px;flex-shrink:0;border:1px solid var(--line);border-radius:8px;cursor:pointer;font-size:18px;margin:0;color:var(--txt)}
+.at-clipe:hover{border-color:var(--acc)}
+#atArquivo:focus-visible+.at-clipe{outline:2px solid var(--acc)}
+.at-anexo{display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+.at-anexo img{width:56px;height:56px;object-fit:cover;border-radius:6px}
+.at-anexo span{flex:1;font-size:13px;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.at-anexo button{padding:4px 10px}
+.at-msg-interna{align-self:flex-end;background:#2a2410;border:1px solid #8a6d1a;color:#ffe9a8;border-bottom-right-radius:4px}
+.at-msg-interna small{color:#ffd25a}
+.at-msg span{display:block}
+.at-img-btn{display:block;background:transparent;padding:0;margin:2px 0 6px;border-radius:8px;overflow:hidden;cursor:zoom-in}
+.at-img{display:block;max-width:260px;max-height:220px;border-radius:8px}
+.at-msgs.soltar{outline:2px dashed var(--acc);outline-offset:-8px}
+.at-acoes{display:flex;gap:6px;flex-wrap:wrap}
+.at-transf{position:relative}
+.at-menu-transf{position:absolute;right:0;top:calc(100% + 4px);z-index:5;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px;display:flex;flex-direction:column;min-width:170px;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.at-menu-transf span{font-size:12px;color:var(--mut);padding:4px 8px}
+.at-menu-transf button{background:transparent;color:var(--txt);text-align:left;padding:8px}
+.at-menu-transf button:hover{background:#1f2d3b}
+.at-lightbox{position:fixed;inset:0;z-index:50;background:rgba(5,10,15,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px}
+.at-lightbox img{max-width:92vw;max-height:80vh;border-radius:8px;background:#fff}
+.at-lightbox-barra{display:flex;gap:8px}
+.at-papel{font-size:11px;font-weight:600;color:#9fd0ff;background:#1f3a55;border-radius:999px;padding:2px 8px;margin-left:2px}
+/* Atendimento: respostas rápidas */
+.at-envio-box{position:relative}
+.at-raio{width:42px;height:42px;padding:0;flex-shrink:0;font-size:17px}
+.at-rapidas{position:absolute;left:14px;right:14px;bottom:calc(100% - 4px);z-index:6;max-height:300px;overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px;box-shadow:0 -8px 24px rgba(0,0,0,.4)}
+.at-rapidas button{display:grid;grid-template-columns:auto 1fr;column-gap:10px;width:100%;text-align:left;background:transparent;color:var(--txt);padding:8px 10px;border-radius:6px}
+.at-rapidas button strong{color:var(--acc);font-size:13px}
+.at-rapidas button span{font-size:13px}
+.at-rapidas button em{grid-column:1/-1;font-style:normal;font-size:12px;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.at-rapidas button.sel,.at-rapidas button:hover{background:#1f2d3b}
+.at-rapidas-vazio{padding:10px;font-size:13px;color:var(--mut)}
+/* Atendimento: pesquisa de satisfação */
+.at-modal-fundo{position:fixed;inset:0;z-index:40;background:rgba(5,10,15,.7);display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto}
+.at-modal{position:relative;width:100%;max-width:640px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px}
+.at-modal h2{margin:0 0 16px;font-size:19px}
+.at-modal h3{margin:22px 0 10px;font-size:15px}
+.at-modal-x{position:absolute;top:14px;right:14px;padding:5px 10px}
+.at-resumo-aval{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.at-kpi{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:2px}
+.at-kpi strong{font-size:26px}
+.at-kpi span{font-size:12px;color:var(--mut)}
+.at-barras{margin-top:16px;display:flex;flex-direction:column;gap:6px}
+.at-barra{display:grid;grid-template-columns:36px 1fr 28px;align-items:center;gap:8px;font-size:13px;color:var(--mut)}
+.at-barra div{height:8px;background:var(--bg);border-radius:4px;overflow:hidden}
+.at-barra i{display:block;height:100%;background:#f5b301;border-radius:4px}
+.at-tabela th,.at-tabela td{padding:8px 10px;font-size:13px}
+.at-lista-aval{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.at-lista-aval li{display:flex;gap:12px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.at-lista-aval li div{display:flex;flex-direction:column;gap:2px}
+.at-lista-aval p{margin:4px 0 0;font-size:13px;color:#c9d6e2}
+.at-estrelas{color:#f5b301;letter-spacing:1px;white-space:nowrap}
+.at-estrelas span{color:#3a4d63}
+@media(max-width:600px){.at-resumo-aval{grid-template-columns:1fr}}
+.at-status-fechado{background:#2a3340;color:#c9d6e2}

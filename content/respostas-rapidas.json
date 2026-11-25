@@ -1,0 +1,59 @@
+{
+  "_ajuda": "Respostas rápidas do Atendimento. Digite / no campo de mensagem para usar. setor: impl, med ou todos. Variáveis automáticas: {nome} (cliente), {atendente} (você), {saudacao} (Bom dia/Boa tarde/Boa noite). Trechos entre [colchetes] ficam selecionados para você preencher.",
+  "respostas": [
+    {
+      "atalho": "saudacao",
+      "titulo": "Saudação inicial",
+      "setor": "todos",
+      "texto": "{saudacao}, {nome}! Aqui é {atendente}, da Onelaudos. Como posso ajudar?"
+    },
+    {
+      "atalho": "verificando",
+      "titulo": "Aguarde, estou verificando",
+      "setor": "todos",
+      "texto": "Só um momento, {nome}, estou verificando para você."
+    },
+    {
+      "atalho": "router",
+      "titulo": "Router instalado (dados DICOM)",
+      "setor": "impl",
+      "texto": "Router instalado ✅\nSegue o DICOM para a configuração do equipamento:\n\nIP: [IP do servidor]\nPorta: 1777\nAETitle: mobilerouter"
+    },
+    {
+      "atalho": "worklist",
+      "titulo": "Worklist instalado",
+      "setor": "impl",
+      "texto": "Worklist instalado ✅\nSegue os dados para configurar no equipamento:\n\nIP: [IP do servidor]\nPorta: [porta]\nAETitle: [AE Title]"
+    },
+    {
+      "atalho": "teste",
+      "titulo": "Pedir teste de envio",
+      "setor": "impl",
+      "texto": "Pode realizar um teste de envio de exame, por favor? Assim confirmo se está chegando corretamente no portal."
+    },
+    {
+      "atalho": "cache",
+      "titulo": "Limpar cache do navegador",
+      "setor": "todos",
+      "texto": "Por favor, limpe o cache do navegador (Ctrl + Shift + Delete, marque \"Imagens e arquivos em cache\") e tente novamente."
+    },
+    {
+      "atalho": "usuario",
+      "titulo": "Usuário criado no portal",
+      "setor": "todos",
+      "texto": "Usuário criado no portal ✅\n\nAcesso: https://onelaudos.mobilemed.com.br/login\nLogin: [e-mail do usuário]\nSenha provisória: [senha]\n\nNo primeiro acesso, o sistema pede para trocar a senha."
+    },
+    {
+      "atalho": "assinatura",
+      "titulo": "Pedir assinatura do médico",
+      "setor": "med",
+      "texto": "{nome}, para cadastrar sua assinatura nos laudos, envie por aqui uma foto da sua assinatura feita com caneta azul ou preta em papel branco, bem iluminada e sem sombras."
+    },
+    {
+      "atalho": "encerrar",
+      "titulo": "Encerramento",
+      "setor": "todos",
+      "texto": "Fico à disposição, {nome}! Se precisar, é só chamar por aqui. Tenha um ótimo dia."
+    }
+  ]
+}

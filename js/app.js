@@ -27,6 +27,7 @@ const rotas = {
   diagnostico: p => Diagnostico.render(app, p),
   glossario: p => Glossario.render(app, p),
   busca: p => Busca.render(app, p),
+  atendimento: () => Atendimento.render(app),
   downloads
 };
 
@@ -45,6 +46,7 @@ function navegar(){
   const partes = location.hash.replace('#/','').split('/');
   const nome = partes[0] || 'home';
   let param = partes.slice(1).join('/');
+  document.body.dataset.rota = rotas[nome] ? nome : 'home'; // o Atendimento usa a tela inteira
   try { param = decodeURIComponent(param); } catch (e) {}
   try { Promise.resolve((rotas[nome] || rotas.home)(param)).catch(mostrarErro); }
   catch (e) { mostrarErro(e); }

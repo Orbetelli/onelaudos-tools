@@ -5,6 +5,9 @@
 const Home = {
     grupos: [
         { titulo: 'Atendimento', itens: [
+            { rota: 'atendimento', icone: '💬', titulo: 'Atendimento (chamados)',
+              descricao: 'Fila de chamados do WhatsApp estilo Chatwoot: o cliente chama, recebe a mensagem automática e o chamado cai na fila para a equipe pegar. Em demonstração.',
+              topicos: ['Seus chamados', 'Fila', 'Chat', 'Mensagem automática'], pronto: false },
             { rota: 'guia', icone: '📘', titulo: 'Guia rápido',
               descricao: 'Triagem do Suporte Médico: o que fazer em cada situação, quem acionar e como priorizar os chamados.',
               topicos: ['Exames não sobem', 'Troca de senha', 'Falha no login', 'Quem acionar?'], pronto: true },
