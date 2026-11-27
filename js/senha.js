@@ -205,6 +205,7 @@ function pwRenderUsers() {
     });
     document.getElementById('pwModalActions').style.display = total ? 'flex' : 'none';
     document.getElementById('pwMsgSection').style.display = total ? 'block' : 'none';
+    pwAtendRender();
     list.textContent = '';
     if (!total) { list.appendChild(pwEl('div', { class: 'pw-empty', text: 'Nenhum usuário salvo ainda.' })); return; }
 
@@ -482,9 +483,142 @@ function pwImportarArquivo(input) {
     if (ext === 'csv') reader.readAsText(file, 'UTF-8'); else reader.readAsArrayBuffer(file);
 }
 
+// ── Integração com o Atendimento: enviar o acesso direto para o chamado do cliente ──
+var pwHandoff = null;          // veio de uma ficha de cadastro do chat: { chamado, cliente, emails }
+var pwAtendVersao = 0;         // evita desenhar uma resposta antiga por cima de uma nova
+
+function pwMontarMensagem(usuarios) {
+    var ed = document.getElementById('pwMensagemCustom');
+    var template = ed && ed.value.trim() ? ed.value : pwGetMsgPadrao();
+    return usuarios.map(function (u) {
+        return template.split('{nome}').join(u.name).split('{email}').join(u.email).split('{senha}').join(u.password);
+    }).join('\n\n---\n\n');
+}
+
+async function pwAtendRender() {
+    var box = document.getElementById('pwAtend'), corpo = document.getElementById('pwAtendCorpo');
+    if (!box || !corpo) return;
+    if (!pwSavedUsers.length || typeof AcessoChamado === 'undefined') { box.style.display = 'none'; return; }
+    box.style.display = 'block';
+    var versao = ++pwAtendVersao;
+    corpo.textContent = '';
+    corpo.appendChild(pwEl('p', { class: 'tag', text: 'Verificando seu login no Atendimento…' }));
+
+    var sit = await AcessoChamado.situacao();
+    if (versao !== pwAtendVersao) return;
+    corpo.textContent = '';
+    if (sit === 'deslogado') {
+        corpo.appendChild(pwEl('p', { class: 'tag', text: 'Entre no Atendimento para mandar o acesso direto para o chamado do cliente.' }));
+        corpo.appendChild(pwEl('a', { class: 'btn', href: '#/atendimento', text: 'Ir para o Atendimento' }));
+        return;
+    }
+    var lista;
+    try { lista = await AcessoChamado.meusAbertos(); }
+    catch (e) { corpo.appendChild(pwEl('p', { class: 'tag', text: e.message })); return; }
+    if (versao !== pwAtendVersao) return;
+    if (!lista.length) {
+        corpo.appendChild(pwEl('p', { class: 'tag', text: 'Nenhum chamado com você agora. Pegue o chamado do cliente no Atendimento e clique em Atualizar.' }));
+        corpo.appendChild(pwEl('button', { type: 'button', class: 'sec', text: 'Atualizar', onclick: pwAtendRender }));
+        return;
+    }
+
+    // Chamado
+    var sel = pwEl('select', { id: 'pwAtendChamado' }, lista.map(function (c) {
+        var o = pwEl('option', { value: String(c.id), text: '#' + c.id + ' · ' + c.rotulo + (c.manual ? ' (manual)' : '') });
+        if (pwHandoff && pwHandoff.chamado === c.id) o.selected = true;
+        return o;
+    }));
+    corpo.appendChild(pwEl('label', { for: 'pwAtendChamado', text: 'Chamado' }));
+    corpo.appendChild(sel);
+    if (pwHandoff && !lista.some(function (c) { return c.id === pwHandoff.chamado; }))
+        corpo.appendChild(pwEl('p', { class: 'tag', text: 'O chamado de ' + pwHandoff.cliente + ' não está mais com você. Escolha outro ou pegue-o de novo.' }));
+
+    // Usuários
+    var marcados = pwSavedUsers.map(function (u) {
+        return !pwHandoff || pwHandoff.emails.indexOf(u.email.toLowerCase()) >= 0;
+    });
+    var area = pwEl('textarea', { id: 'pwAtendTexto', style: 'min-height:170px' });
+    var editado = false;
+    area.addEventListener('input', function () { editado = true; });
+    var atualizar = function () {
+        if (editado) return;
+        area.value = pwMontarMensagem(pwSavedUsers.filter(function (u, i) { return marcados[i]; }));
+    };
+    var quem = pwEl('div', { class: 'pw-atend-quem' }, pwSavedUsers.map(function (u, i) {
+        var cb = pwEl('input', { type: 'checkbox' });
+        cb.checked = marcados[i];
+        cb.addEventListener('change', function () { marcados[i] = cb.checked; editado = false; atualizar(); });
+        return pwEl('label', { class: 'pw-check' }, [cb, document.createTextNode(' ' + u.name + ' — ' + u.email)]);
+    }));
+    corpo.appendChild(pwEl('div', { class: 'tag', text: 'Quem recebe o acesso nesta mensagem' }));
+    corpo.appendChild(quem);
+    corpo.appendChild(pwEl('label', { for: 'pwAtendTexto', text: 'Mensagem (pode editar antes de enviar)' }));
+    corpo.appendChild(area);
+    atualizar();
+
+    var aviso = pwEl('p', { class: 'tag' });
+    var mostrarAviso = function () {
+        var c = lista.find(function (x) { return String(x.id) === sel.value; });
+        aviso.textContent = c && c.manual
+            ? 'Chamado manual: a mensagem fica registrada no histórico do chamado. Copie e mande ao cliente pelo canal que ele usou.'
+            : 'A mensagem entra no chat do chamado como resposta sua. No painel, a senha aparece escondida (com botão "mostrar").';
+    };
+    sel.addEventListener('change', mostrarAviso); mostrarAviso();
+    corpo.appendChild(aviso);
+
+    var status = pwEl('p', { class: 'pw-atend-status' });
+    var btn = pwEl('button', { type: 'button', text: 'Enviar no chamado' });
+    btn.addEventListener('click', async function () {
+        var escolhidos = pwSavedUsers.filter(function (u, i) { return marcados[i]; });
+        if (!escolhidos.length) { alert('Marque pelo menos um usuário.'); return; }
+        if (!area.value.trim()) { alert('A mensagem está vazia.'); return; }
+        var id = Number(sel.value), c = lista.find(function (x) { return x.id === id; });
+        btn.disabled = true; btn.textContent = 'Enviando…';
+        try {
+            await AcessoChamado.enviar(id, area.value.trim(), escolhidos.map(function (u) { return u.email; }));
+            status.textContent = '';
+            status.appendChild(document.createTextNode('✓ Acesso enviado no chamado de ' + c.rotulo + '. '));
+            status.appendChild(pwEl('a', { href: '#/atendimento', text: 'Abrir o chamado',
+                onclick: function () { try { sessionStorage.setItem('at-abrir', String(id)); } catch (e) {} } }));
+            btn.textContent = 'Enviado ✓';
+            pwHandoff = null;
+            var banner = document.getElementById('pwHandoff'); if (banner) banner.style.display = 'none';
+        } catch (e) {
+            alert(e.message); btn.disabled = false; btn.textContent = 'Enviar no chamado';
+        }
+    });
+    corpo.appendChild(pwEl('div', { class: 'pw-actions' }, [btn,
+        pwEl('button', { type: 'button', class: 'sec', text: 'Copiar mensagem', onclick: function (ev) { pwCopiarTexto(area.value, ev.currentTarget, 'Copiado!'); } })]));
+    corpo.appendChild(status);
+}
+
+// Chegou de uma ficha de cadastro do chat ("🔑 Gerar acesso"): gera as senhas e deixa pronto para enviar
+function pwReceberDoAtendimento() {
+    var dados = null;
+    try { dados = JSON.parse(sessionStorage.getItem('pw-handoff') || 'null'); sessionStorage.removeItem('pw-handoff'); } catch (e) {}
+    if (!dados || !dados.usuarios || !dados.usuarios.length) return;
+    pwTab('imp');
+    var cfg = pwCfgImp(), list = document.getElementById('pwListImp');
+    list.textContent = '';
+    dados.usuarios.forEach(function (u) {
+        if (!pwIsValidEmail(u.email)) return;
+        var senha = pwSenhaCompleta(cfg);
+        list.appendChild(pwCriarItemImp(u.nome, u.email, senha));
+        pwAdicionarUsuario({ name: u.nome, email: u.email, password: senha, date: pwHoje() }, 'substituir');
+    });
+    pwHandoff = { chamado: dados.chamado, cliente: dados.cliente,
+                  emails: dados.usuarios.map(function (u) { return String(u.email).toLowerCase(); }) };
+    var banner = document.getElementById('pwHandoff');
+    banner.textContent = '';
+    banner.appendChild(pwEl('strong', { text: '🔑 Acessos gerados para o chamado de ' + dados.cliente + '. ' }));
+    banner.appendChild(document.createTextNode('Crie os usuários no portal com os dados abaixo e envie o acesso em "Enviar ao cliente pelo Atendimento", no fim da página.'));
+    banner.style.display = 'block';
+}
+
 // ── Tela ──
 var PW_MARKUP = `
 <h1>Gerador de senhas</h1>
+<div id="pwHandoff" class="pw-handoff" style="display:none"></div>
 <div class="pw-tabs">
   <button type="button" class="pw-tab active" data-tab="geral" onclick="pwTab('geral')">Geral</button>
   <button type="button" class="pw-tab" data-tab="imp" onclick="pwTab('imp')">Implantação</button>
@@ -581,6 +715,10 @@ var PW_MARKUP = `
       </div>
     </div>
   </div>
+  <div id="pwAtend" class="pw-atend" style="display:none">
+    <h4>💬 Enviar ao cliente pelo Atendimento</h4>
+    <div id="pwAtendCorpo"></div>
+  </div>
 </section>
 `;
 
@@ -595,6 +733,7 @@ const Senha = {
         pwCarregarMensagemPadrao();
         pwAtualizarContador();
         pwAtualizarPreview();
+        pwReceberDoAtendimento();   // veio do chat com usuários para gerar acesso?
         pwRenderUsers(); // reexibe usuários salvos ao voltar para esta aba
     }
 };

@@ -74,6 +74,42 @@ const AtendimentoDemo = (function () {
           msgs: [{ de: 'cliente', texto: 'Preciso trocar meu plantão de sábado, como faço?', hora: '09:43' }, auto('09:43')] }
     ];
 
+    // Chamados antigos (já encerrados), para mostrar o histórico do cliente na demonstração
+    function diasAtras(n, h) { var d = new Date(); d.setDate(d.getDate() - n); if (h) d.setHours(h[0], h[1]); return d.toISOString(); }
+    var ANTIGOS = [
+        { id: 61, setor: 'impl', status: 'fechado', origem: 'whatsapp', canal: 'whatsapp', nome: 'Alan Souza', local: 'Clínica São Lucas', fone: '(11) 90000-0001',
+          atendente: 'Ana', criado: diasAtras(12, [10, 5]), encerrado: diasAtras(12, [11, 40]), nota: 5,
+          msgs: [{ de: 'cliente', texto: 'O Router está mandando os exames duplicados para o portal.', hora: '10:05' },
+                 { de: 'nota', texto: 'Ana assumiu o chamado', hora: '10:07' },
+                 { de: 'agente', autor: 'Ana', texto: 'Bom dia, Alan! Ajustei o AETitle e reiniciei o serviço do Router. Pode testar um envio?', hora: '10:30' },
+                 { de: 'cliente', texto: 'Testei aqui, agora chegou só uma vez. Obrigado!', hora: '11:35' },
+                 { de: 'interna', autor: 'Ana', texto: 'Combinado com o Alan: se voltar a duplicar, trocar a porta para 1777 e pedir acesso remoto ao T.I. (Carlos).', hora: '11:39' }] },
+        { id: 58, setor: 'impl', status: 'fechado', origem: 'manual', canal: 'telefone', nome: 'Carlos (T.I.)', local: 'Clínica São Lucas', fone: '',
+          atendente: 'Bruno', criado: diasAtras(25, [15, 10]), encerrado: diasAtras(25, [15, 50]), nota: null,
+          msgs: [{ de: 'cliente', texto: 'Pediu a criação de 3 usuários novos para a recepção.', hora: '15:10' },
+                 { de: 'agente', autor: 'Bruno', texto: 'Usuários criados e enviados por e-mail.', hora: '15:48' },
+                 { de: 'interna', autor: 'Bruno', texto: 'O Carlos prefere contato por telefone, não por WhatsApp.', hora: '15:50' }] },
+        { id: 44, setor: 'impl', status: 'fechado', origem: 'whatsapp', canal: 'whatsapp', nome: 'Jorge Almeida', local: 'Hospital Santa Rita', fone: '(11) 90000-0003',
+          atendente: 'Carla', criado: diasAtras(40, [9, 0]), encerrado: diasAtras(40, [9, 45]), nota: 3, comentario: 'Demorou um pouco.',
+          msgs: [{ de: 'cliente', texto: 'Reclamação: o laudo saiu sem a assinatura do médico.', hora: '09:00' },
+                 { de: 'agente', autor: 'Carla', texto: 'Reenviamos o laudo assinado. Pedimos desculpas pelo transtorno.', hora: '09:40' },
+                 { de: 'interna', autor: 'Carla', texto: 'Cliente ficou chateado. Na próxima, conferir a assinatura antes de liberar.', hora: '09:44' }] },
+        { id: 39, setor: 'med', status: 'fechado', origem: 'whatsapp', canal: 'whatsapp', nome: 'Dr. Paulo Mendes', local: 'Médico executante', fone: '(11) 90000-0005',
+          atendente: 'Ana', criado: diasAtras(7, [20, 12]), encerrado: diasAtras(7, [20, 40]), nota: 4,
+          msgs: [{ de: 'cliente', texto: 'O certificado digital venceu, como renovo no portal?', hora: '20:12' },
+                 { de: 'agente', autor: 'Ana', texto: 'Doutor, depois de renovar com a certificadora, é só reinstalar o token e entrar de novo no portal.', hora: '20:30' },
+                 { de: 'interna', autor: 'Ana', texto: 'O certificado dele é A3 (token). Se der erro de novo, verificar o driver do token.', hora: '20:38' }] }
+    ];
+    function soNumeros(f) { var d = String(f || '').replace(/\D/g, ''); return d.length >= 8 ? d.slice(-8) : ''; }
+    function chaveLocal(l) { return String(l || '').trim().toLowerCase().replace(/\s+/g, ' ').normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
+    function resumoDe(h) {
+        var ult = function (tipo) { for (var i = h.msgs.length - 1; i >= 0; i--) if (h.msgs[i].de === tipo && h.msgs[i].texto) return h.msgs[i].texto; return null; };
+        var prim = h.msgs.find(function (m) { return m.de === 'cliente' && m.texto; });
+        return { id: h.id, setor: h.setor, status: h.status, origem: h.origem, canal: h.canal, nome: h.nome, local: h.local, atendente: h.atendente,
+                 criado: h.criado, encerrado: h.encerrado, nota: h.nota, comentario: h.comentario || '', motivo: prim ? prim.texto : null,
+                 nota_interna: ult('interna'), resposta: ult('agente') };
+    }
+
     var POOL = {
         impl: [
             { nome: 'Renato Dias', local: 'Clínica Bem Viver', texto: 'Olá, o Worklist não está puxando os pacientes agendados de hoje.' },
@@ -127,7 +163,7 @@ const AtendimentoDemo = (function () {
             }
             var primeira = !c.respondido;
             c.respondido = true;
-            c.msgs.push({ de: 'agente', autor: ATENDENTE, texto: texto, imagem: opcoes.imagem || null, hora: agora() });
+            c.msgs.push({ de: 'agente', autor: ATENDENTE, texto: texto, imagem: opcoes.imagem || null, acesso: !!opcoes.acesso, hora: agora() });
             avisar({ tipo: 'mensagem', id: id, de: 'agente', setor: c.setor, status: c.status });
             // Demonstração: o cliente "responde" depois da primeira resposta
             if (primeira) {
@@ -290,6 +326,24 @@ const AtendimentoDemo = (function () {
             return Promise.resolve();
         },
 
+        historico: function (id) {
+            var c = achar(id); if (!c) return Promise.resolve({ lista: [] });
+            var f = soNumeros(c.fone), l = c.setor === 'med' ? '' : chaveLocal(c.local);
+            var lista = ANTIGOS.concat(chamados.filter(function (x) { return x.id !== id && x.status === 'fechado'; }))
+                .filter(function (h) { return h.setor === c.setor && h.id !== id; })
+                .map(function (h) {
+                    var porFone = f && soNumeros(h.fone) === f, porLocal = l && chaveLocal(h.local) === l;
+                    if (!porFone && !porLocal) return null;
+                    var r = resumoDe(h); r.por = porFone ? 'telefone' : 'unidade'; return r;
+                }).filter(Boolean)
+                .sort(function (a, b) { return String(b.criado || '').localeCompare(String(a.criado || '')); });
+            return Promise.resolve({ lista: lista });
+        },
+        conversa: function (id) {
+            var h = ANTIGOS.find(function (x) { return x.id === id; }) || achar(id);
+            return Promise.resolve(h ? h.msgs.slice() : []);
+        },
+
         avaliacoes: function (setor) {
             return Promise.resolve(avaliacoes.filter(function (a) { return a.setor === setor; }));
         },
@@ -425,6 +479,8 @@ const Atendimento = {
             self.desenhar();
         });
         this.montar(el);
+        // Voltando do Gerador de senhas: abre o chamado para onde o acesso foi enviado
+        try { var volta = Number(sessionStorage.getItem('at-abrir')); sessionStorage.removeItem('at-abrir'); if (volta) this.sel = volta; } catch (e) {}
         this.desenhar();
         if (!demo && p) this.ligarTempoReal(p);   // depois de montar: precisa do selo e do contador na tela
         if (!demo && CadastrosDB.faltando) this.aviso('⚠️ Falta o arquivo js/atendimento-db.js: cadastros e equipe online desligados.');
@@ -512,19 +568,19 @@ const Atendimento = {
               '<div class="at-topo">' +
                 '<button type="button" class="sec at-menu-btn" id="atMenu"></button>' +
                 '<h1>Atendimento</h1>' +
-                (this.demo ? '<span class="at-demo" title="' + Docs.esc(Auth.motivoDemo()) + '">Modo demonstração (passe o mouse para ver o motivo)</span>'
+                (this.demo ? '<span class="at-demo" title="' + Docs.esc(Auth.motivoDemo()) + '">Demonstração</span>'
                            : (this.chamadosReais ? '' : '<span class="at-demo at-demo-info" title="' + Docs.esc('Os chamados da fila ainda são exemplos (cada pessoa vê a sua cópia). ' + (this.motivoExemplo || '')) + '">Chamados de exemplo</span>')) +
                 '<div class="at-setores" role="tablist" aria-label="Setor">' +
                   this.setores.map(function (st) { return '<button type="button" data-setor="' + st + '">' + (st === 'med' ? 'Suporte Médico' : 'Implantação') + '</button>'; }).join('') +
                 '</div>' +
                 '<span class="at-equipe" id="atEquipe"></span>' +
-                (this.demo ? '' : '<button type="button" class="sec at-menu-btn" id="atCadastros">📋 Cadastros <span class="at-badge hidden" id="atCadBadge">0</span></button>') +
-                '<button type="button" class="sec at-menu-btn" id="atAvaliacoes">⭐ Avaliações</button>' +
+                (this.demo ? '' : '<button type="button" class="sec at-menu-btn" id="atCadastros" title="Cadastros recebidos">📋 <span class="at-badge hidden" id="atCadBadge">0</span></button>') +
+                '<button type="button" class="sec at-menu-btn" id="atAvaliacoes" title="Avaliações">⭐</button>' +
                 '<button type="button" class="sec at-menu-btn" id="atSom"></button>' +
                 (this.chamadosReais && typeof Implantacoes !== 'undefined' ? '<button type="button" class="sec at-menu-btn" id="atVista">🏗 Implantações</button>' : '') +
                 (this.chamadosReais ? '<button type="button" id="atNovoChamado" title="Registrar um atendimento que chegou pelo WhatsApp normal, telefone, e-mail...">+ Novo chamado</button>' : '') +
-                '<button type="button" class="sec" id="atSimular" title="Cria um chamado de teste na fila, como se um cliente tivesse chamado">+ Simular contato' + (this.chamadosReais ? ' (teste)' : '') + '</button>' +
-                '<span class="at-eu"><span class="at-avatar">' + iniciais + '</span>' + nome +
+                '<button type="button" class="sec" id="atSimular" title="Cria um chamado de teste na fila, como se um cliente tivesse chamado">🧪 Simular</button>' +
+                '<span class="at-eu" title="' + nome + '"><span class="at-avatar">' + iniciais + '</span>' +
                   (this.ehAdmin && !this.demo ? '<span class="at-papel">Admin</span>' : '') + '</span>' +
                 (this.demo ? '' : '<button type="button" class="sec at-menu-btn" id="atSair">Sair</button>') +
               '</div>' +
@@ -578,7 +634,8 @@ const Atendimento = {
         var btnMenu = el.querySelector('#atMenu');
         var aplicarMenu = function (recolhido) {
             document.body.classList.toggle('menu-recolhido', recolhido);
-            btnMenu.textContent = recolhido ? '☰ Mostrar menu' : '« Recolher menu';
+            btnMenu.textContent = recolhido ? '☰' : '«';
+            btnMenu.title = recolhido ? 'Mostrar menu' : 'Recolher menu';
             btnMenu.setAttribute('aria-expanded', String(!recolhido));
             try { localStorage.setItem('at-menu-recolhido', recolhido ? '1' : '0'); } catch (e) {}
         };
@@ -596,7 +653,8 @@ const Atendimento = {
         var btnSom = el.querySelector('#atSom');
         var mostrarSom = function () {
             var on = AtendimentoSom.ligado();
-            btnSom.textContent = on ? '🔔 Som ligado' : '🔕 Som desligado';
+            btnSom.textContent = on ? '🔔' : '🔕';
+            btnSom.title = on ? 'Som ligado (clique para desligar)' : 'Som desligado (clique para ligar)';
             btnSom.setAttribute('aria-pressed', String(on));
         };
         mostrarSom();
@@ -660,12 +718,18 @@ const Atendimento = {
                 Promise.resolve(AtendimentoDados.transferir(id, b.dataset.para)).then(function () { self.desenhar(); }).catch(falhou);
             if (b.dataset.acao === 'devolver') AtendimentoDados.devolver(id).then(function () { self.sel = null; self.desenhar(); }).catch(function (e2) { alert(e2.message); });
             if (b.dataset.acao === 'ampliar') self.ampliar(b.dataset.src, b.dataset.nome);
+            if (b.dataset.acao === 'historico') self.abrirHistorico(self.ultimoChat);
             if (b.dataset.acao === 'solicitar-cadastro') self.abrirSolicitarCadastro(id);
             if (b.dataset.acao === 'simular-form') self.simularFormulario(b.dataset.token, b.dataset.link);
             if (b.dataset.acao === 'cpf') { var cel = b.parentNode.querySelector('.at-cpf'); var vis = cel.dataset.vis === '1';
                 cel.textContent = vis ? cel.dataset.mask : cel.dataset.full; cel.dataset.vis = vis ? '0' : '1'; b.textContent = vis ? 'mostrar' : 'ocultar'; }
             if (b.dataset.acao === 'copiar-ficha') self.copiarFicha(Number(b.dataset.i), b);
             if (b.dataset.acao === 'csv-ficha') self.exportarFicha(Number(b.dataset.i));
+            if (b.dataset.acao === 'gerar-acesso') self.gerarAcesso(Number(b.dataset.i));
+            if (b.dataset.acao === 'ver-senha') {
+                var sp = b.previousElementSibling, vis = sp.dataset.vis === '1';
+                sp.textContent = vis ? '••••••••' : sp.dataset.full; sp.dataset.vis = vis ? '0' : '1'; b.textContent = vis ? 'mostrar' : 'ocultar';
+            }
             if (b.dataset.acao === 'cadastrado') Promise.resolve(AtendimentoDados.marcarCadastrado(self.sel, Number(b.dataset.i))).catch(falhou);
             if (b.dataset.acao === 'lote-um') Promise.resolve(AtendimentoDados.marcarLote(self.sel, Number(b.dataset.i), Number(b.dataset.u))).catch(falhou);
             if (b.dataset.acao === 'lote-todos') Promise.resolve(AtendimentoDados.marcarLote(self.sel, Number(b.dataset.i), 'todos')).catch(falhou);
@@ -743,16 +807,16 @@ const Atendimento = {
     },
 
     // ---------- Colunas com largura ajustável (arrastar o divisor) ----------
-    LARGURA_PADRAO: 290, LARGURA_MIN: 200, LARGURA_MAX: 560,
+    LARGURA_PADRAO: 236, LARGURA_MIN: 180, LARGURA_MAX: 520,
 
     ativarDivisores: function (el) {
         var self = this, salvas = {};
-        try { salvas = JSON.parse(localStorage.getItem('at-larguras') || '{}'); } catch (e) {}
+        try { salvas = JSON.parse(localStorage.getItem('at-larguras-v2') || '{}'); } catch (e) {}
         var limitar = function (w) { return Math.max(self.LARGURA_MIN, Math.min(self.LARGURA_MAX, Math.round(w))); };
         var aplicar = function (col, w) {
             col.style.width = limitar(w) + 'px';
             salvas[col.id] = limitar(w);
-            try { localStorage.setItem('at-larguras', JSON.stringify(salvas)); } catch (e) {}
+            try { localStorage.setItem('at-larguras-v2', JSON.stringify(salvas)); } catch (e) {}
         };
 
         el.querySelectorAll('.at-divisor').forEach(function (div) {
@@ -1178,7 +1242,8 @@ const Atendimento = {
             '<div class="at-checks">' + checks.map(function (c) { return '<span class="' + (c[1] ? 'ok' : 'ruim') + '">' + (c[1] ? '✓ ' : '✗ ') + c[0] + (c[1] ? '' : ' inválido') + '</span>'; }).join('') + '</div>' +
             '<div class="at-ficha-acoes">' +
               '<button type="button" class="sec" data-acao="copiar-ficha" data-i="' + i + '">Copiar dados</button>' +
-              '<button type="button" class="sec" data-acao="csv-ficha" data-i="' + i + '" title="Planilha para importar no Gerador de senhas">CSV p/ Gerador de senhas</button>' +
+              (feito ? '' : '<button type="button" data-acao="gerar-acesso" data-i="' + i + '" title="Abre o Gerador de senhas já com este usuário; de lá você envia o acesso ao cliente">🔑 Gerar acesso</button>') +
+              '<button type="button" class="sec" data-acao="csv-ficha" data-i="' + i + '" title="Planilha para importar no Gerador de senhas">CSV</button>' +
               (feito ? '' : '<button type="button" data-acao="cadastrado" data-i="' + i + '">Marcar como cadastrado</button>') +
             '</div>' +
             '<small class="tag">Recebido por ' + esc(m.origem || '') + ' · ' + esc(m.hora) + ' · visível só para a equipe</small>' +
@@ -1220,12 +1285,35 @@ const Atendimento = {
             (l.responsavel && l.responsavel.nome ? '<small class="tag">Enviado por ' + esc(l.responsavel.nome) + (l.responsavel.email ? ' · ' + esc(l.responsavel.email) : '') + (l.responsavel.telefone ? ' · ' + esc(l.responsavel.telefone) : '') + '</small>' : '') +
             '<div class="at-lote-wrap"><table class="at-lote"><thead><tr><th>#</th><th>Nome</th><th>E-mail</th><th>Função</th><th>CPF</th><th>Conferência</th><th></th></tr></thead><tbody>' + linhas + '</tbody></table></div>' +
             '<div class="at-ficha-acoes">' +
-              '<button type="button" class="sec" data-acao="lote-csv" data-i="' + i + '" title="Planilha para importar no Gerador de senhas (aba Implantação)">CSV p/ Gerador de senhas</button>' +
+              (tudo ? '' : '<button type="button" data-acao="gerar-acesso" data-i="' + i + '" title="Abre o Gerador de senhas com os usuários válidos ainda não cadastrados">🔑 Gerar acessos</button>') +
+              '<button type="button" class="sec" data-acao="lote-csv" data-i="' + i + '" title="Planilha para importar no Gerador de senhas (aba Implantação)">CSV</button>' +
               '<button type="button" class="sec" data-acao="lote-copiar" data-i="' + i + '">Copiar tabela</button>' +
               (tudo ? '' : '<button type="button" data-acao="lote-todos" data-i="' + i + '">Marcar todos como cadastrados</button>') +
             '</div>' +
             '<small class="tag">Recebido por formulário · ' + esc(m.hora) + ' · visível só para a equipe</small>' +
         '</div>';
+    },
+
+    // Leva os usuários da ficha para o Gerador de senhas; de lá o acesso é enviado de volta a este chamado
+    gerarAcesso: function (i) {
+        var self = this, c = this.ultimoChat, m = c && c.msgs[i]; if (!m) return;
+        var usuarios = m.de === 'cadastro'
+            ? [{ nome: m.dados.nome, email: m.dados.email }]
+            : m.lote.usuarios.filter(function (u) { return u.status !== 'cadastrado' && !self.checarPessoa(u).length; })
+                             .map(function (u) { return { nome: u.nome, email: u.email }; });
+        usuarios = usuarios.filter(function (u) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(u.email || ''); });
+        if (!usuarios.length) { alert('Nenhum usuário com e-mail válido para gerar acesso.'); return; }
+        try { sessionStorage.setItem('pw-handoff', JSON.stringify({ chamado: c.id, cliente: c.nome + (c.local ? ' · ' + c.local : ''), usuarios: usuarios })); } catch (e) {}
+        location.hash = '#/senhas';
+    },
+
+    // Mensagem de acesso: a senha fica escondida no painel (clique em "mostrar" para ver)
+    textoAcesso: function (texto, esc) {
+        return String(texto || '').split('\n').map(function (linha) {
+            var m = linha.match(/^(\s*senha[^:]*:\s*)(\S.*)$/i);
+            if (!m) return esc(linha);
+            return esc(m[1]) + '<span class="at-senha" data-full="' + esc(m[2]) + '">••••••••</span> <button type="button" class="at-link" data-acao="ver-senha">mostrar</button>';
+        }).join('\n');
     },
 
     // CSV do lote (só os válidos), no formato que o Gerador de senhas importa
@@ -1327,6 +1415,93 @@ const Atendimento = {
     },
 
     // Janela por cima do painel (fecha no ✕, no fundo ou com Esc)
+    // ---------- Chamados anteriores do cliente ----------
+    HIST_VALIDADE_MS: 60 * 1000,
+    carregarHistorico: function (c) {
+        if (!AtendimentoDados.historico || !c) return;
+        this.histCache = this.histCache || {};
+        var self = this, cache = this.histCache[c.id];
+        if (cache && Date.now() - cache.t < this.HIST_VALIDADE_MS) { this.desenharHistBanner(c, cache.res); return; }
+        if (cache && cache.buscando) return;
+        this.histCache[c.id] = { t: 0, buscando: true, res: cache && cache.res };
+        if (cache && cache.res) this.desenharHistBanner(c, cache.res);
+        Promise.resolve(AtendimentoDados.historico(c.id)).then(function (res) {
+            self.histCache[c.id] = { t: Date.now(), res: res };
+            if (self.sel === c.id) self.desenharHistBanner(c, res);
+        }).catch(function (e) { self.histCache[c.id] = { t: Date.now(), res: { lista: [] } }; console.warn('Histórico:', e.message); });
+    },
+    dataCurta: function (iso) {
+        if (!iso) return '';
+        var d = new Date(iso), dias = Math.floor((Date.now() - d.getTime()) / 86400000);
+        var txt = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' });
+        return txt + (dias <= 0 ? ' (hoje)' : dias === 1 ? ' (ontem)' : ' (há ' + dias + ' dias)');
+    },
+    desenharHistBanner: function (c, res) {
+        // Só um botão discreto ao lado do nome do cliente; o histórico abre ao clicar
+        var lista = (res && res.lista) || [];
+        var velho = document.getElementById('atHistBtn'); if (velho) velho.remove();
+        var quem = document.querySelector('#atChatTopo .at-quem strong');
+        if (!quem || !lista.length) return;
+        quem.insertAdjacentHTML('afterend', '<button type="button" class="at-hist-btn" id="atHistBtn" data-acao="historico" title="Ver os ' +
+            lista.length + ' chamado(s) anteriores deste cliente">🕘 ' + lista.length + '</button>');
+    },
+    abrirHistorico: function (c) {
+        if (!c) return;
+        var self = this, esc = Docs.esc.bind(Docs);
+        var cache = this.histCache && this.histCache[c.id], lista = (cache && cache.res && cache.res.lista) || [];
+        var rot = function (h) {
+            if (h.status !== 'fechado') return h.status === 'fila' ? 'Na fila' : 'Em atendimento';
+            return h.nota ? 'Encerrado · nota ' + h.nota + ' ★' : 'Encerrado';
+        };
+        this.modal(
+            '<h2>🕘 Histórico do cliente</h2>' +
+            '<p class="tag">' + esc(c.nome) + (c.local ? ' · ' + esc(c.local) : '') + '. Chamados anteriores com o mesmo telefone' + (c.setor === 'med' ? '' : ' ou da mesma unidade') + '.</p>' +
+            '<div class="at-hist-lista">' + lista.map(function (h) {
+                return '<article class="at-hist-item">' +
+                    '<header><strong>' + esc(self.dataCurta(h.criado)) + '</strong>' +
+                      '<span>' + esc(h.nome || '') + (h.atendente ? ' · atendido por ' + esc(h.atendente) : '') + ' · ' +
+                        (h.origem === 'manual' ? '📝 ' + esc(self.rotuloCanal(h.canal)) : 'WhatsApp') + '</span>' +
+                      '<span class="at-status ' + (h.status === 'fechado' ? 'at-status-fechado' : 'at-status-fila') + '">' + esc(rot(h)) + '</span>' +
+                      '<span class="tag">' + (h.por === 'telefone' ? 'mesmo telefone' : 'mesma unidade') + '</span></header>' +
+                    (h.motivo ? '<p><b>Pedido:</b> ' + esc(h.motivo) + '</p>' : '') +
+                    (h.resposta ? '<p><b>Última resposta:</b> ' + esc(h.resposta) + '</p>' : '') +
+                    (h.nota_interna ? '<p class="at-hist-combinado"><b>📌 Nota interna:</b> ' + esc(h.nota_interna) + '</p>' : '') +
+                    (h.comentario ? '<p><b>Comentário na avaliação:</b> ' + esc(h.comentario) + '</p>' : '') +
+                    '<button type="button" class="sec" data-hist-ver="' + h.id + '">Ver conversa</button>' +
+                    '<div class="at-hist-conversa hidden" id="atHistConv' + h.id + '"></div>' +
+                '</article>';
+            }).join('') + '</div>', true);
+        var caixa = document.querySelector('.at-modal-fundo:last-of-type .at-hist-lista');
+        if (!caixa) return;
+        caixa.addEventListener('click', function (e) {
+            var img = e.target.closest('[data-acao="ampliar"]');
+            if (img) { self.ampliar(img.dataset.src, img.dataset.nome); return; }
+            var b = e.target.closest('[data-hist-ver]'); if (!b) return;
+            var id = Number(b.dataset.histVer), alvo = document.getElementById('atHistConv' + id);
+            if (!alvo.classList.contains('hidden')) { alvo.classList.add('hidden'); b.textContent = 'Ver conversa'; return; }
+            alvo.classList.remove('hidden'); b.textContent = 'Esconder conversa';
+            if (alvo.dataset.ok) return;
+            alvo.innerHTML = '<span class="tag">Carregando…</span>';
+            Promise.resolve(AtendimentoDados.conversa(id)).then(function (msgs) {
+                alvo.dataset.ok = '1';
+                alvo.innerHTML = msgs.map(function (m) { return self.msgSoLeitura(m, esc); }).join('') || '<span class="tag">Sem mensagens.</span>';
+            }).catch(function (e2) { alvo.innerHTML = '<span class="tag">Não foi possível carregar: ' + esc(e2.message) + '</span>'; });
+        });
+    },
+    // Mensagem antiga, sem botões de ação
+    msgSoLeitura: function (m, esc) {
+        var img = this.imagemHtml(m.imagem), txt = m.texto ? '<span>' + esc(m.texto) + '</span>' : '', hora = '<time>' + esc(m.hora || '') + '</time>';
+        if (m.de === 'nota') return '<div class="at-nota">' + esc(m.texto) + ' · ' + esc(m.hora || '') + '</div>';
+        if (m.de === 'bot') return '<div class="at-msg at-msg-bot"><small>Mensagem automática</small>' + esc(m.texto) + hora + '</div>';
+        if (m.de === 'interna') return '<div class="at-msg at-msg-interna"><small>🔒 Nota interna · ' + esc(m.autor || '') + '</small>' + img + txt + hora + '</div>';
+        if (m.de === 'agente') return '<div class="at-msg at-msg-agente"><small>' + esc(m.autor || '') + '</small>' + img + txt + hora + '</div>';
+        if (m.de === 'cliente') return '<div class="at-msg at-msg-cliente">' + img + txt + hora + '</div>';
+        if (m.de === 'formulario') return '<div class="at-nota">📋 Link de cadastro enviado · ' + esc(m.hora || '') + '</div>';
+        if (m.de === 'cadastro') return '<div class="at-nota">📋 Cadastro recebido: ' + esc((m.dados && m.dados.nome) || '') + ' · ' + esc(m.hora || '') + '</div>';
+        if (m.de === 'cadastro-lote') return '<div class="at-nota">📋 Cadastro em lote recebido (' + ((m.lote && m.lote.usuarios) || []).length + ' usuários) · ' + esc(m.hora || '') + '</div>';
+        return '';
+    },
+
     modal: function (html, largo) {
         var fundo = document.createElement('div');
         fundo.className = 'at-modal-fundo';
@@ -1586,7 +1761,7 @@ const Atendimento = {
         var esc = Docs.esc.bind(Docs);
         var conversa = c.msgs.filter(function (m) { return m.de === 'cliente' || m.de === 'agente'; });
         var ult = conversa[conversa.length - 1];
-        var resumo = ult ? (ult.de === 'agente' ? 'Você: ' : '') + (ult.texto || (ult.imagem ? '📷 Imagem' : '')) : '';
+        var resumo = ult ? (ult.de === 'agente' ? 'Você: ' : '') + (ult.acesso ? '🔑 Acesso enviado' : (ult.texto || (ult.imagem ? '📷 Imagem' : ''))) : '';
         var ativo = c.id === this.sel ? ' ativo' : '';
         var corpo =
             '<button type="button" class="at-abrir" data-acao="abrir" data-id="' + c.id + '">' +
@@ -1655,7 +1830,7 @@ const Atendimento = {
         if (av && av.status === 'aguardando') rotuloFechado = 'Encerrado · aguardando avaliação';
         else if (av && av.nota) rotuloFechado = 'Encerrado · nota ' + av.nota + ' ★';
         topo.innerHTML =
-            '<div class="at-quem"><strong>' + esc(c.nome) + '</strong><span>' + esc(c.local) +
+            '<div class="at-quem"><div class="at-quem-linha"><strong>' + esc(c.nome) + '</strong></div><span>' + esc(c.local) +
               (c.origem === 'manual' ? (c.fone && c.fone !== '—' ? ' · ' + esc(c.fone) : '') + ' · 📝 via ' + esc(this.rotuloCanal(c.canal)) + (c.registradoPor ? ' (registrado por ' + esc(c.registradoPor) + ')' : '')
                                      : ' · WhatsApp ' + esc(c.fone)) + '</span></div>' +
             (fechado
@@ -1689,13 +1864,17 @@ const Atendimento = {
             if (m.de === 'nota') return '<div class="at-nota">' + esc(m.texto) + ' · ' + esc(m.hora) + '</div>';
             if (m.de === 'bot') return '<div class="at-msg at-msg-bot"><small>Mensagem automática</small>' + esc(m.texto) + '<time>' + esc(m.hora) + '</time></div>';
             if (m.de === 'interna') return '<div class="at-msg at-msg-interna"><small>🔒 Nota interna · ' + esc(m.autor || '') + ' · o cliente não vê</small>' + img + txt + '<time>' + esc(m.hora) + '</time></div>';
-            if (m.de === 'agente') return '<div class="at-msg at-msg-agente"><small>' + esc(m.autor || '') + '</small>' + img + txt + '<time>' + esc(m.hora) + '</time></div>';
+            if (m.de === 'agente') {
+                if (m.acesso) txt = '<span>' + self.textoAcesso(m.texto, esc) + '</span>';
+                return '<div class="at-msg at-msg-agente"><small>' + esc(m.autor || '') + (m.acesso ? ' · 🔑 acesso enviado' : '') + '</small>' + img + txt + '<time>' + esc(m.hora) + '</time></div>';
+            }
             return '<div class="at-msg at-msg-cliente">' + img + txt + '<time>' + esc(m.hora) + '</time></div>';
         }).join('');
         if (c.origem === 'manual') html = '<div class="at-manual-aviso">📝 Chamado registrado manualmente (contato por ' + esc(this.rotuloCanal(c.canal)) + '). As mensagens ficam só no histórico: nada é enviado ao cliente por aqui.</div>' + html;
         if (this.digitandoId === c.id) html += '<div class="at-digitando">' + esc(c.nome) + ' está digitando…</div>';
         msgs.innerHTML = html;
         msgs.scrollTop = msgs.scrollHeight;
+        this.carregarHistorico(c);
 
         // Conversa ainda não carregada (dados reais): pede e redesenha quando chegar
         if (c.carregado === false && AtendimentoDados.abrir) AtendimentoDados.abrir(c.id);

@@ -470,3 +470,68 @@ body.at-redimensionando{cursor:col-resize;user-select:none}
 
 /* Imagem do chamado ainda gerando link seguro */
 .at-img-carregando{display:inline-block;padding:10px 14px;border:1px dashed var(--line);border-radius:8px;color:var(--mut);font-size:.85rem}
+
+/* Histórico do cliente (chamados anteriores) */
+.at-quem-linha{display:flex;align-items:center;gap:6px}
+.at-hist-btn{padding:0 6px;font-size:11px;line-height:18px;border-radius:999px;background:transparent;border:1px solid var(--line);color:var(--mut);cursor:pointer}
+.at-hist-btn:hover{border-color:var(--acc);color:var(--acc)}
+.at-hist-combinado{color:var(--txt);background:rgba(255,193,7,.10);border-radius:6px;padding:4px 8px}
+.at-hist-lista{display:flex;flex-direction:column;gap:12px;max-height:65vh;overflow:auto;padding-right:4px}
+.at-hist-item{border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.at-hist-item header{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:6px}
+.at-hist-item header span:not(.at-status){color:var(--mut);font-size:.85rem}
+.at-hist-item p{margin:4px 0;overflow-wrap:anywhere}
+.at-hist-item > button{margin-top:6px;padding:4px 10px;font-size:.82rem}
+.at-hist-conversa{margin-top:8px;padding:8px;border-top:1px dashed var(--line);display:flex;flex-direction:column;gap:6px}
+
+/* ===== Painel compacto: menos espaço nas bordas, mais espaço para o chat ===== */
+.at-topo{gap:8px;padding:6px 12px}
+.at-topo h1{font-size:16px;margin-right:2px}
+.at-topo button,.at-topo .btn{padding:4px 9px;font-size:12.5px}
+.at-topo .tag,.at-demo{font-size:11.5px}
+.at-setores{padding:2px;border-radius:8px}
+.at-setores button{padding:3px 10px;font-size:12.5px}
+.at-equipe{font-size:12px}
+.at-eu{font-size:13px;gap:6px}
+.at-avatar{width:24px;height:24px;font-size:10px}
+.at-col{width:236px}
+.at-col-topo{padding:8px 10px 4px}
+.at-col-topo h2{font-size:13px}
+.at-conta{font-size:11px;padding:1px 7px}
+.at-lista{padding:2px 8px 10px;gap:5px}
+.at-cartao{padding:6px 9px;gap:4px;border-radius:8px}
+.at-nome{font-size:13px}
+.at-hora,.at-local{font-size:11px}
+.at-resumo{font-size:12px}
+.at-espera{font-size:11px;padding:1px 6px}
+.at-cartao button{padding:3px 10px;font-size:12px}
+.at-chat-topo{gap:8px;padding:6px 14px}
+.at-quem strong{font-size:14px}
+.at-quem span{font-size:12px}
+.at-chat-topo button{padding:4px 9px;font-size:12px}
+.at-chat-topo .at-hist-btn{padding:0 6px;font-size:11px}
+.at-status{font-size:11px;padding:2px 8px}
+.at-acoes{gap:4px}
+.at-msgs{padding:12px 16px;gap:7px}
+.at-msg{max-width:76%;padding:7px 10px;font-size:13.5px;border-radius:10px}
+.at-msg small,.at-msg time{font-size:10.5px}
+.at-nota{font-size:11.5px}
+.at-envio-box{padding:5px 10px 8px;gap:5px}
+.at-modos button{padding:3px 9px;font-size:12px}
+.at-envio textarea{min-height:36px;padding:7px 12px}
+.at-envio button{padding:7px 14px}
+.at-equipe{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.at-topo #atMenu,.at-topo #atSom,.at-topo #atAvaliacoes,.at-topo #atCadastros{padding:4px 8px}
+.at-abas-fila .tag{display:none}
+.at-clipe,.at-raio{width:34px;height:34px;font-size:15px}
+
+/* Gerador de senhas → enviar acesso pelo Atendimento */
+.pw-handoff{border:1px solid var(--acc);border-left-width:3px;background:var(--card);border-radius:8px;padding:10px 12px;margin:0 0 14px;font-size:14px}
+.pw-atend{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.pw-atend h4{margin:0 0 8px}
+.pw-atend select,.pw-atend textarea{width:100%;margin:4px 0 10px}
+.pw-atend-quem{display:flex;flex-direction:column;gap:2px;margin:4px 0 10px}
+.pw-atend-status{margin:8px 0 0;color:#7fe0a5}
+.at-senha{font-family:ui-monospace,Consolas,monospace}
+.at-msg .at-senha{display:inline}
+.at-msg-agente .at-link{color:#fff;text-decoration:underline;background:transparent;padding:0;font-size:12px;opacity:.9}

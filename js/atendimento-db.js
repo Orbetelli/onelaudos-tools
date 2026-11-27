@@ -156,7 +156,7 @@ const AtendimentoReal = (function () {
         var d = m.dados || {}, base = { msgId: m.id, hora: hora(m.criado_em) };
         switch (m.tipo) {
             case 'cliente':  return Object.assign(base, { de: 'cliente', texto: m.texto, imagem: imagemDe(d) });
-            case 'agente':   return Object.assign(base, { de: 'agente', autor: m.autor_nome, texto: m.texto, imagem: imagemDe(d) });
+            case 'agente':   return Object.assign(base, { de: 'agente', autor: m.autor_nome, texto: m.texto, imagem: imagemDe(d), acesso: !!d.acesso });
             case 'interna':  return Object.assign(base, { de: 'interna', autor: m.autor_nome, texto: m.texto, imagem: imagemDe(d) });
             case 'formulario': return Object.assign(base, { de: 'formulario', token: d.token, formato: d.formato, lote: !!d.lote, link: d.link || '' });
             case 'cadastro': return Object.assign(base, { de: 'cadastro', dados: d.dados || {}, status: d.status || 'pendente', origem: d.origem || 'formulário' });
@@ -376,6 +376,29 @@ const AtendimentoReal = (function () {
             await depois(id, true);
         },
 
+        // Chamados anteriores do mesmo cliente (telefone ou unidade) — 10_historico.sql
+        historico: async function (id) {
+            var r = await cli().rpc('historico_cliente', { p_id: id });
+            if (r.error) {
+                if (/historico_cliente|does not exist|schema cache/i.test(r.error.message)) return { faltaSql: true, lista: [] };
+                throw erro(r);
+            }
+            return { lista: (r.data || []).map(function (h) {
+                return { id: h.id, setor: h.setor, status: h.status, origem: h.origem, canal: h.canal,
+                         nome: h.cliente_nome, local: h.cliente_local, atendente: h.atendente_nome,
+                         criado: h.criado_em, encerrado: h.encerrado_em, nota: h.avaliacao_nota, comentario: h.avaliacao_comentario,
+                         motivo: h.motivo, nota_interna: h.ultima_nota, resposta: h.ultima_resposta, por: h.por };
+            }) };
+        },
+        // Conversa completa de um chamado antigo (só leitura)
+        conversa: async function (id) {
+            var r = await cli().from('mensagens').select('*').eq('chamado_id', id).order('id', { ascending: true }).limit(1000);
+            if (r.error) throw erro(r);
+            var lista = (r.data || []).map(converter);
+            await assinar(lista);
+            return lista;
+        },
+
         avaliacoes: async function (setor) {
             var r = await cli().from('chamados').select('cliente_nome, cliente_local, setor, atendente_nome, avaliacao_nota, avaliacao_comentario, encerrado_em')
                 .eq('setor', setor).not('avaliacao_nota', 'is', null).order('encerrado_em', { ascending: false }).limit(300);
@@ -385,6 +408,48 @@ const AtendimentoReal = (function () {
                          nota: a.avaliacao_nota, comentario: a.avaliacao_comentario || '',
                          quando: new Date(a.encerrado_em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) };
             });
+        }
+    };
+})();
+
+// ============================================================
+// Envio de acesso (login + senha temporária) a partir do Gerador de senhas
+// Funciona fora da tela do Atendimento: usa o login (Auth) direto.
+// Sem Supabase configurado, usa os chamados de exemplo (demonstração).
+// ============================================================
+window.AcessoChamado = (function () {
+    function demo() { return !(typeof Auth !== 'undefined' && Auth.configurado()); }
+    function rotulo(c) { return c.nome + (c.local ? ' · ' + c.local : ''); }
+
+    return {
+        // 'ok' | 'deslogado' | 'demo'
+        situacao: async function () {
+            if (demo()) return typeof AtendimentoDemo !== 'undefined' ? 'demo' : 'deslogado';
+            try { return (await Auth.estado()) === 'ok' ? 'ok' : 'deslogado'; } catch (e) { return 'deslogado'; }
+        },
+        // Chamados que estão comigo agora
+        meusAbertos: async function () {
+            if (demo()) {
+                var todos = [];
+                for (var st of ['impl', 'med']) todos = todos.concat(await AtendimentoDemo.listar(st));
+                return todos.filter(function (c) { return c.status === 'meu'; })
+                            .map(function (c) { return { id: c.id, rotulo: rotulo(c), manual: c.origem === 'manual' }; });
+            }
+            var eu = Auth.perfil();
+            var r = await Auth.cliente().from('chamados').select('id, cliente_nome, cliente_local, origem')
+                .eq('status', 'atendimento').eq('atendente_id', eu.id).order('ultima_msg_em', { ascending: false }).limit(50);
+            if (r.error) throw new Error(/does not exist|schema cache/i.test(r.error.message) ? 'O Atendimento ainda não foi instalado (supabase/06).' : r.error.message);
+            return (r.data || []).map(function (c) {
+                return { id: c.id, rotulo: rotulo({ nome: c.cliente_nome, local: c.cliente_local }), manual: c.origem === 'manual' };
+            });
+        },
+        // Manda a mensagem como resposta do atendente; marcada como "acesso" (a senha aparece mascarada no painel)
+        enviar: async function (id, texto, emails) {
+            if (demo()) return AtendimentoDemo.enviar(id, texto, { acesso: true });
+            var eu = Auth.perfil();
+            var r = await Auth.cliente().from('mensagens').insert({ chamado_id: id, tipo: 'agente', autor_id: eu.id, autor_nome: eu.nome,
+                texto: texto, dados: { acesso: { emails: emails || [] } } });
+            if (r.error) throw new Error(/row-level security|violates/i.test(r.error.message) ? 'Este chamado não está mais com você.' : r.error.message);
         }
     };
 })();
